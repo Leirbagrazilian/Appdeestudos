@@ -26,8 +26,8 @@
   const delAula = (i) => { app.cfg.rotina.aulas.splice(i, 1); salvar(); };
 </script>
 
-<h1>Ajustes</h1>
-<p class="msg muted" role="status">{msg}</p>
+<header class="pg"><p class="data">Preferências</p><h1>Ajustes</h1></header>
+<p class="msg sub" role="status">{msg}</p>
 
 <h2>Tema</h2>
 <section class="card bloco">

@@ -3,7 +3,7 @@
   import Chips from '../components/Chips.svelte';
   import { fmtBR } from '../lib/dates.js';
 
-  const CORES = ['#1d4f91', '#c2410c', '#0b7a6f', '#9d2b5b', '#7c3aed', '#4d7c0f'];
+  const CORES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
   let form = $state(false), data = $state(app.dia), concurso = $state('efomm'), notas = $state({});
   const exs = $derived(Object.values(app.exams).sort((a, b) => a.data.localeCompare(b.data)));
   const media = (e) => { const v = Object.values(e.notas); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
@@ -22,7 +22,7 @@
   }
 </script>
 
-<header><h1>Simulados</h1><p class="muted">Nota em % por matéria. O gráfico mostra a evolução.</p></header>
+<header class="pg"><p class="data">Desempenho</p><h1>Simulados</h1><p class="sub">Nota em % por matéria. O gráfico mostra a evolução.</p></header>
 
 {#if !form}<button class="novo" onclick={() => (form = true)}>＋ Registrar simulado</button>
 {:else}
@@ -49,9 +49,9 @@
     <ul class="leg">{#each series as s}<li><i style="background:{s.cor}"></i>{s.nome}</li>{/each}</ul>
   </section>
   <h2>Histórico</h2>
-  <ul class="lista">
+  <ul class="grupo card">
     {#each [...exs].reverse() as e}
-      <li class="card it"><span class="t"><strong>{nomeC(e.concurso)} · {Math.round(media(e))}% de média</strong>
+      <li class="it"><span class="t"><strong>{nomeC(e.concurso)} · {Math.round(media(e))}% de média</strong>
         <span class="muted">{fmtBR(e.data)} · {Object.entries(e.notas).map(([m, v]) => `${m} ${v}`).join(' · ')}</span></span>
         <button class="x" aria-label="Apagar simulado de {fmtBR(e.data)}" onclick={() => delExame(e.id)}>✕</button></li>
     {/each}
@@ -59,7 +59,6 @@
 {/if}
 
 <style>
-  header { padding: 8px 4px; }
   .novo { width: 100%; min-height: 48px; border-radius: 14px; background: var(--ac); color: var(--ac-tx); font-weight: 700; margin-top: 12px; }
   .f { padding: 16px; display: grid; gap: 12px; margin-top: 12px; }
   input { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
@@ -68,7 +67,6 @@
   .sec { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; }
   .g { padding: 12px; } svg { width: 100%; height: auto; }
   .leg { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: .8rem; margin-top: 8px; } .leg i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
-  .lista { list-style: none; padding: 0; display: grid; gap: 8px; }
-  .it { display: flex; align-items: center; padding: 8px 8px 8px 16px; } .t { flex: 1; display: grid; }
+  .it { display: flex; align-items: center; padding: 8px 8px 8px 16px; min-height: 60px; } .t { flex: 1; display: grid; } .t .muted { font-size: .85rem; }
   .x { width: 44px; height: 44px; color: var(--tx2); }
 </style>

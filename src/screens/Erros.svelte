@@ -18,8 +18,8 @@
   async function salvar(ev) { ev.preventDefault(); if (!pode) return; await addErro({ materia, assunto, tipo }); assunto = ''; form = false; }
 </script>
 
-<header><h1>Caderno de erros</h1>
-  <p class="muted">{todos.length ? `${todos.length} registrados. ${resumo}` : 'Registre cada erro em 3 toques. Ele volta como revisão em 1, 7 e 30 dias.'}</p></header>
+<header class="pg"><p class="data">Caderno</p><h1>Erros</h1>
+  <p class="sub">{todos.length ? `${todos.length} registrados. ${resumo}` : 'Registre cada erro em 3 toques. Ele volta como revisão em 1, 7 e 30 dias.'}</p></header>
 
 {#if !form}
   <button class="novo" onclick={() => (form = true)}>＋ Registrar erro</button>
@@ -40,16 +40,15 @@
     <Chips opcoes={[{ id: '', nome: 'Todos os tipos' }, ...tipos]} bind:valor={fTipo} rotulo="Filtrar por tipo" />
   </div>
   <h2>Registros</h2>
-  <ul class="lista">
+  <ul class="grupo card">
     {#each lista as e (e.id)}
-      <li class="card it"><span class="t"><strong>{e.assunto}</strong><span class="muted">{e.materia} · {nomeTipo(e.tipo)} · {fmtCurta(e.dia)}</span></span>
+      <li class="it"><span class="t"><strong>{e.assunto}</strong><span class="muted">{e.materia} · {nomeTipo(e.tipo)} · {fmtCurta(e.dia)}</span></span>
         <button aria-label="Apagar {e.assunto}" class="x" onclick={() => delErro(e.id)}>✕</button></li>
     {:else}<li class="muted">Nenhum erro com esse filtro.</li>{/each}
   </ul>
 {/if}
 
 <style>
-  header { padding: 8px 4px; }
   .novo { width: 100%; min-height: 48px; border-radius: 14px; background: var(--ac); color: var(--ac-tx); font-weight: 700; margin-top: 12px; }
   .novo:disabled { opacity: .45; }
   .f { padding: 16px; display: grid; gap: 12px; margin-top: 12px; }
@@ -57,7 +56,6 @@
   .acoes { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; } .acoes .novo { margin: 0; }
   .sec { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; }
   .filtros { display: grid; gap: 8px; }
-  .lista { list-style: none; padding: 0; display: grid; gap: 8px; }
-  .it { display: flex; align-items: center; padding: 8px 8px 8px 16px; } .t { flex: 1; display: grid; }
+  .it { display: flex; align-items: center; padding: 8px 8px 8px 16px; min-height: 60px; } .t { flex: 1; display: grid; } .t .muted { font-size: .85rem; }
   .x { width: 44px; height: 44px; color: var(--tx2); font-size: 1.1rem; }
 </style>
