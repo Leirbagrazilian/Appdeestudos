@@ -5,11 +5,19 @@
     },
     "i-have-adhd": {
       "source": { "source": "github", "repo": "ayghri/i-have-adhd" }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" }
+    },
+    "nyldn-plugins": {
+      "source": { "source": "github", "repo": "nyldn/plugins" }
     }
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "andrej-karpathy-skills@karpathy-skills": true,
-    "i-have-adhd@i-have-adhd": true
+    "i-have-adhd@i-have-adhd": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "octo@nyldn-plugins": true
   }
 }
