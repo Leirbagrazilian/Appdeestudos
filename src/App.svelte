@@ -1,5 +1,6 @@
 <script>
   import { app, iniciar } from './stores/app.svelte.js';
+  import Enxame from './components/Enxame.svelte';
   import Hoje from './screens/Hoje.svelte';
   import Semana from './screens/Semana.svelte';
   import Calendario from './screens/Calendario.svelte';
@@ -22,6 +23,7 @@
   iniciar();
 </script>
 
+<Enxame />
 <main>
   {#if !app.pronto}
     <p class="muted">Carregando…</p>
@@ -36,7 +38,7 @@
 
 {#if app.toast}
   <div class="toast" role="status">
-    <span>{app.toast.msg}</span>
+    <span class="tx"><strong>{app.toast.msg}</strong><em>{app.toast.sub}</em></span>
     <button onclick={app.toast.desfazer}>Desfazer</button>
   </div>
 {/if}
@@ -52,11 +54,12 @@
 
 <style>
   main { max-width: 640px; margin: 0 auto; padding: 16px 16px calc(100px + env(safe-area-inset-bottom)); }
-  nav { position: fixed; inset: auto 0 0; display: flex; justify-content: center; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+  nav { z-index: 5; position: fixed; inset: auto 0 0; display: flex; justify-content: center; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
   nav a { flex: 1; max-width: 128px; min-height: 64px; display: grid; place-items: center; align-content: center; gap: 2px; text-decoration: none; color: var(--tx2); font-size: .75rem; font-weight: 500; }
   nav a.ativa { color: var(--ac); font-weight: 700; }
   nav svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 8px 4px 16px; border-radius: 14px; background: var(--card); color: var(--tx); border: 1px solid var(--ac); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sobe .25s ease; }
+  .toast { z-index: 6; position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 8px 4px 16px; border-radius: 14px; background: var(--card); color: var(--tx); border: 1px solid var(--ac); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sobe .25s ease; }
+  .tx { display: grid; padding: 6px 0; } .tx em { color: var(--ac2); font-size: .8rem; font-style: normal; }
   .toast button { min-height: 44px; padding: 0 12px; font-weight: 700; color: var(--ac); }
   @keyframes sobe { from { opacity: 0; transform: translate(-50%, 12px); } }
 </style>
