@@ -68,6 +68,7 @@
     <summary><Icon nome="bulb" />{app.cfg.diagnostico.titulo}: leia antes de começar</summary>
     <p>{app.cfg.diagnostico.intro}</p>
     <ol>{#each app.cfg.diagnostico.como as c}<li>{c}</li>{/each}</ol>
+    <p><a class="lk" href="#/questoes">Onde achar provas e gabaritos →</a></p>
   </details>
 {/if}
 {#if leve}<p class="nota"><Icon nome="moon" />Última semana antes da prova de {leve.nome}: revisão leve. Sem conteúdo novo, durma bem.</p>{/if}
@@ -136,6 +137,7 @@
   .nota { display: block; margin-top: 12px; padding: 12px 16px; border-radius: 14px; background: var(--warn-bg); color: var(--warn); font-size: .9rem; text-decoration: none; font-weight: 500; }
   .nota :global(svg), summary :global(svg) { vertical-align: -3px; margin-right: 8px; }
   .nota summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+  .lk { color: var(--ac); font-weight: 700; }
   .nota p, .nota ol { margin: 8px 0 0; color: var(--tx); } .nota ol { padding-left: 20px; }
   h2 { margin-top: 28px; }
   .lista { list-style: none; padding: 0; overflow: hidden; }

@@ -8,6 +8,7 @@
   import Mais from './screens/Mais.svelte';
   import Simulados from './screens/Simulados.svelte';
   import Ajustes from './screens/Ajustes.svelte';
+  import Questoes from './screens/Questoes.svelte';
 
   const abas = [
     { id: 'hoje', nome: 'Hoje', d: 'M5 12.5l4.5 4.5L19 7.5' },
@@ -33,6 +34,7 @@
   {:else if rota === 'erros'}<Erros />
   {:else if rota === 'simulados'}<Simulados />
   {:else if rota === 'ajustes'}<Ajustes />
+  {:else if rota === 'questoes'}<Questoes />
   {:else}<Mais />{/if}
 </main>
 
@@ -45,7 +47,7 @@
 
 <nav aria-label="Principal">
   {#each abas as a}
-    <a href="#/{a.id}" class:ativa={rota === a.id || (a.id === 'mais' && ['simulados', 'ajustes'].includes(rota))} aria-current={rota === a.id ? 'page' : undefined}>
+    <a href="#/{a.id}" class:ativa={rota === a.id || (a.id === 'mais' && ['simulados', 'ajustes', 'questoes'].includes(rota))} aria-current={rota === a.id ? 'page' : undefined}>
       <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d={a.d} /></svg>
       <span>{a.nome}</span>
     </a>
