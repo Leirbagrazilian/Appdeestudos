@@ -18,6 +18,7 @@
   const ler = () => location.hash.replace('#/', '') || 'hoje';
   let rota = $state(ler());
   $effect(() => { const f = () => (rota = ler()); addEventListener('hashchange', f); return () => removeEventListener('hashchange', f); });
+  $effect(() => { const t = app.cfg.tema ?? 'noir'; document.documentElement.dataset.theme = t; document.querySelector('meta[name=theme-color]')?.setAttribute('content', t === 'noir' ? '#0a0a0c' : '#ffffff'); });
   iniciar();
 </script>
 
@@ -55,7 +56,7 @@
   nav a { flex: 1; max-width: 128px; min-height: 64px; display: grid; place-items: center; align-content: center; gap: 2px; text-decoration: none; color: var(--tx2); font-size: .75rem; font-weight: 500; }
   nav a.ativa { color: var(--ac); font-weight: 700; }
   nav svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 8px 4px 16px; border-radius: 14px; background: #1f2937; color: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.25); animation: sobe .25s ease; }
-  .toast button { min-height: 44px; padding: 0 12px; font-weight: 700; color: #5eead4; }
+  .toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 8px 4px 16px; border-radius: 14px; background: var(--card); color: var(--tx); border: 1px solid var(--ac); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sobe .25s ease; }
+  .toast button { min-height: 44px; padding: 0 12px; font-weight: 700; color: var(--ac); }
   @keyframes sobe { from { opacity: 0; transform: translate(-50%, 12px); } }
 </style>

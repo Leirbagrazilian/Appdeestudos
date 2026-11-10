@@ -80,7 +80,7 @@
   .fases span { position: absolute; top: 26px; height: 30px; color: #fff; font-size: .72rem; font-weight: 600; line-height: 30px; padding: 0 6px; overflow: hidden; white-space: nowrap; border-radius: 8px; border: 1px solid var(--card); }
   .faixa { position: relative; height: 34px; margin-top: 0; }
   .faixa { position: absolute; left: 0; right: 0; }
-  .faixa b { position: absolute; left: 6px; top: -2px; font-size: .7rem; color: var(--c); z-index: 2; background: var(--card); padding: 0 4px; border-radius: 4px; }
+  .faixa b { position: absolute; left: 6px; top: -2px; font-size: .7rem; color: var(--tx); z-index: 2; background: var(--card); padding: 0 6px; border-left: 3px solid var(--c); border-radius: 2px; }
   .faixa i { position: absolute; top: 16px; height: 12px; border-radius: 6px; background: var(--c); }
   .insc { opacity: .45; } .evt { height: 18px !important; top: 13px !important; }
   .hoje { position: absolute; top: 20px; bottom: 0; width: 2px; background: var(--ac); z-index: 3; }
@@ -89,7 +89,7 @@
   .lista { list-style: none; padding: 0; display: grid; gap: 8px; }
   .marco { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-left: 6px solid var(--c); min-height: 56px; }
   .g { color: var(--c); font-size: 1.1rem; width: 1.2em; text-align: center; } .t { flex: 1; display: grid; }
-  @media (prefers-color-scheme: dark) { .g { filter: brightness(1.7); } }
+  .g { filter: brightness(var(--cc)); }
   .st { font-size: .75rem; padding: 4px 10px; border-radius: 99px; background: var(--warn-bg); color: var(--warn); white-space: nowrap; }
   .st.ok { background: var(--ac-bg); color: var(--ac); }
   .verif { display: grid; gap: 8px; } .cc { padding: 16px; border-top: 4px solid var(--c); display: grid; gap: 8px; }

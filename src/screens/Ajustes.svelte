@@ -29,6 +29,15 @@
 <h1>Ajustes</h1>
 <p class="msg muted" role="status">{msg}</p>
 
+<h2>Tema</h2>
+<section class="card bloco">
+  <div class="temas" role="radiogroup" aria-label="Tema">
+    {#each [['noir', 'Noir'], ['claro', 'Claro'], ['auto', 'Automático']] as [id, nome]}
+      <button role="radio" aria-checked={(app.cfg.tema ?? 'noir') === id} class:on={(app.cfg.tema ?? 'noir') === id} onclick={() => { app.cfg.tema = id; salvar(); }}>{nome}</button>
+    {/each}
+  </div>
+</section>
+
 <h2>Datas e status</h2>
 <p class="muted">Quando o edital sair, mude a data e o status. As fases se reajustam sozinhas.</p>
 {#each app.cfg.concursos as c}
@@ -84,6 +93,7 @@
 </section>
 
 <style>
+  .temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .temas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; } .temas .on { background: var(--ac); color: var(--ac-tx); border-color: var(--ac); }
   .msg { min-height: 1.5em; }
   .bloco { padding: 16px; display: grid; gap: 12px; margin-top: 8px; border-top: 4px solid var(--c, transparent); }
   .ev { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); } .ev > span { grid-column: 1 / -1; font-weight: 600; }

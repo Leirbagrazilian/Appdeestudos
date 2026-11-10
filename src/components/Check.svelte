@@ -6,8 +6,8 @@
 </button>
 <style>
   .chk { width: 44px; height: 44px; flex: none; display: grid; place-items: center; }
-  .chk::before { content: ''; grid-area: 1/1; width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--tx2); transition: background .2s, border-color .2s, transform .25s cubic-bezier(.3,1.6,.5,1); }
-  .chk.on::before { background: var(--ac); border-color: var(--ac); transform: scale(1.08); }
+  .chk::before { content: ''; grid-area: 1/1; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--tx2); transition: background .18s, border-color .18s, transform .22s cubic-bezier(.3,1.6,.5,1); }
+  .chk.on::before { background: var(--ac); border-color: var(--ac); transform: scale(1.06); }
   svg { grid-area: 1/1; position: relative; fill: none; stroke: var(--ac-tx); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22; stroke-dashoffset: 22; transition: stroke-dashoffset .25s ease .05s; }
   .on svg { stroke-dashoffset: 0; }
 </style>

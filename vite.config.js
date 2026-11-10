@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'Rumo à Aprovação', short_name: 'Rumo', lang: 'pt-BR',
         description: 'Checklist diário de estudos para Escola Naval, EFOMM, ENEM e ITA.',
-        theme_color: '#0e8a7e', background_color: '#f7f8fa', display: 'standalone', start_url: './', scope: './',
+        theme_color: '#0a0a0c', background_color: '#0a0a0c', display: 'standalone', start_url: './', scope: './',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
