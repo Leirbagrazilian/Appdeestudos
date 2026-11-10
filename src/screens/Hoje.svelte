@@ -42,7 +42,7 @@
 
 <section class="card prog" aria-label="Progresso do dia">
   <div class="topo"><strong>{Math.round(pct * 100)}%</strong><span class="muted">{fmtMin(feitoMin)} de {fmtMin(totalMin)}</span></div>
-  <div class="bar" role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
+  <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
 </section>
 
 {#each alertas as a}<a class="card aviso" href="#/calendario">⏰ Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`}</a>{/each}

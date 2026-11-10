@@ -83,3 +83,19 @@ describe('alertas', () => {
     expect(m).toEqual([...m].sort());
   });
 });
+
+import { gerarICS } from '../src/lib/ics.js';
+import { validar } from '../src/lib/backup.js';
+describe('ics e backup', () => {
+  it('gera VEVENTs e alarmes 14/7/1', () => {
+    const s = gerarICS(cfg());
+    expect((s.match(/BEGIN:VEVENT/g) ?? []).length).toBe(10);
+    expect(s).toContain('TRIGGER:-P14D'); expect(s).toContain('TRIGGER:-P1D');
+    expect(s).toContain('DTEND;VALUE=DATE:20270606'); // fim exclusivo
+  });
+  it('valida backup', () => {
+    expect(() => validar('xx')).toThrow();
+    expect(() => validar('{"versao":1,"cfg":{},"done":{}}')).toThrow();
+    expect(validar(JSON.stringify({ versao: 1, cfg: cfg(), done: {} })).cfg.concursos.length).toBe(4);
+  });
+});

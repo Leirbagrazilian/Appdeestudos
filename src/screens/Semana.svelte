@@ -53,7 +53,7 @@
 </section>
 
 <section class="card total">
-  <div class="bar" role="progressbar" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
+  <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
   <p class="muted">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal</p>
 </section>
 
