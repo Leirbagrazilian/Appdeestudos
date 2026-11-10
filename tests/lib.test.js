@@ -70,3 +70,16 @@ describe('planner', () => {
     expect(weekday('2026-11-25')).toBe(3);
   });
 });
+
+import { alertasInscricao, marcos } from '../src/lib/alerts.js';
+describe('alertas', () => {
+  it('avisa inscrições que fecham em até 14 dias', () => {
+    const a = alertasInscricao(cfg(), '2027-05-25'); // EFOMM fecha 02/06 (8 dias)
+    expect(a.find((x) => x.concurso.id === 'efomm').dias).toBe(8);
+    expect(alertasInscricao(cfg(), '2026-11-10')).toHaveLength(0);
+  });
+  it('marcos vêm em ordem', () => {
+    const m = marcos(cfg()).map((x) => x.data);
+    expect(m).toEqual([...m].sort());
+  });
+});

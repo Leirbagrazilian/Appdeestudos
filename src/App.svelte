@@ -1,6 +1,8 @@
 <script>
   import { app, iniciar } from './stores/app.svelte.js';
   import Hoje from './screens/Hoje.svelte';
+  import Semana from './screens/Semana.svelte';
+  import Calendario from './screens/Calendario.svelte';
   import EmBreve from './screens/EmBreve.svelte';
 
   const abas = [
@@ -20,8 +22,8 @@
   {#if !app.pronto}
     <p class="muted">Carregando…</p>
   {:else if rota === 'hoje'}<Hoje />
-  {:else if rota === 'semana'}<EmBreve titulo="Semana" etapa="Semana" />
-  {:else if rota === 'calendario'}<EmBreve titulo="Calendário" etapa="Calendário" />
+  {:else if rota === 'semana'}<Semana />
+  {:else if rota === 'calendario'}<Calendario />
   {:else if rota === 'erros'}<EmBreve titulo="Caderno de erros" etapa="Caderno de erros" />
   {:else}<EmBreve titulo="Mais" etapa="Simulados e Ajustes" />{/if}
 </main>

@@ -25,6 +25,6 @@ Tudo que é conteúdo está em `src/data/seed.json`: datas e status dos concurso
 
 ## Estado das etapas
 - [x] Fundação (Vite + Svelte, PWA, IndexedDB, fases automáticas, planner, revisões, idade)
-- [x] Hoje
-- [ ] Calendário · Semana · Caderno de erros · Simulados · Ajustes (backup, .ics, notificações)
+- [x] Hoje, Calendário, Semana
+- [ ] Caderno de erros · Simulados · Ajustes (backup, .ics, notificações)
 - [ ] Polimento (Lighthouse, notificações)

@@ -4,8 +4,10 @@
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { vencidas } from '../lib/spaced.js';
   import { diaNome, fmtCurta, fmtBR, fmtMin, weekday } from '../lib/dates.js';
+  import { alertasInscricao } from '../lib/alerts.js';
   import Check from '../components/Check.svelte';
 
+  const alertas = $derived(alertasInscricao(app.cfg, app.dia));
   const REV_MIN = 10;
   let aberto = $state(null);
   let assuntos = $state({});
@@ -42,6 +44,8 @@
   <div class="topo"><strong>{Math.round(pct * 100)}%</strong><span class="muted">{fmtMin(feitoMin)} de {fmtMin(totalMin)}</span></div>
   <div class="bar" role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
 </section>
+
+{#each alertas as a}<a class="card aviso" href="#/calendario">⏰ Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`}</a>{/each}
 
 {#if diag}
   <details class="card aviso">
@@ -108,6 +112,7 @@
   .topo strong { font-size: 1.25rem; }
   .bar { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s ease; }
+  a.aviso { display: block; text-decoration: none; font-weight: 600; }
   .aviso { padding: 12px 16px; margin-top: 12px; background: var(--warn-bg); color: var(--warn); border-color: transparent; font-size: .9rem; }
   .aviso summary { font-weight: 600; cursor: pointer; min-height: 24px; }
   .aviso p, .aviso ol { margin: 8px 0 0; } .aviso ol { padding-left: 20px; }
