@@ -14,7 +14,7 @@
 
 {#if prioridades.length}
   <h2>Prioridades agora</h2>
-  <ul class="grupo card pri">{#each prioridades as p}<li><span class="n n{p.n}">{p.n}</span><span><strong>{p.t}</strong><span class="sub"> · {p.m}</span></span></li>{/each}</ul>
+  <ul class="grupo card pri">{#each prioridades as p}<li><span class="n n{p.n}">{p.n}</span><span><strong>{p.t}</strong><span class="sub">&nbsp;· {p.m}</span></span></li>{/each}</ul>
 {:else if !marcados}
   <p class="card vazio">Comece pela semana diagnóstica: depois de fazer as questões de cada tópico, marque aqui a sua nota.</p>
 {/if}

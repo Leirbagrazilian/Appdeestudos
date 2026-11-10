@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, fases, ajustes, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, verCapitulo } from '../stores/app.svelte.js';
+  import { app, fases, ajustes, fazerBackup, adiarLembreteBackup, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, verCapitulo } from '../stores/app.svelte.js';
   import { blocosAjustados } from '../lib/planner.js';
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
@@ -8,6 +8,7 @@
   import { alertasInscricao } from '../lib/alerts.js';
   import { planoSessoes } from '../lib/foco.js';
   import { dur } from '../lib/prefs.js';
+  import { precisaBackup } from '../lib/erros.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
   import Sinal from '../components/Sinal.svelte';
@@ -53,6 +54,9 @@
       simulados: Object.values(app.exams).filter((e) => dentro(e.data)).length };
   });
 
+  // Lembrete de backup: 7 dias depois do último (ou nunca feito depois de 3 dias de uso).
+  const diasDeUso = $derived(new Set(Object.entries(app.done).map(([k, v]) => v.dia ?? k.slice(0, 10))).size);
+  const lembrarBackup = $derived(app.lembreteAdiado !== app.dia && precisaBackup(app.ultimoBackup, app.dia, diasDeUso));
   const noite = $derived(hora >= 18 || hora < 6);
   const tarde = $derived(hora >= 22 || hora < 4);
   const mostrarCarta = $derived(verCarta || (app.cfg.carta && (dificil || (hora >= 19 && pct < 0.3))));
@@ -117,6 +121,12 @@
   {/if}
 </section>
 
+{#if lembrarBackup}
+  <div class="nota backup entra">
+    <p><Icon nome="clock" />{app.ultimoBackup ? 'Faz uma semana do último backup.' : 'Você ainda não fez nenhum backup.'} Guarde seu progresso fora do tablet.</p>
+    <div class="bk"><button class="pri" onclick={fazerBackup}>Fazer backup agora</button><button class="lk" onclick={adiarLembreteBackup}>Amanhã</button></div>
+  </div>
+{/if}
 {#if tarde}<p class="nota"><Icon nome="moon" />Já passou das 22h. Feche o caderno: dormir bem fixa o que você estudou hoje.</p>{/if}
 {#each alertas as a}
   <a class="nota" href="#/calendario"><Icon nome="clock" />Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`}</a>
@@ -242,6 +252,9 @@
   .nota :global(svg), summary :global(svg) { vertical-align: -3px; margin-right: 8px; }
   .nota summary { cursor: pointer; font-weight: 600; min-height: 24px; }
   .nota p, .nota ol { margin: 8px 0 0; color: var(--tx); } .nota ol { padding-left: 20px; }
+  .backup p { margin: 0; color: var(--warn); }
+  .bk { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
+  .bk .pri { flex: 1; }
   .carta { margin: 12px 0 0; padding: 16px; border-left: 3px solid var(--ac); background: var(--ac-bg); border-radius: 0 14px 14px 0; display: grid; gap: 6px; }
   .carta p:last-child { font-style: italic; white-space: pre-line; }
   h2 { margin-top: 28px; }

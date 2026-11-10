@@ -30,6 +30,9 @@ Tudo que é conteúdo está em `src/data/seed.json`: datas e status dos concurso
 - [x] Motivação: cidade que acende (uma janela por bloco da semana), sinal que acompanha o dia e o horário, "dia difícil", carta para você mesmo, pausas ativas
 - [x] Profundidade: mapa de lacunas, nota de corte nos simulados, insígnias e capítulos
 - [x] Extras: som de chuva gerado no próprio app (sem download)
+- [x] Caderno de erros 2.0: lição por erro, treino tipo flashcard (2 acertos seguidos = dominado), abas e busca, painel "Seus vilões"
+- [x] QG (antiga aba Mais): cartões de resumo, redação com as 5 competências do ENEM, status do backup
+- [x] Proteção dos dados: o app pede ao navegador para não apagar os dados; lembrete de backup a cada 7 dias
 
 ## Como usar o modo foco
 1. Na tela Hoje, toque no ▶ ao lado do bloco.
