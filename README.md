@@ -18,7 +18,7 @@ Abra o endereço publicado no Chrome (Android) → menu ⋮ → "Instalar app". 
 O build usa caminhos relativos e rotas por `#`, então funciona em qualquer um destes:
 - **Netlify** (recomendado): "Add new site → Import from Git", build `npm run build`, pasta `dist`. Funciona com repositório privado.
 - **Cloudflare Pages / Vercel**: mesma configuração (build `npm run build`, saída `dist`).
-- **GitHub Pages**: só de graça se o repositório for público; publique a pasta `dist`.
+- **GitHub Pages** (já configurado em `.github/workflows/pages.yml`): em Settings → Pages, escolha Source = **GitHub Actions**. Cada push na `main` publica o app. Grátis se o repositório for público.
 
 ## Editar dados
 Tudo que é conteúdo está em `src/data/seed.json`: datas e status dos concursos, rotina, modelo de semana, métodos e a semana diagnóstica (com "como fazer" e "onde achar"). Os dados já salvos no aparelho ficam em Ajustes (etapa futura); para recarregar o seed do zero, limpe os dados do site.
