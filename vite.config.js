@@ -11,7 +11,7 @@ export default defineConfig({
       includeAssets: ['fonts/inter.woff2', 'icon.svg'],
       workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2,png,json}'] },
       manifest: {
-        name: 'Rumo à Aprovação', short_name: 'Rumo', lang: 'pt-BR',
+        name: 'Estuda Gabriel', short_name: 'Estuda Gabriel', lang: 'pt-BR',
         description: 'Checklist diário de estudos para Escola Naval, EFOMM, ENEM e ITA.',
         theme_color: '#0a0a0c', background_color: '#0a0a0c', display: 'standalone', start_url: './', scope: './',
         icons: [

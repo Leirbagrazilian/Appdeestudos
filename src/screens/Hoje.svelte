@@ -7,6 +7,8 @@
   import { alertasInscricao } from '../lib/alerts.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
+  import Sinal from '../components/Sinal.svelte';
+  import Skyline from '../components/Skyline.svelte';
   import { diffDays } from '../lib/dates.js';
 
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
@@ -25,12 +27,13 @@
   const feitoMin = $derived(blocos.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) + revs.filter((r) => r.feita).length * REV_MIN);
   const pct = $derived(totalMin ? feitoMin / totalMin : 0);
   const pendRevs = $derived(revs);
-  const FRASES = ['Respeito se constrói em silêncio, bloco a bloco.', 'A cidade dorme. Você estuda.', 'Disciplina é a única família que nunca falha.', 'Pequenas vitórias, todos os dias, constroem um império.', 'Paciência. A aprovação não se apressa, ela se conquista.', 'A noite é longa, mas o plano é maior.', 'Quem aparece todo dia não precisa de sorte.'];
+  const FRASES = ['Respeito se constrói em silêncio, bloco a bloco.', 'A cidade dorme. Você estuda.', 'Seja o sinal na escuridão: estude hoje.', 'A noite pertence a quem não desiste.', 'Disciplina é a única família que nunca falha.', 'Pequenas vitórias, todos os dias, constroem um império.', 'Paciência. A aprovação não se apressa, ela se conquista.', 'A noite é longa, mas o plano é maior.', 'Quem aparece todo dia não precisa de sorte.'];
   const frase = $derived(FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
   const lembrete = $derived(weekday(app.dia) === 0 || weekday(app.dia) === 3 ? app.cfg.metodos.exercicio : app.cfg.metodos.sono);
 </script>
 
 <header>
+  <Skyline /><Sinal />
   <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
   <h1>{pct >= 1 ? 'Missão cumprida.' : `Bora, ${app.cfg.perfil.nome}.`}</h1>
   <p class="frase">{frase}</p>
@@ -107,11 +110,12 @@
 <p class="lembrete"><Icon nome={weekday(app.dia) === 0 || weekday(app.dia) === 3 ? 'run' : 'moon'} size={16} />{lembrete}</p>
 
 <style>
-  header { padding: 20px 4px 20px; }
+  header { padding: 20px 4px 20px; position: relative; }
+  header > :global(*:not(.sk):not(.sinal)) { position: relative; }
   .data { color: var(--tx2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
   h1 { margin-top: 4px; font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; }
   .frase { margin-top: 6px; color: var(--tx2); font-style: italic; font-size: .95rem; }
-  .fase { margin-top: 14px; display: inline-block; padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; font-size: .8rem; font-weight: 600; color: var(--ac); }
+  .fase { margin-top: 14px; display: inline-block; background: var(--bg); padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; font-size: .8rem; font-weight: 600; color: var(--ac); }
   .fase span { color: var(--tx2); font-weight: 400; }
   .prova { display: flex; align-items: center; gap: 16px; padding: 12px 4px; text-decoration: none; color: inherit; min-height: 64px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .num { font-size: 2.6rem; font-weight: 300; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 3.2ch; text-align: right; color: var(--tx); }

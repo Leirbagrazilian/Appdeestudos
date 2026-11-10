@@ -1,4 +1,4 @@
-# Rumo à Aprovação: plano do projeto
+# Estuda Gabriel (antes: Rumo à Aprovação): plano do projeto
 
 > Documento para aprovação antes de começar a programar.
 > Data do plano: 10/11/2026.

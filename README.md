@@ -1,4 +1,4 @@
-# Rumo à Aprovação
+# Estuda Gabriel
 
 App pessoal de estudos em formato checklist (Escola Naval, EFOMM, ENEM e ITA). PWA offline, sem backend, dados no IndexedDB do aparelho.
 

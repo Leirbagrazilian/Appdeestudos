@@ -6,7 +6,7 @@ const esc = (t) => t.replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n');
 
 /** Eventos de dia inteiro (fim exclusivo) + alarmes 14/7/1 dia antes do fim das inscrições. */
 export function gerarICS(cfg) {
-  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Rumo a Aprovacao//PT-BR', 'CALSCALE:GREGORIAN', 'X-WR-CALNAME:Rumo à Aprovação'];
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Estuda Gabriel//PT-BR', 'CALSCALE:GREGORIAN', 'X-WR-CALNAME:Estuda Gabriel'];
   for (const c of cfg.concursos) for (const e of c.eventos) {
     const nome = e.tipo === 'inscricao' ? 'Inscrições' : (e.nome ?? 'Prova');
     L.push('BEGIN:VEVENT', `UID:${c.id}-${e.tipo}-${e.inicio}@rumo-aprovacao`, `DTSTAMP:20260101T000000Z`,
