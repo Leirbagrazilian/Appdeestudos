@@ -20,7 +20,7 @@
   .pt { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); margin-right: 10px; filter: brightness(var(--cc)); }
   a { display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 56px; text-decoration: none; color: var(--tx); }
   .t { flex: 1; font-size: .92rem; }
-  .tag { font-size: .7rem; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--tx2); white-space: nowrap; }
+  .tag { font-size: .8125rem; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--tx2); white-space: nowrap; }
   .tag.of { border-color: var(--ac); color: var(--ac); font-weight: 600; }
   .aviso { margin: 16px 4px 0; }
 </style>

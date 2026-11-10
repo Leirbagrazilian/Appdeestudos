@@ -20,7 +20,7 @@
   {/each}
 </div>
 <style>
-  .enxame { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; color: var(--tx2); }
+  .enxame { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; color: var(--tx2); }
   .festa { z-index: 4; color: var(--ac); }
   .rota { position: absolute; left: 0; animation: cruza linear infinite; will-change: transform; }
   .rota.volta { animation-direction: reverse; }

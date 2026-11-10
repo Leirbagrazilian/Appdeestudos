@@ -19,15 +19,47 @@
 :root { --r: 16px; }
 * { box-sizing: border-box; margin: 0; }
 html { -webkit-text-size-adjust: 100%; }
-body { font: 16px/1.5 Inter, system-ui, sans-serif; background: radial-gradient(120% 60% at 50% -10%, var(--glow), transparent 60%) no-repeat, var(--bg); background-attachment: fixed; color: var(--tx); min-height: 100dvh; }
-button, input { font: inherit; color: inherit; }
+body { font: 1rem/1.5 Inter, system-ui, sans-serif; background: radial-gradient(120% 60% at 50% -10%, var(--glow), transparent 60%) no-repeat, var(--bg); background-attachment: fixed; color: var(--tx); min-height: 100dvh; }
+button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; }
 :focus-visible { outline: 3px solid var(--ac); outline-offset: 2px; border-radius: 8px; }
 h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
 h2 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ac); margin: 24px 4px 8px; }
 .muted { color: var(--tx2); font-size: .875rem; }
 .card { background: var(--card); border-radius: var(--r); box-shadow: var(--sh); border: 1px solid var(--line); }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } .enxame { display: none; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } .enxame { display: none; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+
+/* ---------- Vocabulário de animações ----------
+   toque: o elemento "afunda" (100 ms) · confirmação: check + anel (Check.svelte)
+   abrir/fechar: desliza (220 ms) · navegar: a tela desliza na direção da aba (280 ms)
+   alerta: tremor curto · conquista: bando de morcegos dourados */
+:where(button, a, summary, label.sec, label.pri, [role=radio], [role=checkbox]) {
+  -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+  transition: transform .1s ease, filter .12s ease, background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+:where(button, a, summary, label.sec, label.pri, [role=radio]):active:not(:disabled) { transform: scale(.97); filter: brightness(1.15); }
+.treme { animation: treme .32s ease; }
+@keyframes treme { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.entra { animation: entra .3s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } }
+
+/* Navegação: a nova tela entra pelo lado da aba escolhida. */
+::view-transition-old(tela), ::view-transition-new(tela) { animation-duration: .28s; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+:root[data-dir=frente]::view-transition-old(tela) { animation-name: saiEsq; }
+:root[data-dir=frente]::view-transition-new(tela) { animation-name: entraDir; }
+:root[data-dir=tras]::view-transition-old(tela) { animation-name: saiDir; }
+:root[data-dir=tras]::view-transition-new(tela) { animation-name: entraEsq; }
+@keyframes saiEsq { to { opacity: 0; transform: translateX(-28px); } }
+@keyframes saiDir { to { opacity: 0; transform: translateX(28px); } }
+@keyframes entraDir { from { opacity: 0; transform: translateX(28px); } }
+@keyframes entraEsq { from { opacity: 0; transform: translateX(-28px); } }
+
+/* Preferência do app: animações discretas ou desligadas. */
+:root[data-motion=discretas] .enxame, :root[data-motion=nenhuma] .enxame { display: none; }
+:root[data-motion=discretas] :is(.voa, .disco, .pulso) { animation: none !important; }
+:root[data-motion=nenhuma] *, :root[data-motion=nenhuma] *::before, :root[data-motion=nenhuma] *::after { animation: none !important; transition: none !important; }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* utilitários compartilhados (estilo Noir) */
 .pg { padding: 20px 4px 8px; }

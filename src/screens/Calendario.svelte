@@ -32,6 +32,7 @@
   <a class="nota" href="#/calendario"><Icon nome="clock" />Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`} · {fmtBR(a.evento.fim)}</a>
 {/each}
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div class="card tl" bind:this={scroller} tabindex="0" role="group" aria-label="Linha do tempo, role para o lado">
   <div class="canvas" style="width:{W}px">
     {#each meses as m}<span class="mes" style="left:{x(m.d)}px">{m.n}</span>{/each}
@@ -87,23 +88,23 @@
   .nota :global(svg) { vertical-align: -3px; margin-right: 8px; }
   .tl { margin-top: 16px; overflow-x: auto; padding: 8px 0 12px; scrollbar-width: thin; }
   .canvas { position: relative; height: 230px; }
-  .mes { position: absolute; top: 0; font-size: .65rem; color: var(--tx2); padding-left: 4px; border-left: 1px solid var(--line); height: 100%; text-transform: uppercase; letter-spacing: .08em; }
-  .fases span { position: absolute; top: 26px; height: 28px; background: var(--line); color: var(--tx); font-size: .7rem; font-weight: 600; line-height: 28px; padding: 0 8px; overflow: hidden; white-space: nowrap; border-radius: 8px; border: 1px solid var(--card); }
+  .mes { position: absolute; top: 0; font-size: .8125rem; color: var(--tx2); padding-left: 4px; border-left: 1px solid var(--line); height: 100%; text-transform: uppercase; letter-spacing: .08em; }
+  .fases span { position: absolute; top: 26px; height: 28px; background: var(--line); color: var(--tx); font-size: .8125rem; font-weight: 600; line-height: 28px; padding: 0 8px; overflow: hidden; white-space: nowrap; border-radius: 8px; border: 1px solid var(--card); }
   .fases span.atual { background: var(--ac); color: var(--ac-tx); }
   .faixa { position: absolute; left: 0; right: 0; height: 34px; }
-  .faixa b { position: absolute; left: 6px; top: -2px; font-size: .7rem; color: var(--tx); z-index: 2; background: var(--card); padding: 0 6px; border-left: 3px solid var(--c); border-radius: 2px; }
+  .faixa b { position: absolute; left: 6px; top: -2px; font-size: .8125rem; color: var(--tx); z-index: 2; background: var(--card); padding: 0 6px; border-left: 3px solid var(--c); border-radius: 2px; }
   .faixa i { position: absolute; top: 16px; height: 10px; border-radius: 5px; background: var(--c); filter: brightness(var(--cc)); }
   .insc { opacity: .4; } .evt { height: 16px !important; top: 13px !important; border-radius: 4px !important; }
   .hoje { position: absolute; top: 20px; bottom: 0; width: 1px; background: var(--ac); z-index: 3; }
-  .hoje span { position: absolute; bottom: -2px; left: 4px; font-size: .65rem; font-weight: 700; color: var(--ac); text-transform: uppercase; letter-spacing: .08em; }
-  .leg { margin: 8px 4px 0; font-size: .75rem; color: var(--tx2); }
+  .hoje span { position: absolute; bottom: -2px; left: 4px; font-size: .8125rem; font-weight: 700; color: var(--ac); text-transform: uppercase; letter-spacing: .08em; }
+  .leg { margin: 8px 4px 0; font-size: .8125rem; color: var(--tx2); }
   h2 { margin-top: 28px; }
   .lista { list-style: none; padding: 0; overflow: hidden; }
   .lista li + li { border-top: 1px solid var(--line); }
   .lista li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 56px; }
   .g { color: var(--c); width: 1.2em; text-align: center; filter: brightness(var(--cc)); }
   .t { flex: 1; display: grid; }
-  .st { font-size: .7rem; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--tx2); white-space: nowrap; }
+  .st { font-size: .8125rem; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--tx2); white-space: nowrap; }
   .st.ok { border-color: var(--ac); color: var(--ac); }
   .cc { display: grid !important; gap: 6px; align-items: start; }
   .cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
