@@ -1,5 +1,7 @@
 <script>
-  import { app, salvarCfg, importar, restaurarSeed } from '../stores/app.svelte.js';
+  import { app, salvarCfg, importar, restaurarSeed, pf } from '../stores/app.svelte.js';
+  import { vibrar } from '../lib/prefs.js';
+  import { sino } from '../lib/audio.js';
   import { gerarICS } from '../lib/ics.js';
   import { baixar, montar, validar } from '../lib/backup.js';
   import { pedir, suportado } from '../lib/notify.js';
@@ -22,12 +24,47 @@
     if (notif !== 'granted') msg = 'O navegador não permitiu notificações. Os alertas continuam na tela Hoje e no arquivo .ics.';
   }
   async function resetar() { if (confirm('Voltar as datas, horários e metas para o padrão? Seu histórico de estudo é mantido.')) { await restaurarSeed(); msg = 'Padrão restaurado.'; } }
+  const setPref = (k, v) => { app.cfg.prefs = { ...pf(), [k]: v }; salvar(); if (k === 'vibracao' && v) vibrar(pf(), 'ok'); if (k === 'sons' && v) sino(); };
+  const OPCOES = {
+    animacoes: [['completas', 'Completas'], ['discretas', 'Discretas'], ['nenhuma', 'Nenhuma']],
+    texto: [['normal', 'Normal'], ['grande', 'Grande'], ['muito', 'Muito grande']],
+  };
   const addAula = () => { app.cfg.rotina.aulas.push({ dia: 1, inicio: '08:00', fim: '10:00', nome: 'Aula' }); salvar(); };
   const delAula = (i) => { app.cfg.rotina.aulas.splice(i, 1); salvar(); };
 </script>
 
 <header class="pg"><p class="data">Preferências</p><h1>Ajustes</h1></header>
 <p class="msg sub" role="status">{msg}</p>
+
+<h2>Sensação e acessibilidade</h2>
+<section class="card bloco">
+  <span class="rot">Animações</span>
+  <div class="temas" role="radiogroup" aria-label="Animações">
+    {#each OPCOES.animacoes as [id, nome]}<button role="radio" aria-checked={pf().animacoes === id} class:on={pf().animacoes === id} onclick={() => setPref('animacoes', id)}>{nome}</button>{/each}
+  </div>
+  <p class="muted">Discretas tira os morcegos voando e os efeitos contínuos. Nenhuma desliga tudo.</p>
+  <span class="rot">Tamanho do texto</span>
+  <div class="temas" role="radiogroup" aria-label="Tamanho do texto">
+    {#each OPCOES.texto as [id, nome]}<button role="radio" aria-checked={pf().texto === id} class:on={pf().texto === id} onclick={() => setPref('texto', id)}>{nome}</button>{/each}
+  </div>
+  <div class="tg"><span><strong>Vibração</strong><span class="muted">Ao concluir tarefas e quando o tempo do cronômetro acaba.</span></span>
+    <button role="switch" aria-checked={pf().vibracao} aria-label="Vibração" class="sw" class:on={pf().vibracao} onclick={() => setPref('vibracao', !pf().vibracao)}><i></i></button></div>
+  <div class="tg"><span><strong>Sons</strong><span class="muted">Um sininho ao concluir e ao fim de cada sessão. Desligado por padrão (biblioteca).</span></span>
+    <button role="switch" aria-checked={pf().sons} aria-label="Sons" class="sw" class:on={pf().sons} onclick={() => setPref('sons', !pf().sons)}><i></i></button></div>
+</section>
+
+<h2>Modo foco</h2>
+<section class="card bloco duas">
+  <label>Sessão de foco (min)<input type="number" min="15" max="90" step="5" bind:value={app.cfg.foco.sessaoMin} onchange={salvar} /></label>
+  <label>Pausa (min)<input type="number" min="3" max="30" bind:value={app.cfg.foco.pausaMin} onchange={salvar} /></label>
+</section>
+
+<h2>Sua carta</h2>
+<section class="card bloco">
+  <label for="carta">Por que você quer a Escola Naval? Escreva para o você dos dias difíceis.</label>
+  <textarea id="carta" rows="5" placeholder="Eu quero isso porque…" bind:value={app.cfg.carta} onchange={salvar}></textarea>
+  <p class="muted">Ela aparece na tela Hoje quando você ativa o "dia difícil" ou quando o dia está pesado.</p>
+</section>
 
 <h2>Tema</h2>
 <section class="card bloco">
@@ -85,9 +122,9 @@
 
 <h2>Backup e agenda</h2>
 <section class="card bloco">
-  <button class="pri" onclick={() => baixar(`rumo-backup-${app.dia}.json`, montar(app), 'application/json')}>Exportar backup (JSON)</button>
+  <button class="pri" onclick={() => baixar(`estuda-gabriel-backup-${app.dia}.json`, montar(app), 'application/json')}>Exportar backup (JSON)</button>
   <label class="sec file">Importar backup<input type="file" accept="application/json,.json" onchange={arquivo} hidden /></label>
-  <button class="pri" onclick={() => baixar('rumo-aprovacao.ics', gerarICS(app.cfg), 'text/calendar')}>Exportar .ics (Google Agenda)</button>
+  <button class="pri" onclick={() => baixar('estuda-gabriel.ics', gerarICS(app.cfg), 'text/calendar')}>Exportar .ics (Google Agenda)</button>
   <p class="muted">Na Google Agenda: Configurações → Importar e exportar → Importar. Os alarmes de 14, 7 e 1 dia já vão no arquivo.</p>
   <button class="sec" onclick={resetar}>Restaurar datas e metas padrão</button>
 </section>
@@ -95,6 +132,14 @@
 <style>
   .temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .temas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; } .temas .on { background: var(--ac); color: var(--ac-tx); border-color: var(--ac); }
   .msg { min-height: 1.5em; }
+  .rot { font-weight: 600; }
+  .duas { grid-template-columns: 1fr 1fr; }
+  textarea { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); resize: vertical; }
+  .tg { display: flex; align-items: center; gap: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .tg > span { flex: 1; display: grid; }
+  .sw { width: 56px; height: 34px; flex: none; border-radius: 99px; background: var(--line); position: relative; }
+  .sw i { position: absolute; top: 4px; left: 4px; width: 26px; height: 26px; border-radius: 50%; background: var(--tx2); transition: transform .2s cubic-bezier(.3,1.4,.5,1), background .2s; }
+  .sw.on { background: var(--ac); } .sw.on i { transform: translateX(22px); background: var(--ac-tx); }
   .bloco { padding: 16px; display: grid; gap: 12px; margin-top: 8px; border-top: 4px solid var(--c, transparent); }
   .ev { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); } .ev > span { grid-column: 1 / -1; font-weight: 600; }
   label { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }

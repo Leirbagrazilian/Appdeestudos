@@ -360,7 +360,8 @@
           "como": [
             "Abra o edital/programa da Escola Naval e da EFOMM e copie os tópicos de Matemática, Física, Português e Inglês.",
             "Dê uma nota de 0 a 3 para cada tópico (0 = nunca vi, 3 = domino).",
-            "Os tópicos com nota 0 e 1 viram a prioridade da Fase 1."
+            "Os tópicos com nota 0 e 1 viram a prioridade da Fase 1.",
+            "Marque as notas também no app: Mais → Mapa de lacunas."
           ],
           "onde": [
             "Edital: sites da Marinha (SSPM e CIAGA, links no app).",
@@ -698,5 +699,76 @@
       ],
       "terceiros": []
     }
-  ]
+  ],
+  "foco": {
+    "sessaoMin": 50,
+    "pausaMin": 10
+  },
+  "pausasAtivas": [
+    "Rotação de ombros: 10 para a frente e 10 para trás.",
+    "Alongamento de peitoral no batente da porta: 30 s de cada lado.",
+    "Mobilidade de pescoço: incline devagar para cada lado, 5 vezes.",
+    "Agachamento livre lento: 10 repetições.",
+    "Afundo com alongamento do flexor do quadril: 30 s cada perna.",
+    "Respiração 4-4-6: inspire 4 s, segure 4 s, solte em 6 s, por 1 minuto.",
+    "Levante, caminhe e beba água: 2 minutos longe da tela.",
+    "Extensão torácica no encosto da cadeira: 8 repetições.",
+    "Alongamento de punhos e antebraços: 30 s em cada posição."
+  ],
+  "topicos": {
+    "Matemática": [
+      "Funções",
+      "Trigonometria",
+      "Geometria plana",
+      "Geometria espacial",
+      "Geometria analítica",
+      "PA e PG",
+      "Análise combinatória",
+      "Probabilidade",
+      "Matrizes e sistemas",
+      "Logaritmos e exponenciais",
+      "Números complexos",
+      "Polinômios"
+    ],
+    "Física": [
+      "Cinemática",
+      "Dinâmica",
+      "Trabalho e energia",
+      "Hidrostática",
+      "Termologia",
+      "Óptica",
+      "Ondulatória",
+      "Eletricidade",
+      "Magnetismo"
+    ],
+    "Química": [
+      "Atomística",
+      "Tabela periódica e ligações",
+      "Estequiometria",
+      "Soluções",
+      "Termoquímica",
+      "Cinética",
+      "Equilíbrio",
+      "Eletroquímica",
+      "Química orgânica"
+    ],
+    "Português": [
+      "Interpretação de texto",
+      "Classes de palavras",
+      "Sintaxe",
+      "Concordância",
+      "Regência",
+      "Crase",
+      "Pontuação",
+      "Semântica"
+    ],
+    "Inglês": [
+      "Interpretação de texto",
+      "Vocabulário",
+      "Tempos verbais",
+      "Falsos cognatos",
+      "Preposições",
+      "Conectivos"
+    ]
+  }
 }
