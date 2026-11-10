@@ -3,6 +3,7 @@
   import { blocosDoDia, metaDoDia } from '../lib/planner.js';
   import { addDays, startOfWeek, diaNome, fmtMin, parse } from '../lib/dates.js';
   import Ring from '../components/Ring.svelte';
+  import { fmtCurta } from '../lib/dates.js';
 
   const fs = $derived(fases());
   const feitoNoDia = (dia) => Object.entries(app.done).filter(([k]) => k.startsWith(dia + ':')).reduce((s, [, v]) => s + v.min, 0);
@@ -38,51 +39,59 @@
   const letra = (d) => diaNome(d).slice(0, 3);
 </script>
 
-<h1>Semana</h1>
-<p class="muted">{feitoTotal / 60 < 10 ? (feitoTotal / 60).toFixed(1).replace('.', ',') : Math.round(feitoTotal / 60)}h feitas de {metaTotal / 60}h de meta</p>
+<header>
+  <p class="data">Semana · {fmtCurta(ini)} a {fmtCurta(addDays(ini, 6))}</p>
+  <h1>{feitoTotal / 60 < 10 ? (feitoTotal / 60).toFixed(1).replace('.', ',') : Math.round(feitoTotal / 60)}h <span>de {metaTotal / 60}h</span></h1>
+  <div class="bar" role="progressbar" aria-label="Meta semanal" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
+  <p class="sub">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal</p>
+</header>
 
-<section class="card aneis" aria-label="Progresso por dia">
+<section class="aneis" aria-label="Progresso por dia">
   {#each dias as d}
     {@const p = d.planMin ? d.feito / d.planMin : 0}
     <div class="dia" class:hoje={d.dia === app.dia}>
-      <Ring pct={p} size={44} />
+      <Ring pct={p} size={40} stroke={4} />
       <span class="l">{letra(d.dia)}</span>
-      <span class="muted v">{d.feito ? fmtMin(d.feito) : '–'}</span>
+      <span class="v">{d.feito ? fmtMin(d.feito) : '–'}</span>
     </div>
   {/each}
 </section>
 
-<section class="card total">
-  <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
-  <p class="muted">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal</p>
-</section>
-
 <h2>Constância</h2>
 <section class="card cons">
-  <p class="big">{media}%</p>
-  <p class="muted">média das últimas 4 semanas</p>
-  <div class="hist" aria-hidden="true">{#each hist as h}<i style="height:{Math.max(6, Math.min(1, h) * 48)}px"></i>{/each}</div>
-  <p>{msg}</p>
-  <p class="muted">Semanas boas (70% ou mais) até agora: <strong>{boas}</strong>. Esse número nunca diminui.</p>
+  <div class="topo"><p class="big">{media}%</p><p class="sub">média das últimas 4 semanas</p></div>
+  <div class="hist" aria-hidden="true">{#each hist as h}<i style="height:{Math.max(4, Math.min(1, h) * 48)}px"></i>{/each}</div>
+  <p class="frase">{msg}</p>
+  <p class="sub">Semanas boas (70% ou mais): <strong>{boas}</strong>. Esse número nunca diminui.</p>
 </section>
 
-<h2>Por matéria (esta semana)</h2>
+<h2>Por matéria</h2>
 <section class="card mat">
   {#each porMateria as [nome, min]}
-    <div class="lin"><span>{nome}</span><div class="b"><i style="width:{min / maxMat * 100}%"></i></div><span class="muted">{fmtMin(min)}</span></div>
-  {:else}<p class="muted">Marque seu primeiro bloco para ver o gráfico.</p>{/each}
-  {#if porMateria.length}<p class="muted">Meta: Matemática perto de metade do tempo total.</p>{/if}
+    <div class="lin"><span>{nome}</span><div class="b"><i style="width:{min / maxMat * 100}%"></i></div><span class="sub">{fmtMin(min)}</span></div>
+  {:else}<p class="sub">Marque seu primeiro bloco para ver o gráfico.</p>{/each}
+  {#if porMateria.length}<p class="sub">Meta: Matemática perto de metade do tempo total.</p>{/if}
 </section>
 
 <style>
-  .aneis { display: grid; grid-template-columns: repeat(7, 1fr); padding: 16px 4px; margin-top: 16px; text-align: center; }
-  .dia { display: grid; justify-items: center; gap: 2px; padding: 4px 0; border-radius: 12px; }
-  .dia.hoje { background: var(--ac-bg); }
-  .l { font-size: .75rem; font-weight: 600; text-transform: capitalize; } .v { font-size: .7rem; }
-  .total { padding: 16px; margin-top: 12px; display: grid; gap: 8px; }
-  .bar, .b { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  header { padding: 20px 4px 8px; }
+  .data { color: var(--tx2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
+  h1 { margin-top: 4px; font-size: 2.4rem; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  h1 span { font-size: 1.1rem; font-weight: 400; color: var(--tx2); letter-spacing: 0; }
+  .bar, .b { height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
+  header .bar { margin-top: 12px; }
   .bar i, .b i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s ease; }
-  .cons { padding: 16px; display: grid; gap: 4px; } .big { font-size: 2.25rem; font-weight: 700; color: var(--ac); }
-  .hist { display: flex; gap: 8px; align-items: end; height: 52px; margin: 8px 0; } .hist i { width: 28px; background: var(--ac); border-radius: 6px; opacity: .8; }
-  .mat { padding: 16px; display: grid; gap: 12px; } .lin { display: grid; grid-template-columns: 7rem 1fr auto; gap: 12px; align-items: center; font-size: .9rem; }
+  .sub { color: var(--tx2); font-size: .85rem; }
+  header .sub { margin-top: 8px; }
+  .aneis { display: grid; grid-template-columns: repeat(7, 1fr); padding: 20px 0 8px; margin-top: 12px; text-align: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .dia { display: grid; justify-items: center; gap: 2px; padding: 6px 0; border-radius: 12px; }
+  .dia.hoje { outline: 1px solid var(--ac); outline-offset: -1px; }
+  .l { font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--tx2); } .dia.hoje .l { color: var(--ac); }
+  .v { font-size: .7rem; color: var(--tx2); font-variant-numeric: tabular-nums; }
+  h2 { margin-top: 28px; }
+  .cons { padding: 16px; display: grid; gap: 8px; }
+  .topo { display: flex; align-items: baseline; gap: 12px; } .big { font-size: 2.2rem; font-weight: 300; letter-spacing: -.03em; color: var(--ac); }
+  .hist { display: flex; gap: 6px; align-items: end; height: 52px; } .hist i { width: 100%; max-width: 44px; background: var(--ac); border-radius: 4px; opacity: .75; }
+  .frase { font-style: italic; color: var(--tx); }
+  .mat { padding: 16px; display: grid; gap: 14px; } .lin { display: grid; grid-template-columns: 6.5rem 1fr auto; gap: 12px; align-items: center; font-size: .9rem; }
 </style>
