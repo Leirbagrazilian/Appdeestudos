@@ -99,3 +99,73 @@ describe('ics e backup', () => {
     expect(validar(JSON.stringify({ versao: 1, cfg: cfg(), done: {} })).cfg.concursos.length).toBe(4);
   });
 });
+
+import { planoSessoes, iniciar, estado, encerrarSessao, proximaSessao, minutosFoco } from '../src/lib/foco.js';
+import { blocosAjustados } from '../src/lib/planner.js';
+import { avaliar, revisoesDoDia } from '../src/lib/spaced.js';
+import { conquistas, estatisticas } from '../src/lib/conquistas.js';
+
+describe('cronômetro de foco', () => {
+  it('Matemática de 2h vira 2 sessões de 50 min; Física 1h vira 1 de 50; caderno de erros 10 min', () => {
+    expect(planoSessoes(120)).toEqual({ sessoes: 2, len: 50, pausa: 10 });
+    expect(planoSessoes(60)).toEqual({ sessoes: 1, len: 50, pausa: 10 });
+    expect(planoSessoes(10)).toEqual({ sessoes: 1, len: 10, pausa: 10 });
+    expect(planoSessoes(240).sessoes).toBe(4);
+  });
+  it('conta o tempo pelo relógio, mesmo com o app fechado, e limita ao planejado', () => {
+    const t0 = 1_000_000, min = 60000;
+    let t = iniciar({ id: 'd:mat', titulo: 'Mat', materia: 'Matemática', chave: 'mat', min: 120 }, undefined, t0);
+    expect(estado(t, t0 + 30 * min).restante).toBe(20 * min);
+    expect(estado(t, t0 + 55 * min).acabou).toBe(true);
+    t = encerrarSessao(t, t0 + 180 * min); // esqueceu o app aberto por 3h
+    expect(t.fase).toBe('pausa');
+    expect(minutosFoco(t, t0 + 180 * min)).toBe(50);
+    t = proximaSessao(t, t0 + 190 * min);
+    expect(t.sessao).toBe(2);
+    t = encerrarSessao(t, t0 + 220 * min); // parou cedo: 30 min
+    expect(t.fase).toBe('fim');
+    expect(minutosFoco(t, t0 + 220 * min)).toBe(80);
+  });
+});
+
+describe('ajustes do dia', () => {
+  it('passar para amanhã tira o bloco de hoje e coloca amanhã', () => {
+    const f = gerarFases(cfg()); const c = cfg();
+    const adiados = { '2026-11-23:fis': '2026-11-24' };
+    expect(blocosAjustados(c, f, '2026-11-23', { adiados }).some((b) => b.id === '2026-11-23:fis')).toBe(false);
+    const amanha = blocosAjustados(c, f, '2026-11-24', { adiados });
+    expect(amanha.find((b) => b.id === '2026-11-23:fis')?.adiadoDe).toBe('2026-11-23');
+  });
+  it('dia difícil deixa só o essencial', () => {
+    const f = gerarFases(cfg()); const c = cfg();
+    const l = blocosAjustados(c, f, '2026-11-23', { dificeis: { '2026-11-23': true } });
+    expect(l.map((b) => b.chave)).toEqual(['mat', 'erros']);
+    expect(l[0].min).toBe(50);
+  });
+});
+
+describe('revisão com dificuldade', () => {
+  const base = agendarRevisoes({ origem: 'o', assunto: 'a', materia: 'm', dia: '2026-11-10' });
+  it('fácil empurra as próximas revisões para mais longe', () => {
+    const { mudadas } = avaliar(base, base[0], 'facil', '2026-11-11');
+    expect(mudadas.find((x) => x.id === base[1].id).due).toBe('2026-11-20'); // 17/11 + 3
+  });
+  it('difícil cria uma revisão extra em 2 dias', () => {
+    const { novas } = avaliar(base, base[0], 'dificil', '2026-11-11');
+    expect(novas[0].due).toBe('2026-11-13');
+  });
+  it('revisão feita hoje continua na lista do dia', () => {
+    const r = [{ ...base[0], feita: true, feitaEm: '2026-11-11' }, base[1]];
+    expect(revisoesDoDia(r, '2026-11-11')).toHaveLength(1);
+  });
+});
+
+describe('insígnias', () => {
+  it('nunca exigem perfeição e contam questões registradas', () => {
+    const done = { '2026-11-10:mat': { min: 100, questoes: { feitas: 120, acertos: 80 }, sozinho: true } };
+    expect(estatisticas({ done }).questoes).toBe(120);
+    const ok = conquistas({ done }).filter((x) => x.ok).map((x) => x.id);
+    expect(ok).toEqual(expect.arrayContaining(['primeiro-bloco', 'cem-questoes']));
+    expect(ok).not.toContain('sete-dias');
+  });
+});

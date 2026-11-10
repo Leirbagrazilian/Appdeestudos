@@ -28,5 +28,22 @@ export function blocosDoDia(cfg, fases, dia) {
     };
   });
 }
+/** Blocos que realmente valem para o dia: o que foi passado para outro dia sai,
+ *  o que veio de outro dia entra, e no "dia difícil" fica só o essencial. */
+export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {} } = {}) {
+  let lista = blocosDoDia(cfg, fases, dia).filter((b) => !adiados[b.id] || adiados[b.id] === dia);
+  for (const [id, alvo] of Object.entries(adiados)) {
+    const orig = id.slice(0, 10);
+    if (alvo !== dia || orig === dia) continue;
+    const b = blocosDoDia(cfg, fases, orig).find((x) => x.id === id);
+    if (b) lista.push({ ...b, adiadoDe: orig });
+  }
+  if (dificeis[dia] && lista.length) {
+    const principal = lista.find((b) => b.chave !== 'erros') ?? lista[0];
+    lista = lista.filter((b) => b === principal || b.chave === 'erros')
+      .map((b) => (b === principal ? { ...b, min: Math.min(b.min, 50), essencial: true } : b));
+  }
+  return lista;
+}
 export const metaDoDia = (cfg, dia) => cfg.rotina.metaHoras[weekday(dia)] * 60;
 export { diaNome };
