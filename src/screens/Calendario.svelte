@@ -79,7 +79,7 @@
 
 <style>
   header { padding: 20px 4px 8px; }
-  .data { color: var(--tx2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
+  .data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
   h1 { margin-top: 4px; font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; }
   .sub { color: var(--tx2); font-size: .85rem; }
   header .sub { margin-top: 4px; }

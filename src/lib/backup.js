@@ -9,6 +9,6 @@ export const montar = (app) => JSON.stringify({ versao: VERSAO, exportado: new D
 /** Valida o JSON de backup; lança Error com mensagem em português. */
 export function validar(texto) {
   let d; try { d = JSON.parse(texto); } catch { throw new Error('Arquivo inválido: não é um JSON.'); }
-  if (!d || d.versao !== VERSAO || !d.cfg?.concursos || typeof d.done !== 'object') throw new Error('Este arquivo não parece um backup do Rumo à Aprovação.');
+  if (!d || d.versao !== VERSAO || !d.cfg?.concursos || typeof d.done !== 'object') throw new Error('Este arquivo não parece um backup do Estuda Gabriel.');
   return { cfg: d.cfg, done: d.done ?? {}, reviews: d.reviews ?? {}, errors: d.errors ?? {}, exams: d.exams ?? {} };
 }

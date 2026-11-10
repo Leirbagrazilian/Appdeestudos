@@ -10,4 +10,6 @@
   .chk.on::before { background: var(--ac); border-color: var(--ac); transform: scale(1.06); }
   svg { grid-area: 1/1; position: relative; fill: none; stroke: var(--ac-tx); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22; stroke-dashoffset: 22; transition: stroke-dashoffset .25s ease .05s; }
   .on svg { stroke-dashoffset: 0; }
+  .chk.on::after { content: ''; grid-area: 1/1; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ac); animation: estouro .55s ease-out forwards; pointer-events: none; }
+  @keyframes estouro { from { transform: scale(1); opacity: .9; } to { transform: scale(2.2); opacity: 0; } }
 </style>

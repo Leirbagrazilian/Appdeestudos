@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0e8a7e"/><path d="M140 270l82 82 150-170" fill="none" stroke="#fff" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><radialGradient id="g" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#f4d675"/><stop offset=".75" stop-color="#d6a93c"/><stop offset="1" stop-color="#b98a22"/></radialGradient>
+<radialGradient id="h" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#d6a93c" stop-opacity=".35"/><stop offset="1" stop-color="#d6a93c" stop-opacity="0"/></radialGradient></defs>
+<rect width="512" height="512" fill="#0a0a0c"/>
+<circle cx="256" cy="256" r="230" fill="url(#h)"/>
+<circle cx="256" cy="256" r="150" fill="url(#g)"/>
+<g transform="translate(256 262) scale(3.6 3.6) translate(-32 -16)" fill="#0a0a0c"><path d="M32,7 L35,3 L36,9 L44,8 L54,5 L63,12 L58,13 L55,20 L50,15 L46,23 L41,16 L37,22 L32,29 L27,22 L23,16 L18,23 L14,15 L9,20 L6,13 L1,12 L10,5 L20,8 L28,9 L29,3Z"/></g>
+<g fill="#7d7a72"><g transform="translate(78 92) scale(1.1) "><path transform="scale(1)" d="M32,7 L35,3 L36,9 L44,8 L54,5 L63,12 L58,13 L55,20 L50,15 L46,23 L41,16 L37,22 L32,29 L27,22 L23,16 L18,23 L14,15 L9,20 L6,13 L1,12 L10,5 L20,8 L28,9 L29,3Z"/></g>
+<g transform="translate(372 78) scale(.75)"><path d="M32,7 L35,3 L36,9 L44,8 L54,5 L63,12 L58,13 L55,20 L50,15 L46,23 L41,16 L37,22 L32,29 L27,22 L23,16 L18,23 L14,15 L9,20 L6,13 L1,12 L10,5 L20,8 L28,9 L29,3Z"/></g>
+<g transform="translate(398 392) scale(.9)"><path d="M32,7 L35,3 L36,9 L44,8 L54,5 L63,12 L58,13 L55,20 L50,15 L46,23 L41,16 L37,22 L32,29 L27,22 L23,16 L18,23 L14,15 L9,20 L6,13 L1,12 L10,5 L20,8 L28,9 L29,3Z"/></g>
+<g transform="translate(62 380) scale(.65)"><path d="M32,7 L35,3 L36,9 L44,8 L54,5 L63,12 L58,13 L55,20 L50,15 L46,23 L41,16 L37,22 L32,29 L27,22 L23,16 L18,23 L14,15 L9,20 L6,13 L1,12 L10,5 L20,8 L28,9 L29,3Z"/></g></g>
+</svg>

@@ -7,6 +7,9 @@
   import { alertasInscricao } from '../lib/alerts.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
+  import Sinal from '../components/Sinal.svelte';
+  import Enxame from '../components/Enxame.svelte';
+  import Skyline from '../components/Skyline.svelte';
   import { diffDays } from '../lib/dates.js';
 
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
@@ -25,12 +28,19 @@
   const feitoMin = $derived(blocos.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) + revs.filter((r) => r.feita).length * REV_MIN);
   const pct = $derived(totalMin ? feitoMin / totalMin : 0);
   const pendRevs = $derived(revs);
-  const FRASES = ['Respeito se constrói em silêncio, bloco a bloco.', 'A cidade dorme. Você estuda.', 'Disciplina é a única família que nunca falha.', 'Pequenas vitórias, todos os dias, constroem um império.', 'Paciência. A aprovação não se apressa, ela se conquista.', 'A noite é longa, mas o plano é maior.', 'Quem aparece todo dia não precisa de sorte.'];
+  const FRASES = [
+    'A cidade dorme. Você estuda.', 'Seja o sinal na escuridão: estude hoje.', 'A noite pertence a quem não desiste.',
+    'Medo é combustível. Transforme em questão resolvida.', 'Nem herói nasce pronto: treina todo dia.',
+    'Hoje você vira a versão que a prova vai respeitar.', 'Os vilões da prova têm nome: lacuna, pressa e distração.',
+    'Cada bloco marcado é um morcego a mais no céu.', 'Disciplina é o seu maior gadget.', 'Quem aparece todo dia não precisa de sorte.',
+    'Respeito se constrói em silêncio, bloco a bloco.', 'A aprovação é uma missão de longo prazo. Hoje é só mais uma etapa.',
+    'Treine como quem vai ser chamado ao amanhecer.', 'Pequenas vitórias, todos os dias, constroem um império.'];
   const frase = $derived(FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
   const lembrete = $derived(weekday(app.dia) === 0 || weekday(app.dia) === 3 ? app.cfg.metodos.exercicio : app.cfg.metodos.sono);
 </script>
 
 <header>
+  <Skyline /><Sinal />{#if pct >= 1}<Enxame festa />{/if}
   <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
   <h1>{pct >= 1 ? 'Missão cumprida.' : `Bora, ${app.cfg.perfil.nome}.`}</h1>
   <p class="frase">{frase}</p>
@@ -58,6 +68,7 @@
     <summary><Icon nome="bulb" />{app.cfg.diagnostico.titulo}: leia antes de começar</summary>
     <p>{app.cfg.diagnostico.intro}</p>
     <ol>{#each app.cfg.diagnostico.como as c}<li>{c}</li>{/each}</ol>
+    <p><a class="lk" href="#/questoes">Onde achar provas e gabaritos →</a></p>
   </details>
 {/if}
 {#if leve}<p class="nota"><Icon nome="moon" />Última semana antes da prova de {leve.nome}: revisão leve. Sem conteúdo novo, durma bem.</p>{/if}
@@ -107,24 +118,26 @@
 <p class="lembrete"><Icon nome={weekday(app.dia) === 0 || weekday(app.dia) === 3 ? 'run' : 'moon'} size={16} />{lembrete}</p>
 
 <style>
-  header { padding: 20px 4px 20px; }
-  .data { color: var(--tx2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
+  header { padding: 20px 4px 20px; position: relative; }
+  header > :global(*:not(.sk):not(.sinal):not(.enxame)) { position: relative; }
+  .data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
   h1 { margin-top: 4px; font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; }
-  .frase { margin-top: 6px; color: var(--tx2); font-style: italic; font-size: .95rem; }
-  .fase { margin-top: 14px; display: inline-block; padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; font-size: .8rem; font-weight: 600; color: var(--ac); }
+  .frase { margin-top: 6px; color: var(--ac2); font-style: italic; font-size: .95rem; }
+  .fase { margin-top: 14px; display: inline-block; background: var(--bg); padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; font-size: .8rem; font-weight: 600; color: var(--ac); }
   .fase span { color: var(--tx2); font-weight: 400; }
   .prova { display: flex; align-items: center; gap: 16px; padding: 12px 4px; text-decoration: none; color: inherit; min-height: 64px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .num { font-size: 2.6rem; font-weight: 300; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 3.2ch; text-align: right; color: var(--tx); }
+  .num { font-size: 2.6rem; font-weight: 300; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 3.2ch; text-align: right; color: var(--ac); }
   .lbl { display: grid; font-size: .8rem; color: var(--tx2); border-left: 3px solid var(--c); padding-left: 12px; }
   .lbl strong { color: var(--tx); font-size: .95rem; font-weight: 600; }
   .prog { padding: 20px 4px 8px; }
   .topo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; color: var(--tx2); font-size: .85rem; font-variant-numeric: tabular-nums; }
-  .topo strong { color: var(--tx); font-size: 1.4rem; font-weight: 600; }
+  .topo strong { color: var(--ac); font-size: 1.4rem; font-weight: 600; }
   .bar { height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
   .bar i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s ease; }
   .nota { display: block; margin-top: 12px; padding: 12px 16px; border-radius: 14px; background: var(--warn-bg); color: var(--warn); font-size: .9rem; text-decoration: none; font-weight: 500; }
   .nota :global(svg), summary :global(svg) { vertical-align: -3px; margin-right: 8px; }
   .nota summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+  .lk { color: var(--ac); font-weight: 700; }
   .nota p, .nota ol { margin: 8px 0 0; color: var(--tx); } .nota ol { padding-left: 20px; }
   h2 { margin-top: 28px; }
   .lista { list-style: none; padding: 0; overflow: hidden; }

@@ -75,7 +75,7 @@
 
 <style>
   header { padding: 20px 4px 8px; }
-  .data { color: var(--tx2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
+  .data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
   h1 { margin-top: 4px; font-size: 2.4rem; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
   h1 span { font-size: 1.1rem; font-weight: 400; color: var(--tx2); letter-spacing: 0; }
   .bar, .b { height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }

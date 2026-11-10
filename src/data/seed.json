@@ -609,5 +609,94 @@
       "id": "tempo",
       "nome": "Tempo"
     }
+  ],
+  "questoes": [
+    {
+      "id": "en",
+      "nome": "Escola Naval",
+      "oficial": [
+        {
+          "nome": "Site do SSPM (procure provas e gabaritos do CPAEN)",
+          "url": "https://www.marinha.mil.br/sspm"
+        }
+      ],
+      "terceiros": [
+        {
+          "nome": "Estratégia Militares: gabarito da Escola Naval",
+          "url": "https://militares.estrategia.com/portal/eventos/gabaritos/confira-o-gabarito-da-escola-naval/"
+        },
+        {
+          "nome": "QConcursos: gabarito Escola Naval 2026 (1º dia)",
+          "url": "https://arquivos.qconcursos.com/prova/arquivo_gabarito/158250/marinha-2026-escola-naval-aspirante-1-dia-gabarito.pdf"
+        },
+        {
+          "nome": "QConcursos: gabarito Escola Naval 2025 (2º dia)",
+          "url": "https://arquivos.qconcursos.com/prova/arquivo_gabarito/136785/marinha-2025-escola-naval-aspirante-2-dia-gabarito.pdf"
+        }
+      ]
+    },
+    {
+      "id": "efomm",
+      "nome": "EFOMM",
+      "oficial": [
+        {
+          "nome": "Site do CIAGA",
+          "url": "https://www.marinha.mil.br/ciaga"
+        }
+      ],
+      "terceiros": [
+        {
+          "nome": "Concursos Militares: EFOMM 2020 (1º dia)",
+          "url": "https://www.concursosmilitares.com.br/provas-anteriores/marinha/efomm/2020-efomm-oficial-da-marinha-mercante-primeiro-dia.pdf"
+        },
+        {
+          "nome": "Concursos Militares: EFOMM 2018 (1º dia)",
+          "url": "https://www.concursosmilitares.com.br/provas-anteriores/marinha/efomm/2018-efomm-oficial-da-marinha-mercante-primeiro-dia.pdf"
+        },
+        {
+          "nome": "Concursos Militares: EFOMM 2017 (Português e Inglês)",
+          "url": "https://www.concursosmilitares.com.br/provas-anteriores/marinha/efomm/2017efomm-portugues-ingles.pdf"
+        },
+        {
+          "nome": "Concursos Militares: EFOMM 2014 (Português e Inglês)",
+          "url": "https://www.concursosmilitares.com.br/provas-anteriores/marinha/efomm/2014efomm-portugues-ingles.pdf"
+        }
+      ]
+    },
+    {
+      "id": "ita",
+      "nome": "ITA",
+      "oficial": [
+        {
+          "nome": "Site do vestibular do ITA",
+          "url": "https://vestibular.ita.br"
+        }
+      ],
+      "terceiros": [
+        {
+          "nome": "Curso Objetivo: ITA 2025",
+          "url": "https://curso-objetivo.br/vestibular/assets/download/informativos/04-ITA-2025.pdf"
+        },
+        {
+          "nome": "Estratégia Vestibulares: prova e gabarito ITA 2022",
+          "url": "https://vestibulares.estrategia.com/portal/noticias/prova-e-gabarito-vestibular-ita-2022/"
+        },
+        {
+          "nome": "SimpleStudy: provas e gabaritos do ITA",
+          "url": "https://simplestudy.com/pt-br/vestibular/ita/gabaritos"
+        }
+      ]
+    },
+    {
+      "id": "enem",
+      "nome": "ENEM",
+      "oficial": [
+        {
+          "nome": "Portal do participante (INEP): provas e gabaritos",
+          "url": "https://enem.inep.gov.br/participante"
+        }
+      ],
+      "terceiros": []
+    }
   ]
 }

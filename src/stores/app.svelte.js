@@ -24,9 +24,10 @@ export async function iniciar() {
 export async function salvarCfg() { await db.put('kv', 'config', $state.snapshot(app.cfg)); }
 
 let timer;
+const ELOGIOS = ['Mais um morcego no céu.', 'A cidade está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.'];
 function avisar(msg, desfazer) {
   clearTimeout(timer);
-  app.toast = { msg, desfazer };
+  app.toast = { msg, desfazer, sub: ELOGIOS[Math.floor(Math.random() * ELOGIOS.length)] };
   timer = setTimeout(() => (app.toast = null), 5000);
 }
 
