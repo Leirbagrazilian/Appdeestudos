@@ -1,0 +1,613 @@
+{
+  "perfil": {
+    "nome": "Gabriel",
+    "nascimento": "2005-11-25",
+    "inicioPlano": "2026-11-10",
+    "inicioDesenvolvimento": "2027-03-01",
+    "semanasEspecifica": 7
+  },
+  "concursos": [
+    {
+      "id": "en",
+      "nome": "Escola Naval",
+      "sigla": "EN",
+      "cor": "#1d4f91",
+      "prioridade": 1,
+      "idade": {
+        "tipo": "menorQue",
+        "limite": 23,
+        "ref": "01-01",
+        "texto": "Ter menos de 23 anos em 1º de janeiro do ano da matrícula."
+      },
+      "link": "https://www.marinha.mil.br/sspm",
+      "eventos": [
+        {
+          "tipo": "inscricao",
+          "inicio": "2027-04-30",
+          "fim": "2027-06-05",
+          "status": "estimada"
+        },
+        {
+          "tipo": "prova",
+          "inicio": "2027-08-29",
+          "fim": "2027-08-30",
+          "status": "estimada"
+        }
+      ]
+    },
+    {
+      "id": "efomm",
+      "nome": "EFOMM",
+      "sigla": "EFOMM",
+      "cor": "#0b7285",
+      "prioridade": 2,
+      "idade": {
+        "tipo": "menorQue",
+        "limite": 23,
+        "ref": "01-01",
+        "texto": "23 anos incompletos em 1º de janeiro do ano da matrícula."
+      },
+      "link": "https://www.marinha.mil.br/ciaga",
+      "eventos": [
+        {
+          "tipo": "inscricao",
+          "inicio": "2027-05-21",
+          "fim": "2027-06-02",
+          "status": "estimada"
+        },
+        {
+          "tipo": "prova",
+          "inicio": "2027-07-25",
+          "fim": "2027-07-26",
+          "status": "estimada"
+        },
+        {
+          "tipo": "teste",
+          "nome": "Teste físico",
+          "inicio": "2027-11-01",
+          "fim": "2027-12-15",
+          "status": "estimada"
+        }
+      ]
+    },
+    {
+      "id": "enem",
+      "nome": "ENEM",
+      "sigla": "ENEM",
+      "cor": "#b45309",
+      "prioridade": 3,
+      "link": "https://enem.inep.gov.br/participante",
+      "eventos": [
+        {
+          "tipo": "inscricao",
+          "inicio": "2027-05-25",
+          "fim": "2027-06-05",
+          "status": "estimada"
+        },
+        {
+          "tipo": "prova",
+          "inicio": "2027-11-08",
+          "fim": "2027-11-15",
+          "status": "estimada"
+        }
+      ]
+    },
+    {
+      "id": "ita",
+      "nome": "ITA",
+      "sigla": "ITA",
+      "cor": "#9d2b5b",
+      "prioridade": 4,
+      "idade": {
+        "tipo": "menorQue25fim",
+        "limite": 25,
+        "ref": "12-31",
+        "texto": "Não completar 25 anos até 31 de dezembro do ano da matrícula."
+      },
+      "link": "https://vestibular.ita.br",
+      "eventos": [
+        {
+          "tipo": "inscricao",
+          "inicio": "2027-06-02",
+          "fim": "2027-07-12",
+          "status": "estimada"
+        },
+        {
+          "tipo": "prova",
+          "nome": "1ª fase",
+          "inicio": "2027-09-27",
+          "fim": "2027-09-27",
+          "status": "estimada"
+        },
+        {
+          "tipo": "prova",
+          "nome": "2ª fase",
+          "inicio": "2027-10-20",
+          "fim": "2027-10-23",
+          "status": "estimada"
+        }
+      ]
+    }
+  ],
+  "rotina": {
+    "aulas": [
+      {
+        "dia": 1,
+        "inicio": "07:30",
+        "fim": "11:10",
+        "nome": "Faculdade"
+      },
+      {
+        "dia": 3,
+        "inicio": "09:30",
+        "fim": "10:10",
+        "nome": "Faculdade"
+      },
+      {
+        "dia": 4,
+        "inicio": "13:00",
+        "fim": "18:00",
+        "nome": "Faculdade"
+      }
+    ],
+    "metaHoras": {
+      "0": 4,
+      "1": 4,
+      "2": 4,
+      "3": 2,
+      "4": 4,
+      "5": 4,
+      "6": 6
+    }
+  },
+  "metodos": {
+    "recuperacao": "Prática de recuperação: faça as questões sem consultar nada. Tentar lembrar fixa mais do que reler.",
+    "espacada": "Revisão espaçada: rever em 1, 7 e 30 dias faz o assunto durar de verdade.",
+    "intercalada": "Prática intercalada: misture tipos de exercício. Parece mais difícil, e é por isso que funciona.",
+    "autoexplicacao": "Autoexplicação: explique com suas palavras, em voz alta ou no papel, por que cada passo funciona.",
+    "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil.",
+    "sono": "Sono de 7 a 9h consolida o que você estudou hoje.",
+    "exercicio": "Se mexer 30 minutos hoje melhora foco e memória (e você é de Educação Física)."
+  },
+  "modeloSemana": {
+    "util": [
+      {
+        "chave": "mat",
+        "materia": "Matemática",
+        "min": 120,
+        "metodo": "recuperacao"
+      },
+      {
+        "chave": "fis",
+        "materia": "Física",
+        "min": 60,
+        "metodo": "autoexplicacao"
+      },
+      {
+        "chave": "lingua",
+        "materia": "Português/Inglês",
+        "min": 60,
+        "metodo": "intercalada"
+      },
+      {
+        "chave": "erros",
+        "materia": "Caderno de erros",
+        "titulo": "Caderno de erros",
+        "min": 10,
+        "metodo": "espacada"
+      }
+    ],
+    "3": [
+      {
+        "chave": "rev",
+        "materia": "Revisão",
+        "titulo": "Revisão espaçada",
+        "min": 60,
+        "metodo": "espacada"
+      },
+      {
+        "chave": "mix",
+        "materia": "Misto",
+        "titulo": "Questões misturadas",
+        "min": 60,
+        "metodo": "intercalada"
+      }
+    ],
+    "6": [
+      {
+        "chave": "prova",
+        "materia": "Prova antiga",
+        "titulo": "Prova antiga cronometrada",
+        "min": 240,
+        "metodo": "recuperacao"
+      },
+      {
+        "chave": "corr",
+        "materia": "Correção",
+        "titulo": "Correção e caderno de erros",
+        "min": 120,
+        "metodo": "autoexplicacao"
+      }
+    ],
+    "0": [
+      {
+        "chave": "red",
+        "materia": "Redação",
+        "titulo": "Redação",
+        "min": 90,
+        "metodo": "autoexplicacao"
+      },
+      {
+        "chave": "qui",
+        "materia": "Química",
+        "titulo": "Química",
+        "min": 90,
+        "metodo": "recuperacao"
+      },
+      {
+        "chave": "plan",
+        "materia": "Planejamento",
+        "titulo": "Planejar a semana",
+        "min": 30,
+        "metodo": "autoexplicacao"
+      }
+    ]
+  },
+  "provaSabado": {
+    "base": "Prova antiga de qualquer concurso naval (a mais recente que você ainda não fez)",
+    "desenvolvimento": "Prova antiga alternando EFOMM e Escola Naval (a cada 2 semanas)",
+    "efomm": "Prova antiga da EFOMM, uma por semana",
+    "en": "Prova antiga da Escola Naval (CPAEN), uma por semana",
+    "final": "Alternar: prova antiga do ENEM (dia 1 e dia 2) e 1ª fase do ITA"
+  },
+  "fases": {
+    "base": {
+      "nome": "Base",
+      "numero": 1,
+      "foco": "Matemática e física do básico ao intermediário, português e inglês."
+    },
+    "desenvolvimento": {
+      "nome": "Desenvolvimento",
+      "numero": 2,
+      "foco": "Conteúdo completo, uma prova antiga a cada 2 semanas e checklist de inscrições."
+    },
+    "efomm": {
+      "nome": "Específica EFOMM",
+      "numero": 3,
+      "foco": "Uma prova antiga da EFOMM por semana."
+    },
+    "en": {
+      "nome": "Específica Escola Naval",
+      "numero": 4,
+      "foco": "Provas antigas e redação no estilo da Escola Naval."
+    },
+    "final": {
+      "nome": "Reta final ITA e ENEM",
+      "numero": 5,
+      "foco": "Química, discursivas do ITA, redação e provas antigas do ENEM."
+    }
+  },
+  "diagnostico": {
+    "titulo": "Semana diagnóstica",
+    "intro": "Esta semana o objetivo é descobrir o que você já sabe. Cronometre, não consulte nada e anote cada erro no caderno de erros.",
+    "como": [
+      "Baixe as provas antigas e os gabaritos antes de começar (veja 'onde achar' em cada tarefa).",
+      "Faça com cronômetro e sem consulta, em lugar silencioso.",
+      "Marque na hora as questões que você chutou. Chute que acertou conta como lacuna.",
+      "Depois de corrigir, anote no Caderno de erros: matéria, assunto e tipo (conteúdo, atenção ou tempo)."
+    ],
+    "dias": {
+      "2026-11-10": [
+        {
+          "chave": "d-mat1",
+          "materia": "Matemática",
+          "titulo": "Diagnóstico de Matemática (prova completa)",
+          "min": 120,
+          "metodo": "diagnostico",
+          "como": [
+            "Escolha a prova de Matemática mais recente da Escola Naval (CPAEN).",
+            "Resolva tudo em 2h, sem calculadora e sem consulta.",
+            "Corrija com o gabarito e anote acertos por assunto."
+          ],
+          "onde": [
+            "Site da Marinha (SSPM, link no app), seção de provas anteriores.",
+            "Se não achar lá: busque 'prova CPAEN matemática com gabarito' em canais e sites de cursinhos militares."
+          ]
+        },
+        {
+          "chave": "d-fis1",
+          "materia": "Física",
+          "titulo": "Diagnóstico de Física (10 questões)",
+          "min": 60,
+          "metodo": "diagnostico",
+          "como": [
+            "Pegue as 10 primeiras questões de Física da mesma prova da Escola Naval.",
+            "Resolva em 1h sem consulta e marque os chutes."
+          ],
+          "onde": [
+            "A mesma prova da Escola Naval usada em Matemática."
+          ]
+        },
+        {
+          "chave": "d-port1",
+          "materia": "Português",
+          "titulo": "Diagnóstico de Português",
+          "min": 60,
+          "metodo": "diagnostico",
+          "como": [
+            "Faça as questões de Português da prova da EFOMM mais recente (interpretação, gramática).",
+            "Anote quais assuntos de gramática você errou."
+          ],
+          "onde": [
+            "Site do CIAGA (link no app), provas anteriores da EFOMM."
+          ]
+        },
+        {
+          "chave": "erros",
+          "materia": "Caderno de erros",
+          "titulo": "Caderno de erros",
+          "min": 10,
+          "metodo": "espacada"
+        }
+      ],
+      "2026-11-11": [
+        {
+          "chave": "d-map",
+          "materia": "Planejamento",
+          "titulo": "Mapa de conteúdos (lista dos temas das provas)",
+          "min": 60,
+          "metodo": "autoexplicacao",
+          "como": [
+            "Abra o edital/programa da Escola Naval e da EFOMM e copie os tópicos de Matemática, Física, Português e Inglês.",
+            "Dê uma nota de 0 a 3 para cada tópico (0 = nunca vi, 3 = domino).",
+            "Os tópicos com nota 0 e 1 viram a prioridade da Fase 1."
+          ],
+          "onde": [
+            "Edital: sites da Marinha (SSPM e CIAGA, links no app).",
+            "Conteúdo programático costuma estar no anexo do edital ou no manual do candidato."
+          ]
+        },
+        {
+          "chave": "d-mix",
+          "materia": "Misto",
+          "titulo": "Questões misturadas de ENEM (Matemática e Natureza)",
+          "min": 60,
+          "metodo": "intercalada",
+          "como": [
+            "Faça 20 questões do ENEM (10 Matemática e 10 Ciências da Natureza) sem consulta.",
+            "Alterne os assuntos para treinar a intercalação."
+          ],
+          "onde": [
+            "Provas anteriores do ENEM: enem.inep.gov.br/participante (provas e gabaritos)."
+          ]
+        }
+      ],
+      "2026-11-12": [
+        {
+          "chave": "d-mat2",
+          "materia": "Matemática",
+          "titulo": "Diagnóstico por tópicos de Matemática",
+          "min": 120,
+          "metodo": "diagnostico",
+          "como": [
+            "Para cada tópico, faça 3 questões simples: funções, trigonometria, geometria plana e espacial, geometria analítica, PA/PG, análise combinatória e probabilidade, matrizes e sistemas, logaritmos, complexos e polinômios.",
+            "Anote acertos de 0 a 3 por tópico: isso vira seu mapa de lacunas."
+          ],
+          "onde": [
+            "Questões de cada tópico nas provas antigas da Escola Naval, EFOMM e ENEM, ou em listas de exercícios de qualquer livro do ensino médio."
+          ]
+        },
+        {
+          "chave": "d-fis2",
+          "materia": "Física",
+          "titulo": "Diagnóstico por tópicos de Física",
+          "min": 60,
+          "metodo": "diagnostico",
+          "como": [
+            "2 questões de cada: cinemática, dinâmica, energia, hidrostática, termologia, óptica, ondas, eletricidade.",
+            "Anote acertos por tópico."
+          ],
+          "onde": [
+            "Provas antigas da Escola Naval e EFOMM, filtrando por tema."
+          ]
+        },
+        {
+          "chave": "d-ing1",
+          "materia": "Inglês",
+          "titulo": "Diagnóstico de Inglês",
+          "min": 60,
+          "metodo": "diagnostico",
+          "como": [
+            "Faça a parte de Inglês de uma prova da EFOMM ou Escola Naval (textos e vocabulário).",
+            "Anote as palavras que você não conhecia."
+          ],
+          "onde": [
+            "Provas anteriores da EFOMM (CIAGA) ou Escola Naval (SSPM)."
+          ]
+        },
+        {
+          "chave": "erros",
+          "materia": "Caderno de erros",
+          "titulo": "Caderno de erros",
+          "min": 10,
+          "metodo": "espacada"
+        }
+      ],
+      "2026-11-13": [
+        {
+          "chave": "d-mat3",
+          "materia": "Matemática",
+          "titulo": "Corrigir e estudar as 3 maiores lacunas de Matemática",
+          "min": 120,
+          "metodo": "autoexplicacao",
+          "como": [
+            "Olhe o mapa da quinta e escolha os 3 tópicos com menor nota.",
+            "Para cada um, explique em voz alta como resolver uma questão que você errou."
+          ],
+          "onde": [
+            "Seu caderno de erros e livros ou videoaulas do tópico."
+          ]
+        },
+        {
+          "chave": "d-fis3",
+          "materia": "Física",
+          "titulo": "Estudar as 2 maiores lacunas de Física",
+          "min": 60,
+          "metodo": "autoexplicacao",
+          "como": [
+            "Escolha os 2 tópicos com menor nota e refaça as questões que errou."
+          ],
+          "onde": [
+            "Seu caderno de erros e material do tópico."
+          ]
+        },
+        {
+          "chave": "d-port2",
+          "materia": "Português",
+          "titulo": "Português: estudar as lacunas da gramática",
+          "min": 60,
+          "metodo": "recuperacao",
+          "como": [
+            "Refaça sem consulta as questões de Português que você errou na terça."
+          ],
+          "onde": [
+            "Prova da EFOMM usada na terça."
+          ]
+        },
+        {
+          "chave": "erros",
+          "materia": "Caderno de erros",
+          "titulo": "Caderno de erros",
+          "min": 10,
+          "metodo": "espacada"
+        }
+      ],
+      "2026-11-14": [
+        {
+          "chave": "d-sim",
+          "materia": "Simulado",
+          "titulo": "Simulado diagnóstico completo da EFOMM (cronometrado)",
+          "min": 240,
+          "metodo": "diagnostico",
+          "como": [
+            "Use a prova da EFOMM mais recente (Matemática, Física, Português e Inglês).",
+            "Cronometre 4h seguidas, simulando a prova: sem celular, sem consulta.",
+            "Marque os chutes."
+          ],
+          "onde": [
+            "Site do CIAGA (link no app), provas anteriores. Se estiver difícil de achar, busque 'prova EFOMM com gabarito' em sites de cursinho."
+          ]
+        },
+        {
+          "chave": "d-corr",
+          "materia": "Correção",
+          "titulo": "Corrigir o simulado e registrar a nota por matéria",
+          "min": 120,
+          "metodo": "autoexplicacao",
+          "como": [
+            "Corrija com o gabarito.",
+            "Registre a nota por matéria na tela Simulados.",
+            "Cada erro vai pro Caderno de erros."
+          ],
+          "onde": [
+            "Gabarito oficial da prova."
+          ]
+        }
+      ],
+      "2026-11-15": [
+        {
+          "chave": "d-red",
+          "materia": "Redação",
+          "titulo": "Redação diagnóstica (tema livre estilo ENEM)",
+          "min": 90,
+          "metodo": "diagnostico",
+          "como": [
+            "Escolha um tema de redação do ENEM de um ano anterior.",
+            "Escreva 30 linhas em 1h e releia por 30 min.",
+            "Confira se tem tese, 2 argumentos e proposta de intervenção."
+          ],
+          "onde": [
+            "Temas e redações nota 1000 no site do INEP: enem.inep.gov.br/participante."
+          ]
+        },
+        {
+          "chave": "d-qui",
+          "materia": "Química",
+          "titulo": "Diagnóstico de Química (20 questões)",
+          "min": 90,
+          "metodo": "diagnostico",
+          "como": [
+            "Faça 20 questões de Química de provas antigas do ENEM ou da Escola Naval.",
+            "Anote os assuntos que você não lembrava."
+          ],
+          "onde": [
+            "Provas do ENEM (INEP) ou Escola Naval."
+          ]
+        },
+        {
+          "chave": "plan",
+          "materia": "Planejamento",
+          "titulo": "Planejar a semana: montar o mapa de lacunas",
+          "min": 30,
+          "metodo": "autoexplicacao",
+          "como": [
+            "Junte as notas por matéria e as lacunas dos tópicos.",
+            "Escolha o que será prioridade nas próximas 4 semanas."
+          ],
+          "onde": [
+            "Seu mapa de conteúdos e o caderno de erros."
+          ]
+        }
+      ],
+      "2026-11-16": [
+        {
+          "chave": "mat",
+          "materia": "Matemática",
+          "min": 120,
+          "metodo": "recuperacao"
+        },
+        {
+          "chave": "fis",
+          "materia": "Física",
+          "min": 60,
+          "metodo": "autoexplicacao"
+        },
+        {
+          "chave": "lingua",
+          "materia": "Português/Inglês",
+          "min": 60,
+          "metodo": "intercalada"
+        },
+        {
+          "chave": "erros",
+          "materia": "Caderno de erros",
+          "titulo": "Caderno de erros",
+          "min": 10,
+          "metodo": "espacada"
+        }
+      ]
+    }
+  },
+  "materias": [
+    "Matemática",
+    "Física",
+    "Português",
+    "Inglês",
+    "Química",
+    "Redação"
+  ],
+  "tiposErro": [
+    {
+      "id": "conteudo",
+      "nome": "Conteúdo"
+    },
+    {
+      "id": "atencao",
+      "nome": "Atenção"
+    },
+    {
+      "id": "tempo",
+      "nome": "Tempo"
+    }
+  ]
+}
