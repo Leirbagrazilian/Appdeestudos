@@ -31,7 +31,7 @@
 <h2>Capítulos</h2>
 <ul class="grupo card">
   {#each caps as f}
-    <li class="cap" class:ok={f.ok}><span class="num">{f.numero}</span><span><strong>{f.nome}</strong><span class="sub"> · {f.ok ? 'concluído' : f.inicio <= app.dia ? 'em andamento' : 'a seguir'}</span></span></li>
+    <li class="cap" class:ok={f.ok}><span class="num">{f.numero}</span><span><strong>{f.nome}</strong><span class="sub">&nbsp;· {f.ok ? 'concluído' : f.inicio <= app.dia ? 'em andamento' : 'a seguir'}</span></span></li>
   {/each}
 </ul>
 

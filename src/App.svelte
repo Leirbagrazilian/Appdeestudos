@@ -16,17 +16,18 @@
   import Foco from './screens/Foco.svelte';
   import Lacunas from './screens/Lacunas.svelte';
   import Conquistas from './screens/Conquistas.svelte';
+  import Redacao from './screens/Redacao.svelte';
 
   const abas = [
     { id: 'hoje', nome: 'Hoje', d: 'M5 12.5l4.5 4.5L19 7.5' },
     { id: 'semana', nome: 'Semana', d: 'M4 6h16M4 12h16M4 18h10' },
     { id: 'calendario', nome: 'Calendário', d: 'M5 5h14v15H5zM5 10h14M9 3v4M15 3v4' },
     { id: 'erros', nome: 'Erros', d: 'M12 8v5M12 17h.01M12 3l9 16H3z' },
-    { id: 'mais', nome: 'Mais', d: 'M5 12h.01M12 12h.01M19 12h.01' },
+    { id: 'mais', nome: 'QG', d: 'M4 20V10l8-6 8 6v10h-5v-6H9v6z' },
   ];
   // Ordem das telas: define se a transição desliza para a esquerda ou para a direita.
-  const ORDEM = ['hoje', 'foco', 'semana', 'calendario', 'erros', 'mais', 'simulados', 'lacunas', 'conquistas', 'questoes', 'ajustes'];
-  const SUB_MAIS = ['simulados', 'ajustes', 'questoes', 'lacunas', 'conquistas'];
+  const ORDEM = ['hoje', 'foco', 'semana', 'calendario', 'erros', 'mais', 'simulados', 'redacao', 'lacunas', 'conquistas', 'questoes', 'ajustes'];
+  const SUB_MAIS = ['simulados', 'ajustes', 'questoes', 'lacunas', 'conquistas', 'redacao'];
   const ler = () => location.hash.replace('#/', '').split('?')[0] || 'hoje';
   let rota = $state(ler());
 
@@ -63,6 +64,7 @@
   {:else if rota === 'questoes'}<Questoes />
   {:else if rota === 'lacunas'}<Lacunas />
   {:else if rota === 'conquistas'}<Conquistas />
+  {:else if rota === 'redacao'}<Redacao />
   {:else}<Mais />{/if}
 </main>
 

@@ -8,13 +8,16 @@ import { prefs, aplicarPrefs, vibrar } from '../lib/prefs.js';
 import { sino } from '../lib/audio.js';
 import { conquistas } from '../lib/conquistas.js';
 import * as foco from '../lib/foco.js';
+import { treinar } from '../lib/erros.js';
+import { montar } from '../lib/backup.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} } };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
   ...structuredClone(EXTRAS), timer: null, dia: today(), toast: null, insignia: null,
+  ultimoBackup: null, lembreteAdiado: null, persistente: null,
 });
 export const fases = () => gerarFases(app.cfg);
 export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis });
@@ -34,6 +37,9 @@ export async function iniciar() {
   app.exams = await db.all('exams');
   for (const k of Object.keys(EXTRAS)) app[k] = (await db.get('kv', k)) ?? structuredClone(EXTRAS[k]);
   app.timer = (await db.get('kv', 'timer')) ?? null;
+  app.ultimoBackup = (await db.get('kv', 'ultimoBackup')) ?? null;
+  app.lembreteAdiado = (await db.get('kv', 'lembreteAdiado')) ?? null;
+  protegerDados();
   // Primeira vez com insígnias: as já conquistadas entram como vistas, sem enxurrada de avisos.
   if (!Object.keys(app.vistos.conquistas).length) { for (const c of conquistas(dadosConquistas())) if (c.ok) app.vistos.conquistas[c.id] = true; await salvarKV('vistos'); }
   verificar(app.cfg, app.reviews, app.dia);
@@ -125,9 +131,9 @@ export async function alternarRevisao(r) {
 // ---------- caderno de erros, simulados, lacunas ----------
 const novoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 
-/** Registra um erro (com foto opcional) e agenda as revisões de 1, 7 e 30 dias. */
-export async function addErro({ materia, assunto, tipo, foto = null }) {
-  const id = novoId(), e = { id, materia, assunto: assunto.trim(), tipo, dia: app.dia, foto };
+/** Registra um erro (lição e foto opcionais) e agenda as revisões de 1, 7 e 30 dias. */
+export async function addErro({ materia, assunto, tipo, licao = '', foto = null }) {
+  const id = novoId(), e = { id, materia, assunto: assunto.trim(), tipo, licao: licao.trim(), dia: app.dia, foto, status: 'novo' };
   app.errors[id] = e; await db.put('errors', id, e);
   for (const r of agendarRevisoes({ origem: `erro:${id}`, assunto: e.assunto, materia, dia: app.dia })) { app.reviews[r.id] = r; await db.put('reviews', r.id, r); }
   comemorar();
@@ -137,6 +143,51 @@ export async function delErro(id) {
   delete app.errors[id]; await db.del('errors', id);
   for (const k of Object.keys(app.reviews)) if (app.reviews[k].origem === `erro:${id}`) { delete app.reviews[k]; await db.del('reviews', k); }
 }
+export async function atualizarErro(id, campos) {
+  const e = { ...snap(app.errors[id]), ...campos };
+  app.errors[id] = e; await db.put('errors', id, e);
+}
+/** Uma tentativa no treino de erros. Devolve o erro atualizado. */
+export async function treinarErro(id, acertou) {
+  const antes = snap(app.errors[id]);
+  const e = treinar(antes, acertou, app.dia);
+  app.errors[id] = e; await db.put('errors', id, e);
+  vibrar(pf(), acertou ? 'ok' : 'toque');
+  if (e.status === 'dominado' && antes.status !== 'dominado') { if (pf().sons) sino(); avisar(`${e.assunto}: dominado`, null, 'Dois acertos seguidos. Esse vilão foi preso.'); }
+  checarConquistas();
+  return e;
+}
+
+// ---------- redação ----------
+export async function addRedacao(r) { const id = novoId(); app.redacoes[id] = { id, ...r }; await salvarKV('redacoes'); comemorar(); }
+export async function delRedacao(id) { delete app.redacoes[id]; await salvarKV('redacoes'); }
+
+// ---------- proteção dos dados e backup ----------
+/** Pede ao navegador para não apagar os dados do app na limpeza automática. */
+export async function protegerDados() {
+  try {
+    if (!navigator.storage?.persist) { app.persistente = false; return; }
+    app.persistente = (await navigator.storage.persisted()) || (await navigator.storage.persist());
+  } catch { app.persistente = false; }
+}
+/** Gera o backup e abre o compartilhar do sistema (Drive, WhatsApp…); sem compartilhar, baixa o arquivo. */
+export async function fazerBackup() {
+  const nome = `estuda-gabriel-backup-${app.dia}.json`;
+  const texto = montar(app);
+  const arquivo = typeof File !== 'undefined' ? new File([texto], nome, { type: 'application/json' }) : null;
+  try {
+    if (arquivo && navigator.canShare?.({ files: [arquivo] })) await navigator.share({ files: [arquivo], title: 'Backup do Estuda Gabriel' });
+    else {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+      a.download = nome; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+  } catch (e) { if (e?.name === 'AbortError') return false; throw e; }
+  app.ultimoBackup = app.dia; await db.put('kv', 'ultimoBackup', app.dia);
+  avisar('Backup feito', null, 'Guarde o arquivo no Drive ou mande para você mesmo.');
+  return true;
+}
+export async function adiarLembreteBackup() { app.lembreteAdiado = app.dia; await db.put('kv', 'lembreteAdiado', app.dia); }
+
 export async function addExame(ex) { const id = novoId(); app.exams[id] = { id, ...ex }; await db.put('exams', id, { id, ...ex }); comemorar(); checarConquistas(); }
 export async function delExame(id) { delete app.exams[id]; await db.del('exams', id); }
 

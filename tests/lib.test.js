@@ -169,3 +169,33 @@ describe('insígnias', () => {
     expect(ok).not.toContain('sete-dias');
   });
 });
+
+import { treinar, filaTreino, viloes, precisaBackup, totalRedacao } from '../src/lib/erros.js';
+describe('caderno de erros', () => {
+  const e = { id: 'a', assunto: 'Trigonometria', materia: 'Matemática', tipo: 'conteudo' };
+  it('2 acertos seguidos = dominado; errar zera a sequência', () => {
+    let x = treinar(e, true, '2026-11-10');
+    expect(x.status).toBe('treinando');
+    x = treinar(treinar(x, false, '2026-11-11'), true, '2026-11-12');
+    expect(x.status).toBe('treinando');
+    x = treinar(x, true, '2026-11-13');
+    expect(x.status).toBe('dominado');
+  });
+  it('fila: nunca treinados primeiro, dominados fora', () => {
+    const l = [{ ...e, id: 'b', ultimoTreino: '2026-11-09' }, { ...e, id: 'c' }, { ...e, id: 'd', status: 'dominado' }];
+    expect(filaTreino(l).map((x) => x.id)).toEqual(['c', 'b']);
+  });
+  it('vilões: assunto repetido e dica pelo tipo dominante', () => {
+    const l = [e, { ...e, id: 'b', assunto: ' trigonometria ' }, { ...e, id: 'c', assunto: 'PA', tipo: 'atencao' }, { ...e, id: 'd', assunto: 'PG', tipo: 'atencao' }, { ...e, id: 'f', assunto: 'PG', tipo: 'atencao' }];
+    const v = viloes(l);
+    expect(v.top[0]).toMatchObject({ assunto: 'Trigonometria', n: 2 });
+    expect(v.dica).toMatch(/atenção/);
+  });
+  it('lembrete de backup', () => {
+    expect(precisaBackup(null, '2026-11-10', 2)).toBe(false);
+    expect(precisaBackup(null, '2026-11-10', 3)).toBe(true);
+    expect(precisaBackup('2026-11-04', '2026-11-10', 9)).toBe(false);
+    expect(precisaBackup('2026-11-03', '2026-11-10', 9)).toBe(true);
+  });
+  it('total da redação', () => expect(totalRedacao({ notas: [120, 160, 120, 160, 80] })).toBe(640));
+});

@@ -1,9 +1,9 @@
 <script>
-  import { app, salvarCfg, importar, restaurarSeed, pf } from '../stores/app.svelte.js';
+  import { app, salvarCfg, importar, restaurarSeed, pf, fazerBackup } from '../stores/app.svelte.js';
   import { vibrar } from '../lib/prefs.js';
   import { sino } from '../lib/audio.js';
   import { gerarICS } from '../lib/ics.js';
-  import { baixar, montar, validar } from '../lib/backup.js';
+  import { baixar, validar } from '../lib/backup.js';
   import { pedir, suportado } from '../lib/notify.js';
   import { fmtBR } from '../lib/dates.js';
 
@@ -122,7 +122,8 @@
 
 <h2>Backup e agenda</h2>
 <section class="card bloco">
-  <button class="pri" onclick={() => baixar(`estuda-gabriel-backup-${app.dia}.json`, montar(app), 'application/json')}>Exportar backup (JSON)</button>
+  <button class="pri" onclick={fazerBackup}>Fazer backup (salvar ou compartilhar)</button>
+  <p class="muted">{app.ultimoBackup ? `Último backup: ${fmtBR(app.ultimoBackup)}.` : 'Nenhum backup feito ainda.'} {app.persistente ? 'Os dados estão protegidos contra a limpeza automática do navegador.' : 'O navegador não garantiu proteção contra limpeza automática: mantenha o backup semanal.'}</p>
   <label class="sec file">Importar backup<input type="file" accept="application/json,.json" onchange={arquivo} hidden /></label>
   <button class="pri" onclick={() => baixar('estuda-gabriel.ics', gerarICS(app.cfg), 'text/calendar')}>Exportar .ics (Google Agenda)</button>
   <p class="muted">Na Google Agenda: Configurações → Importar e exportar → Importar. Os alarmes de 14, 7 e 1 dia já vão no arquivo.</p>
