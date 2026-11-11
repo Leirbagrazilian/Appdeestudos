@@ -1,7 +1,8 @@
+import { mesclarBiblioteca } from './livros.js';
 // Atualiza a configuração salva no aparelho quando o seed ganha conteúdo novo,
 // sem perder o que você editou (datas, status, metas, carta, links, preferências...).
 // Conteúdo que você não edita no app (fases, tópicos, textos) é sempre trazido do seed.
-const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'pausasAtivas', 'questoes', 'materias', 'tiposErro', 'materiasInfo', 'regras', 'horasFase', 'categorias'];
+const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'pausasAtivas', 'questoes', 'materias', 'tiposErro', 'materiasInfo', 'regras', 'horasFase', 'categorias', 'ritmos', 'temasRedacao'];
 const CAMPOS_CONCURSO = ['nome', 'sigla', 'cor', 'prioridade', 'idade', 'link', 'plano'];
 const mesmoEvento = (a, b) => a.tipo === b.tipo && (a.nome ?? '') === (b.nome ?? '');
 
@@ -19,6 +20,7 @@ export function migrarCfg(salvo, seed) {
   delete cfg.rotina.metaHoras;
   if (aulasSemEdicao) cfg.rotina.aulas = structuredClone(seed.rotina.aulas);
   delete cfg.modeloSemana;
+  cfg.biblioteca = mesclarBiblioteca(salvo.biblioteca, seed.biblioteca); // o que você cadastrou fica; recursos novos do seed entram
 
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));
   cfg.concursos = seed.concursos.map((novo) => {

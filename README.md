@@ -61,6 +61,12 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - A rampa vale nas 2 primeiras semanas do planner, depois da semana diagnóstica.
 - A Fase 6 (ENEM) usa uma tabela estimada (muita prova antiga); ajuste em `horasFase.enem` no seed se quiser.
 
+## Meus livros (SPEC v2, etapa 4)
+- Tela **QG → Meus livros**: por matéria, escolha o **livro principal** (Física Clássica por padrão; Tópicos de Física como opção; Química: Feltre, editável), veja os volumes e vincule cada um a tópicos da Trilha.
+- Cadastre **uma vez** capítulo, páginas e exercícios de cada tópico. O app calcula a **cota do bloco** (teoria 10 pág/h, gramática 15 pág/h, ajustados pelo que você registrar) e **continua de onde você parou**: o que não foi lido fica para o próximo bloco.
+- A biblioteca do SPEC vem cadastrada **sem páginas**. Links: só entram os que apareceram na busca ("link visto na busca"); os demais ficam "a confirmar" e você cola o seu. Questões por hora: 6 (EN/EFOMM) e 3 (ITA).
+- Os temas de redação já cobrados na Escola Naval aparecem na tela Redação (lista do SPEC, não verificada).
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

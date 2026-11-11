@@ -259,7 +259,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(6);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(4);
+    expect(novo.versaoSeed).toBe(5);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
@@ -515,5 +515,113 @@ describe('planner v2: casos de borda (revisão)', () => {
     expect(novo.rotina.janelas[1]).toEqual([{ ini: '05:00', fim: '07:00' }]);
     expect(novo.rotina.metaLiquida).toBe(38); expect(novo.rotina.rampa.ativa).toBe(true);
     expect(novo.modeloSemana).toBeUndefined();
+  });
+});
+
+import { series, principalDe, recursosAtivos, vinculosDoTopico, temPaginas, ritmoDe, ritmoQuestoes, proximaPagina, progresso, cotaPaginas, registrarLeitura, pararNaPagina, novoRecurso, mesclarBiblioteca, slug } from '../src/lib/livros.js';
+describe('Meus livros', () => {
+  const c = cfg();
+  const iezzi3 = () => ({ id: 'x', recurso: 'iezzi-3', materia: 'Matemática', topico: 'Trigonometria', pagIni: 1, pagFim: 100, exIni: 1, exFim: 50 });
+  const rec = (id) => c.biblioteca.recursos.find((r) => r.id === id);
+
+  it('o seed tem a biblioteca do SPEC §7, sem páginas, e todo vínculo aponta para recurso e tópico que existem', () => {
+    const b = c.biblioteca;
+    expect(b.recursos.filter((r) => r.serie === 'iezzi')).toHaveLength(11);
+    expect(b.recursos.filter((r) => r.serie === 'topicos-fisica')).toHaveLength(3);
+    for (const v of b.vinculos) {
+      expect(rec(v.recurso), v.id).toBeTruthy();
+      expect(c.topicos[v.materia].some((t) => t.nome === v.topico), v.id).toBe(true);
+      expect(temPaginas(v)).toBe(false); // sem páginas: você cadastra
+    }
+    for (const r of b.recursos) { expect(c.materias).toContain(r.materia); if (r.link) expect(r.link).toMatch(/^https:\/\//); }
+    expect(b.recursos.filter((r) => r.link).every((r) => r.linkStatus === 'visto na busca')).toBe(true);
+    for (const m of Object.keys(b.principal)) if (b.principal[m]) expect(series(c, m).some((s) => s.id === b.principal[m])).toBe(true);
+  });
+  it('Física Clássica é o livro principal; Tópicos de Física fica como opção e só vale quando escolhido', () => {
+    expect(principalDe(c, 'Física')).toBe('fisica-classica');
+    expect(series(c, 'Física').map((s) => s.id)).toEqual(['fisica-classica', 'topicos-fisica']);
+    expect(recursosAtivos(c, 'Física').some((r) => r.serie === 'topicos-fisica')).toBe(false);
+    expect(recursosAtivos(c, 'Física').some((r) => r.id === 'fisica-total')).toBe(true); // vídeos valem sempre
+    const d = cfg(); d.biblioteca.principal.Física = 'topicos-fisica';
+    expect(recursosAtivos(d, 'Física').filter((r) => r.serie === 'topicos-fisica')).toHaveLength(3);
+    expect(vinculosDoTopico(d, 'Física', 'Cinemática')[0].recurso).toBe('topicos-fisica-1');
+    expect(vinculosDoTopico(c, 'Física', 'Cinemática')).toHaveLength(0);
+    expect(principalDe(c, 'Química')).toBe('feltre');
+  });
+  it('cota de páginas: 10 pág/h x 2 h = 20 páginas, a partir do início', () => {
+    const v = iezzi3();
+    expect(cotaPaginas(v, null, 120, 10)).toMatchObject({ de: 1, ate: 20, n: 20, restante: 80, concluido: false });
+    expect(cotaPaginas({ ...v, pagIni: null }, null, 120, 10)).toBeNull(); // sem páginas: nada de cota
+  });
+  it('continua de onde parou e o que não foi feito vai para o próximo bloco', () => {
+    const v = iezzi3();
+    let l = null;
+    expect(cotaPaginas(v, l, 100, 10)).toMatchObject({ de: 1, ate: 17 });
+    l = registrarLeitura(l, v, 12, 100, '2026-11-23'); // fez só 12 das 17
+    expect(proximaPagina(v, l)).toBe(13);
+    expect(cotaPaginas(v, l, 100, 10)).toMatchObject({ de: 13, ate: 29 }); // as 5 que faltaram entram no próximo
+    expect(progresso(v, l)).toBeCloseTo(0.12);
+    l = pararNaPagina(l, v, 60);
+    expect(proximaPagina(v, l)).toBe(61);
+  });
+  it('termina o livro sem passar do fim e avisa que concluiu', () => {
+    const v = iezzi3();
+    const l = { proxima: 95, registros: [] };
+    expect(cotaPaginas(v, l, 120, 10)).toMatchObject({ de: 95, ate: 100, restante: 0 });
+    const fim = registrarLeitura(l, v, 50, 60, 'd');
+    expect(fim.proxima).toBe(101);
+    expect(cotaPaginas(v, fim, 60, 10)).toEqual({ concluido: true });
+    expect(progresso(v, fim)).toBe(1);
+  });
+  it('exercícios andam na mesma proporção das páginas', () => {
+    const v = iezzi3(); // 100 páginas, 50 exercícios
+    expect(cotaPaginas(v, null, 120, 10).ex).toEqual({ de: 1, ate: 10 }); // 20% das páginas = 10 exercícios
+    const l = { proxima: 51, registros: [] };
+    expect(cotaPaginas(v, l, 60, 10)).toMatchObject({ de: 51, ate: 60, ex: { de: 26, ate: 30 } });
+    expect(cotaPaginas({ ...v, exIni: '', exFim: '' }, null, 60, 10).ex).toBeNull();
+  });
+  it('ritmo: teoria 10/h, gramática 15/h; ajusta pelo que você registrar', () => {
+    expect(ritmoDe(c, rec('iezzi-3')).ritmo).toBe(10);
+    expect(ritmoDe(c, rec('cegalla')).ritmo).toBe(15);
+    expect(ritmoDe(c, rec('iezzi-3'), []).ajustado).toBe(false);
+    const rapido = ritmoDe(c, rec('iezzi-3'), [{ pags: 40, min: 120 }]); // 20 pág/h em 2 h
+    expect(rapido.ajustado).toBe(true); expect(rapido.ritmo).toBeGreaterThan(10); expect(rapido.ritmo).toBeLessThan(20);
+    const muitoDados = ritmoDe(c, rec('iezzi-3'), [{ pags: 150, min: 600 }]); // 15 pág/h em 10 h: vale o real
+    expect(muitoDados.ritmo).toBeCloseTo(15);
+    expect(ritmoDe(c, rec('iezzi-3'), [{ pags: 1000, min: 60 }]).ritmo).toBe(25); // limitado a 2,5x
+  });
+  it('questões por hora: 6 (EN/EFOMM) e 3 (ITA)', () => {
+    expect(ritmoQuestoes(c, 'en')).toBe(6); expect(ritmoQuestoes(c, 'efomm')).toBe(6); expect(ritmoQuestoes(c, 'ita')).toBe(3);
+  });
+  it('cadastrar recurso: id único, série pelo título e link do usuário', () => {
+    const r = novoRecurso(c, { tipo: 'livro', materia: 'Química', titulo: 'Química Geral', volume: '1', link: ' https://x.com ' });
+    expect(r).toMatchObject({ id: 'quimica-geral-1', serie: 'quimica-geral', link: 'https://x.com', linkStatus: 'informado por você' });
+    c.biblioteca.recursos.push(r);
+    expect(novoRecurso(c, { tipo: 'livro', materia: 'Química', titulo: 'Química Geral', volume: '1' }).id).toBe('quimica-geral-1-2');
+    expect(slug('Física Clássica (2ª ed.)')).toBe('fisica-classica-2-ed');
+  });
+  it('migração: o que você cadastrou e editou fica; recursos novos do seed entram; o que você apagou não volta', () => {
+    const salva = structuredClone(c.biblioteca);
+    salva.recursos = salva.recursos.filter((r) => r.id !== 'cegalla' && r.id !== 'portal-obmep');
+    salva.removidos = ['cegalla'];
+    salva.recursos.push({ id: 'meu', tipo: 'livro', materia: 'Química', titulo: 'Meu livro', link: '', linkStatus: 'a confirmar' });
+    salva.recursos.find((r) => r.id === 'iezzi-3').link = 'https://meu-link';
+    salva.vinculos.find((v) => v.recurso === 'iezzi-3').pagIni = 7;
+    salva.principal.Matemática = 'iezzi'; salva.principal.Física = 'topicos-fisica';
+    const antigoSemLink = salva.recursos.find((r) => r.id === 'matzero'); antigoSemLink.link = ''; antigoSemLink.linkStatus = 'a confirmar';
+    const novo = mesclarBiblioteca(salva, c.biblioteca);
+    const ids = novo.recursos.map((r) => r.id);
+    expect(ids).toContain('meu'); expect(ids).not.toContain('cegalla'); expect(ids).toContain('portal-obmep');
+    expect(novo.recursos.find((r) => r.id === 'iezzi-3').link).toBe('https://meu-link');
+    expect(novo.vinculos.find((v) => v.recurso === 'iezzi-3').pagIni).toBe(7);
+    expect(novo.principal.Física).toBe('topicos-fisica');
+    expect(novo.recursos.find((r) => r.id === 'matzero').link).toMatch(/youtube/); // quem não tinha link recebe o novo
+    expect(novo.vinculos.some((v) => v.recurso === 'cegalla')).toBe(false);
+    expect(mesclarBiblioteca(undefined, c.biblioteca)).toEqual(c.biblioteca);
+  });
+  it('configuração antiga ganha a biblioteca ao migrar', () => {
+    const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
+    const novo = migrarCfg(velho, cfg());
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(5); expect(novo.ritmos.teoria).toBe(10);
   });
 });

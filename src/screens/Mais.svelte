@@ -72,6 +72,7 @@
 
 <h2>Recursos</h2>
 <ul class="grupo card">
+  <li><a href="#/livros"><span class="t"><strong>Meus livros</strong><span class="sub">Livros, vídeos e sites por matéria; páginas e ritmo de leitura</span></span><Icon nome="mapa" size={18} /></a></li>
   <li><a href="#/questoes"><span class="t"><strong>Onde achar questões</strong><span class="sub">Provas e gabaritos: Escola Naval, EFOMM, ITA e ENEM</span></span><Icon nome="ext" size={18} /></a></li>
 </ul>
 
