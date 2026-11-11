@@ -53,6 +53,12 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - A tela **Trilha** (substitui o Mapa de lacunas) lista os tópicos de cada matéria na ordem de estudo, com os concursos que cada um serve e a sua nota de domínio (0 a 3). As notas antigas do mapa foram aproveitadas.
 - "O que estudar a seguir": dentro da janela dos próximos 3 tópicos, vale primeiro o que serve a mais concursos.
 
+## Rotina e planner v2 (SPEC v2, etapa 3)
+- **Janelas de estudo** por dia (editáveis em Ajustes). Os blocos entram nelas com **50 min de foco e 10 de pausa**; cada bloco mostra o horário.
+- **Horas por semana** vêm da tabela da fase (base de 50 h) escalada para a **meta líquida de 43 h**. Sábado: prova antiga cronometrada + correção; domingo: redação + planejamento.
+- Regras: matéria abaixo de 50% no último simulado ganha +2 h na semana seguinte (tiradas da mais forte); inglês com 75% ou mais fica em 1 h de manutenção; rampa opcional de 75% nas 2 primeiras semanas; semana antes da prova = revisão leve.
+- A Fase 6 (ENEM) usa uma tabela estimada (muita prova antiga); ajuste em `horasFase.enem` no seed se quiser.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

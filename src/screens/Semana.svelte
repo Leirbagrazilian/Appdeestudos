@@ -1,6 +1,6 @@
 <script>
   import { app, fases, ajustes } from '../stores/app.svelte.js';
-  import { blocosAjustados, metaDoDia } from '../lib/planner.js';
+  import { blocosAjustados } from '../lib/planner.js';
   import { addDays, startOfWeek, diaNome, fmtMin, parse } from '../lib/dates.js';
   import Ring from '../components/Ring.svelte';
   import { fmtCurta } from '../lib/dates.js';
@@ -11,7 +11,7 @@
   const semana = (ini) => Array.from({ length: 7 }, (_, i) => {
     const dia = addDays(ini, i), plan = blocosAjustados(app.cfg, fs, dia, ajustes());
     const planMin = plan.reduce((s, b) => s + b.min, 0);
-    return { dia, plan, planMin, feito: feitoNoDia(dia), meta: metaDoDia(app.cfg, dia) };
+    return { dia, plan, planMin, feito: feitoNoDia(dia), meta: planMin };
   });
   const ini = $derived(startOfWeek(app.dia));
   const dias = $derived(semana(ini));
@@ -48,11 +48,12 @@
   });
   const msg = $derived(media >= 80 ? 'Ritmo excelente. Mantenha o ritmo.' : media >= 50 ? 'Bom ritmo. Uma semana mais fraca não apaga o que você construiu.' : 'Recomeçar é parte do processo. Faça só o próximo bloco.');
   const letra = (d) => diaNome(d).slice(0, 3);
+  const hm = (m) => `${(m / 60).toFixed(1).replace('.', ',').replace(',0', '')}h`;
 </script>
 
 <header>
   <p class="data">Semana · {fmtCurta(ini)} a {fmtCurta(addDays(ini, 6))}</p>
-  <h1>{feitoTotal / 60 < 10 ? (feitoTotal / 60).toFixed(1).replace('.', ',') : Math.round(feitoTotal / 60)}h <span>de {metaTotal / 60}h</span></h1>
+  <h1>{hm(feitoTotal)}<span> de {hm(metaTotal)}</span></h1>
   <div class="bar" role="progressbar" aria-label="Meta semanal" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
   <p class="sub">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal</p>
 </header>

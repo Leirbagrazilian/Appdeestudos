@@ -11,7 +11,7 @@ export function planoSessoes(min, foco = FOCO_PADRAO) {
 }
 
 export function iniciar(b, foco, agora) {
-  const { sessoes, len, pausa } = planoSessoes(b.min, foco);
+  const { sessoes, len, pausa } = planoSessoes(b.bruto ?? b.min, foco); // bruto = tempo no relógio, com as pausas
   return {
     id: b.id, titulo: b.titulo, materia: b.materia, chave: b.chave, comAssunto: !!b.comAssunto,
     sessoes, len, pausa, sessao: 1, fase: 'foco', inicio: agora, focoMs: 0, avisado: false,

@@ -181,25 +181,113 @@
       },
       {
         "dia": 3,
-        "inicio": "09:30",
-        "fim": "10:10",
+        "inicio": "09:00",
+        "fim": "11:00",
         "nome": "Faculdade"
       },
       {
         "dia": 4,
-        "inicio": "13:00",
-        "fim": "18:00",
+        "inicio": "13:30",
+        "fim": "17:00",
         "nome": "Faculdade"
+      },
+      {
+        "dia": 2,
+        "inicio": "15:00",
+        "fim": "16:00",
+        "nome": "Academia"
+      },
+      {
+        "dia": 2,
+        "inicio": "18:30",
+        "fim": "20:00",
+        "nome": "Jiu-jitsu"
       }
     ],
-    "metaHoras": {
-      "0": 4,
-      "1": 4,
-      "2": 4,
-      "3": 2,
-      "4": 4,
-      "5": 4,
-      "6": 6
+    "janelas": {
+      "1": [
+        {
+          "ini": "06:00",
+          "fim": "07:00"
+        },
+        {
+          "ini": "12:30",
+          "fim": "18:30"
+        },
+        {
+          "ini": "20:00",
+          "fim": "21:00"
+        }
+      ],
+      "2": [
+        {
+          "ini": "07:00",
+          "fim": "12:00"
+        },
+        {
+          "ini": "13:00",
+          "fim": "15:00"
+        },
+        {
+          "ini": "16:00",
+          "fim": "18:00"
+        }
+      ],
+      "3": [
+        {
+          "ini": "06:30",
+          "fim": "08:30"
+        },
+        {
+          "ini": "12:00",
+          "fim": "18:00"
+        },
+        {
+          "ini": "19:00",
+          "fim": "20:00"
+        }
+      ],
+      "4": [
+        {
+          "ini": "06:30",
+          "fim": "12:30"
+        },
+        {
+          "ini": "18:00",
+          "fim": "20:00"
+        }
+      ],
+      "5": [
+        {
+          "ini": "08:00",
+          "fim": "12:00"
+        },
+        {
+          "ini": "13:00",
+          "fim": "17:00"
+        }
+      ],
+      "6": [
+        {
+          "ini": "08:00",
+          "fim": "15:00",
+          "tipo": "prova"
+        }
+      ],
+      "0": [
+        {
+          "ini": "09:00",
+          "fim": "12:00",
+          "tipo": "domingo"
+        }
+      ]
+    },
+    "metaNominal": 50,
+    "metaLiquida": 43,
+    "rampa": {
+      "ativa": false,
+      "semanas": 2,
+      "fator": 0.75
     }
   },
   "metodos": {
@@ -210,90 +298,6 @@
     "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil.",
     "sono": "Sono de 7 a 9h consolida o que você estudou hoje.",
     "exercicio": "Se mexer 30 minutos hoje melhora foco e memória (e você é de Educação Física)."
-  },
-  "modeloSemana": {
-    "util": [
-      {
-        "chave": "mat",
-        "materia": "Matemática",
-        "min": 120,
-        "metodo": "recuperacao"
-      },
-      {
-        "chave": "fis",
-        "materia": "Física",
-        "min": 60,
-        "metodo": "autoexplicacao"
-      },
-      {
-        "chave": "lingua",
-        "materia": "Português/Inglês",
-        "min": 60,
-        "metodo": "intercalada"
-      },
-      {
-        "chave": "erros",
-        "materia": "Caderno de erros",
-        "titulo": "Caderno de erros",
-        "min": 10,
-        "metodo": "espacada"
-      }
-    ],
-    "3": [
-      {
-        "chave": "rev",
-        "materia": "Revisão",
-        "titulo": "Revisão espaçada",
-        "min": 60,
-        "metodo": "espacada"
-      },
-      {
-        "chave": "mix",
-        "materia": "Misto",
-        "titulo": "Questões misturadas",
-        "min": 60,
-        "metodo": "intercalada"
-      }
-    ],
-    "6": [
-      {
-        "chave": "prova",
-        "materia": "Prova antiga",
-        "titulo": "Prova antiga cronometrada",
-        "min": 240,
-        "metodo": "recuperacao"
-      },
-      {
-        "chave": "corr",
-        "materia": "Correção",
-        "titulo": "Correção e caderno de erros",
-        "min": 120,
-        "metodo": "autoexplicacao"
-      }
-    ],
-    "0": [
-      {
-        "chave": "red",
-        "materia": "Redação",
-        "titulo": "Redação",
-        "min": 90,
-        "metodo": "autoexplicacao"
-      },
-      {
-        "chave": "qui",
-        "materia": "Química",
-        "titulo": "Química",
-        "min": 90,
-        "metodo": "recuperacao"
-      },
-      {
-        "chave": "plan",
-        "materia": "Planejamento",
-        "titulo": "Planejar a semana",
-        "min": 30,
-        "metodo": "autoexplicacao"
-      }
-    ]
   },
   "provaSabado": {
     "base": "Prova antiga de qualquer concurso naval (a mais recente que você ainda não fez)",
@@ -606,33 +610,6 @@
           "onde": [
             "Seu mapa de conteúdos e o caderno de erros."
           ]
-        }
-      ],
-      "2026-11-16": [
-        {
-          "chave": "mat",
-          "materia": "Matemática",
-          "min": 120,
-          "metodo": "recuperacao"
-        },
-        {
-          "chave": "fis",
-          "materia": "Física",
-          "min": 60,
-          "metodo": "autoexplicacao"
-        },
-        {
-          "chave": "lingua",
-          "materia": "Português/Inglês",
-          "min": 60,
-          "metodo": "intercalada"
-        },
-        {
-          "chave": "erros",
-          "materia": "Caderno de erros",
-          "titulo": "Caderno de erros",
-          "min": 10,
-          "metodo": "espacada"
         }
       ]
     }
@@ -1011,7 +988,7 @@
       }
     ]
   },
-  "versaoSeed": 3,
+  "versaoSeed": 4,
   "materiasInfo": {
     "Matemática": {
       "concursos": [
@@ -1073,6 +1050,118 @@
     "en": {
       "minPorMateriaPct": 50,
       "minRedacaoDe100": 50
+    }
+  },
+  "horasFase": {
+    "base": {
+      "mat": 20,
+      "fis": 14,
+      "qui": 3,
+      "por": 4,
+      "red": 2,
+      "ing": 2,
+      "hg": 0,
+      "provas": 5
+    },
+    "desenvolvimento": {
+      "mat": 17,
+      "fis": 13,
+      "qui": 3,
+      "por": 4,
+      "red": 2,
+      "ing": 2,
+      "hg": 3,
+      "provas": 6
+    },
+    "efomm": {
+      "mat": 14,
+      "fis": 10,
+      "qui": 2,
+      "por": 5,
+      "red": 3,
+      "ing": 2,
+      "hg": 5,
+      "provas": 9
+    },
+    "en": {
+      "mat": 15,
+      "fis": 12,
+      "qui": 2,
+      "por": 5,
+      "red": 3,
+      "ing": 2,
+      "hg": 0,
+      "provas": 11
+    },
+    "ita": {
+      "mat": 15,
+      "fis": 13,
+      "qui": 10,
+      "por": 3,
+      "red": 3,
+      "ing": 2,
+      "hg": 0,
+      "provas": 4
+    },
+    "enem": {
+      "mat": 7,
+      "fis": 5,
+      "qui": 2,
+      "por": 2,
+      "red": 4,
+      "ing": 0,
+      "hg": 0,
+      "provas": 30
+    }
+  },
+  "categorias": {
+    "mat": {
+      "materia": "Matemática",
+      "metodo": "recuperacao"
+    },
+    "fis": {
+      "materia": "Física",
+      "metodo": "autoexplicacao"
+    },
+    "qui": {
+      "materia": "Química",
+      "metodo": "recuperacao"
+    },
+    "por": {
+      "materia": "Português",
+      "metodo": "recuperacao"
+    },
+    "ing": {
+      "materia": "Inglês",
+      "metodo": "intercalada"
+    },
+    "hg": {
+      "materia": "Hist/Geo",
+      "metodo": "espacada"
+    },
+    "red": {
+      "materia": "Redação",
+      "titulo": "Redação",
+      "metodo": "autoexplicacao"
+    },
+    "prova": {
+      "materia": "Prova antiga",
+      "metodo": "recuperacao"
+    },
+    "corr": {
+      "materia": "Correção",
+      "titulo": "Correção e caderno de erros",
+      "metodo": "autoexplicacao"
+    },
+    "plan": {
+      "materia": "Planejamento",
+      "titulo": "Planejar a semana",
+      "metodo": "autoexplicacao"
+    },
+    "erros": {
+      "materia": "Caderno de erros",
+      "titulo": "Caderno de erros",
+      "metodo": "espacada"
     }
   }
 }

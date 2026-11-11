@@ -6,6 +6,7 @@
   import { baixar, validar } from '../lib/backup.js';
   import { pedir, suportado } from '../lib/notify.js';
   import { fmtBR } from '../lib/dates.js';
+  import { slotsDaJanela, toMin } from '../lib/semana.js';
 
   const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
   const ordem = [1, 2, 3, 4, 5, 6, 0];
@@ -29,7 +30,17 @@
     animacoes: [['completas', 'Completas'], ['discretas', 'Discretas'], ['nenhuma', 'Nenhuma']],
     texto: [['normal', 'Normal'], ['grande', 'Grande'], ['muito', 'Muito grande']],
   };
-  const addAula = () => { app.cfg.rotina.aulas.push({ dia: 1, inicio: '08:00', fim: '10:00', nome: 'Aula' }); salvar(); };
+  const capacidade = (d) => {
+    const js = app.cfg.rotina.janelas[d] ?? [];
+    if (!js.length) return 'sem estudo';
+    const n = js.filter((j) => !j.tipo).reduce((a, j) => a + slotsDaJanela(toMin(j.fim) - toMin(j.ini), app.cfg.foco.sessaoMin, app.cfg.foco.pausaMin), 0);
+    const nome = (j) => `${j.ini}–${j.fim}${j.tipo === 'prova' ? ' (prova antiga e correção)' : j.tipo === 'domingo' ? ' (redação e planejamento)' : ''}`;
+    return `${js.map(nome).join(' · ')}${n ? ` · ${n} sessões` : ''}`;
+  };
+  const addJanela = (d) => { (app.cfg.rotina.janelas[d] ??= []).push({ ini: '19:00', fim: '20:00' }); salvar(); };
+  const delJanela = (d, i) => { app.cfg.rotina.janelas[d].splice(i, 1); salvar(); };
+  
+  const addAula = () => { app.cfg.rotina.aulas.push({ dia: 1, inicio: '08:00', fim: '10:00', nome: 'Compromisso' }); salvar(); };
   const delAula = (i) => { app.cfg.rotina.aulas.splice(i, 1); salvar(); };
 </script>
 
@@ -95,22 +106,43 @@
   <label>Semanas da fase específica (6 a 8)<input type="number" min="6" max="8" bind:value={app.cfg.perfil.semanasEspecifica} onchange={salvar} /></label>
 </section>
 
-<h2>Meta de horas por dia</h2>
-<section class="card bloco metas">
-  {#each ordem as d}<label>{DIAS[d].slice(0, 3)}<input type="number" min="0" max="12" step="0.5" bind:value={app.cfg.rotina.metaHoras[d]} onchange={salvar} /></label>{/each}
+<h2>Rotina de estudo</h2>
+<section class="card bloco">
+  <label>Meta líquida por semana (horas de foco, sem as pausas)
+    <input type="number" min="10" max="60" step="1" bind:value={app.cfg.rotina.metaLiquida} onchange={salvar} /></label>
+  <p class="muted">As horas de cada matéria vêm da tabela da fase (base de 50 h), escalada para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}.</p>
+  <div class="tg"><span><strong>Rampa de 75%</strong><span class="muted">Nas {app.cfg.rotina.rampa.semanas} primeiras semanas do plano, 75% das horas.</span></span>
+    <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>
 
-<h2>Aulas da faculdade</h2>
+<h2>Janelas de estudo</h2>
+<p class="muted">Os blocos do dia são encaixados nestas janelas, com 50 min de foco e 10 de pausa. Sábado e domingo têm janela própria: prova antiga e correção no sábado, redação e planejamento no domingo.</p>
+{#each ordem as d}
+  <section class="card bloco">
+    <div class="cj"><strong>{DIAS[d]}</strong><span class="muted">{capacidade(d)}</span></div>
+    {#each app.cfg.rotina.janelas[d] ?? [] as j, i}
+      <div class="jan">
+        <input type="time" aria-label="Início da janela {i + 1} de {DIAS[d]}" bind:value={j.ini} onchange={salvar} />
+        <input type="time" aria-label="Fim da janela {i + 1} de {DIAS[d]}" bind:value={j.fim} onchange={salvar} />
+        <button class="x" aria-label="Remover janela {i + 1} de {DIAS[d]}" onclick={() => delJanela(d, i)}>✕</button>
+      </div>
+    {/each}
+    <button class="sec" onclick={() => addJanela(d)}>＋ Adicionar janela</button>
+  </section>
+{/each}
+
+<h2>Aulas e compromissos fixos</h2>
 <section class="card bloco">
   {#each app.cfg.rotina.aulas as a, i}
     <div class="aula">
+      <input class="nome" aria-label="Nome do compromisso" placeholder="Nome" bind:value={a.nome} onchange={salvar} />
       <select aria-label="Dia" bind:value={a.dia} onchange={salvar}>{#each ordem as d}<option value={d}>{DIAS[d]}</option>{/each}</select>
       <input type="time" aria-label="Início" bind:value={a.inicio} onchange={salvar} />
       <input type="time" aria-label="Fim" bind:value={a.fim} onchange={salvar} />
       <button class="x" aria-label="Remover aula" onclick={() => delAula(i)}>✕</button>
     </div>
   {/each}
-  <button class="sec" onclick={addAula}>＋ Adicionar aula</button>
+  <button class="sec" onclick={addAula}>＋ Adicionar compromisso</button>
 </section>
 
 <h2>Notificações</h2>
@@ -146,7 +178,8 @@
   label { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }
   input, select { width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
   .metas { grid-template-columns: repeat(7, 1fr); gap: 4px; } .metas input { padding: 8px 2px; text-align: center; }
-  .aula { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 6px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line); } .aula select { grid-column: 1 / -1; }
+  .aula { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 6px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line); } .aula select, .aula .nome { grid-column: 1 / -1; }
+  .cj { display: grid; gap: 2px; } .jan { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 6px; align-items: center; }
   .x { width: 44px; height: 44px; color: var(--tx2); }
   .pri, .sec { min-height: 48px; border-radius: 14px; font-weight: 600; display: grid; place-items: center; cursor: pointer; }
   .pri { background: var(--ac); color: var(--ac-tx); } .sec { border: 1px solid var(--line); color: var(--tx); font-size: 1rem; }

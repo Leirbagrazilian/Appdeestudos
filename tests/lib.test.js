@@ -84,18 +84,13 @@ describe('planner', () => {
     const b = blocosDoDia(cfg(), f, '2026-11-10');
     expect(b[0].onde.length).toBeGreaterThan(0);
   });
-  it('português e inglês alternam por dia', () => {
-    const f = gerarFases(cfg()); const c = cfg();
-    const dias = ['2026-11-23', '2026-11-24', '2026-11-26', '2026-11-27'];
-    const l = dias.map((d) => blocosDoDia(c, f, d).find((b) => b.chave === 'lingua').materia);
-    expect(l).toEqual(['Português', 'Inglês', 'Português', 'Inglês']);
-  });
-  it('dia útil soma 4h e quarta 2h', () => {
-    const f = gerarFases(cfg()); const c = cfg();
-    const soma = (d) => blocosDoDia(c, f, d).reduce((s, b) => s + b.min, 0);
-    expect(soma('2026-11-23')).toBe(250);
-    expect(soma('2026-11-25')).toBe(120);
-    expect(weekday('2026-11-25')).toBe(3);
+  it('depois da semana diagnóstica vale o planner: blocos com horário e id por matéria', () => {
+    const f = gerarFases(cfg());
+    const b = blocosDoDia(cfg(), f, '2026-11-23');
+    expect(b[0]).toMatchObject({ ini: '06:00', fim: '06:50', min: 50, bruto: 50 });
+    expect(b.every((x) => /^2026-11-23:[a-z]+\d*$/.test(x.id))).toBe(true);
+    expect(new Set(b.map((x) => x.id)).size).toBe(b.length);
+    expect(b.at(-1).cat).toBe('erros'); // caderno de erros: 10 min, sem horário fixo
   });
 });
 
@@ -159,16 +154,18 @@ describe('cronômetro de foco', () => {
 describe('ajustes do dia', () => {
   it('passar para amanhã tira o bloco de hoje e coloca amanhã', () => {
     const f = gerarFases(cfg()); const c = cfg();
-    const adiados = { '2026-11-23:fis': '2026-11-24' };
-    expect(blocosAjustados(c, f, '2026-11-23', { adiados }).some((b) => b.id === '2026-11-23:fis')).toBe(false);
+    const alvo = blocosDoDia(c, f, '2026-11-23').find((b) => b.cat === 'fis');
+    const adiados = { [alvo.id]: '2026-11-24' };
+    expect(blocosAjustados(c, f, '2026-11-23', { adiados }).some((b) => b.id === alvo.id)).toBe(false);
     const amanha = blocosAjustados(c, f, '2026-11-24', { adiados });
-    expect(amanha.find((b) => b.id === '2026-11-23:fis')?.adiadoDe).toBe('2026-11-23');
+    expect(amanha.find((b) => b.id === alvo.id)?.adiadoDe).toBe('2026-11-23');
   });
-  it('dia difícil deixa só o essencial', () => {
+  it('dia difícil deixa só o essencial: o primeiro bloco (até 50 min) e o caderno de erros', () => {
     const f = gerarFases(cfg()); const c = cfg();
     const l = blocosAjustados(c, f, '2026-11-23', { dificeis: { '2026-11-23': true } });
-    expect(l.map((b) => b.chave)).toEqual(['mat', 'erros']);
-    expect(l[0].min).toBe(50);
+    expect(l).toHaveLength(2);
+    expect(l[0]).toMatchObject({ essencial: true, min: 50 });
+    expect(l[1].cat).toBe('erros');
   });
 });
 
@@ -262,7 +259,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(6);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(3);
+    expect(novo.versaoSeed).toBe(4);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
@@ -284,7 +281,7 @@ describe('backup antigo importado', () => {
     const f = gerarFases(novo);
     expect(f.every((x) => x.nome && x.numero)).toBe(true);
     const sabado = '2027-06-12';
-    const prova = blocosDoDia(novo, f, sabado).find((b) => b.chave === 'prova');
+    const prova = blocosDoDia(novo, f, sabado).find((b) => b.cat === 'prova' && !b.sessoes);
     expect(prova.titulo).not.toMatch(/undefined/);
   });
   it('sem a ESA no cadastro, as fases ainda se formam', () => {
@@ -335,5 +332,104 @@ describe('trilha', () => {
     expect(novo.Física.Cinemática).toBe(2);
     expect(novo.Matemática.Trigonometria).toBeUndefined();
     expect(migrarLacunas(novo, c.topicos)).toEqual(novo); // idempotente
+  });
+});
+
+import { planoSemana, orcamentoSemana, slotsDaJanela, brutoDeSlots, toMin, repartir } from '../src/lib/semana.js';
+describe('planner v2: janelas, horas por fase e regras', () => {
+  const f = gerarFases(cfg());
+  const semana = (seg, c = cfg(), ctx = {}) => planoSemana(c, f, seg, ctx);
+  const liquido = (dias) => dias.flatMap((d) => d.blocos).filter((b) => b.sessoes || ['prova', 'corr', 'red'].includes(b.cat)).reduce((a, b) => a + b.min, 0);
+
+  it('contas de sessão: 50 min de foco com 10 de pausa, sem pausa no fim', () => {
+    expect([60, 120, 300, 360, 240, 110].map((m) => slotsDaJanela(m))).toEqual([1, 2, 5, 6, 4, 2]);
+    expect([1, 2, 3].map((k) => brutoDeSlots(k))).toEqual([50, 110, 170]);
+  });
+  it('repartir mantém o total', () => {
+    const r = repartir({ a: 17.2, b: 12.1, c: 2.6 }, 32);
+    expect(Object.values(r).reduce((x, y) => x + y, 0)).toBe(32);
+  });
+  it('as horas por matéria seguem a tabela da fase (43/50) e a semana fecha perto de 43h líquidas', () => {
+    const o = orcamentoSemana(cfg(), 'base', '2026-11-23');
+    expect(o).toMatchObject({ mat: 1032, fis: 722, qui: 155, por: 206, red: 103, ing: 103, hg: 0, provas: 258 });
+    const dias = semana('2026-11-23');
+    expect(liquido(dias)).toBeGreaterThan(2480); expect(liquido(dias)).toBeLessThan(2620);
+    const mat = dias.flatMap((d) => d.blocos).filter((b) => b.cat === 'mat').reduce((a, b) => a + b.min, 0);
+    expect(Math.abs(mat - 1032)).toBeLessThanOrEqual(100);
+  });
+  it('fase 3 inclui Hist/Geo (ESA) e o excedente de provas vira estudo na semana', () => {
+    const dias = semana('2027-07-12');
+    const por = (cat) => dias.flatMap((d) => d.blocos).filter((b) => b.cat === cat).reduce((a, b) => a + b.min, 0);
+    expect(por('hg')).toBeGreaterThanOrEqual(200);
+    expect(dias[4].blocos.some((b) => b.cat === 'prova' && b.sessoes)).toBe(true);
+    expect(por('prova')).toBeGreaterThanOrEqual(300 + 20); // sábado + excedente
+  });
+  it('encaixe nas janelas: todo bloco cabe numa janela do dia, sem sobreposição e com pausa de 10 min', () => {
+    const c = cfg();
+    for (const seg of ['2026-11-23', '2027-03-08', '2027-07-12', '2027-09-13']) {
+      for (const d of semana(seg, c)) {
+        const janelas = (c.rotina.janelas[d.wd] ?? []).map((j) => [toMin(j.ini), toMin(j.fim)]);
+        const bl = d.blocos;
+        for (const b of bl) {
+          expect(janelas.some(([a, z]) => b.ini >= a && b.fim <= z)).toBe(true);
+          expect(b.fim - b.ini).toBe(b.bruto);
+        }
+        for (let i = 1; i < bl.length; i++) expect(bl[i].ini).toBeGreaterThanOrEqual(bl[i - 1].fim);
+        for (let i = 1; i < bl.length; i++) {
+          const mesmaJanela = janelas.find(([a, z]) => bl[i].ini >= a && bl[i].fim <= z) === janelas.find(([a, z]) => bl[i - 1].ini >= a && bl[i - 1].fim <= z);
+          if (mesmaJanela && bl[i].sessoes && bl[i - 1].sessoes) expect(bl[i].ini - bl[i - 1].fim).toBe(10);
+        }
+      }
+    }
+  });
+  it('sábado: prova antiga cronometrada e correção; domingo: redação e planejamento', () => {
+    const dias = semana('2026-11-23');
+    expect(dias[5].blocos.slice(0, 2).map((b) => b.cat)).toEqual(['prova', 'corr']);
+    expect(dias[5].blocos[0].ini).toBe(toMin('08:00'));
+    expect(dias[6].blocos.map((b) => b.cat)).toEqual(['red', 'plan']);
+    expect(dias[6].blocos[1].fim).toBe(toMin('12:00'));
+  });
+  it('rampa de 75% nas 2 primeiras semanas (quando ligada)', () => {
+    const c = cfg(); c.rotina.rampa.ativa = true;
+    const r = orcamentoSemana(c, 'base', '2026-11-16'); // semana 2 do plano
+    expect(r.mat).toBe(Math.round(20 * 0.86 * 60 * 0.75));
+    expect(orcamentoSemana(c, 'base', '2026-11-23').mat).toBe(1032); // a partir da 3ª semana, cheio
+    expect(orcamentoSemana(cfg(), 'base', '2026-11-16').mat).toBe(1032); // desligada
+  });
+  it('matéria abaixo de 50% no último simulado: +2h na semana seguinte, tiradas da mais forte', () => {
+    const exams = { a: { id: 'a', data: '2026-11-21', concurso: 'efomm', notas: { Matemática: 80, Física: 40, Português: 60 } } };
+    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
+    const o = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams });
+    expect(o.fis - base.fis).toBe(120);
+    expect(base.mat - o.mat).toBe(120); // Matemática (80%) é a mais forte
+    // duas semanas depois a regra já não vale
+    expect(orcamentoSemana(cfg(), 'base', '2026-12-07', { exams }).fis).toBe(base.fis);
+  });
+  it('inglês com 75% ou mais: só manutenção (1h) e o resto vai para a Matemática', () => {
+    const exams = { a: { id: 'a', data: '2026-11-14', concurso: 'efomm', notas: { Inglês: 80 } } };
+    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
+    const o = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams });
+    expect(o.ing).toBe(60);
+    expect(o.mat - base.mat).toBe(base.ing - 60);
+  });
+  it('semana antes da prova: revisão leve reduz o estudo do dia', () => {
+    const c = cfg(); const g = gerarFases(c);
+    const cheio = blocosDoDia(c, g, '2027-07-14').filter((b) => b.sessoes).length; // 11 dias antes da EFOMM
+    const leve = blocosDoDia(c, g, '2027-07-21').filter((b) => b.sessoes).length; // dentro dos 7 dias
+    expect(leve).toBeLessThan(cheio);
+  });
+  it('configuração antiga é migrada: rotina nova entra e as aulas do primeiro cadastro são atualizadas', () => {
+    const velho = cfg(); delete velho.versaoSeed;
+    velho.rotina = { aulas: [{ dia: 1, inicio: '07:30', fim: '11:10', nome: 'Faculdade' }, { dia: 3, inicio: '09:30', fim: '10:10', nome: 'Faculdade' }, { dia: 4, inicio: '13:00', fim: '18:00', nome: 'Faculdade' }], metaHoras: { 1: 4 } };
+    delete velho.janelas; delete velho.horasFase; delete velho.categorias;
+    const novo = migrarCfg(velho, cfg());
+    expect(novo.rotina.janelas[1]).toHaveLength(3);
+    expect(novo.rotina.metaLiquida).toBe(43);
+    expect(novo.rotina.metaHoras).toBeUndefined();
+    expect(novo.rotina.aulas.find((a) => a.dia === 4).inicio).toBe('13:30');
+    expect(novo.horasFase.base.mat).toBe(20);
+    // aulas editadas por você são mantidas
+    const editado = cfg(); delete editado.versaoSeed; editado.rotina = { aulas: [{ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' }] };
+    expect(migrarCfg(editado, cfg()).rotina.aulas).toEqual([{ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' }]);
   });
 });

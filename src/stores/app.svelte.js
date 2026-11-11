@@ -22,7 +22,7 @@ export const app = $state({
   ultimoBackup: null, lembreteAdiado: null, persistente: null,
 });
 export const fases = () => gerarFases(app.cfg);
-export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis });
+export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis, exams: app.exams });
 export const pf = () => prefs(app.cfg);
 const snap = (v) => $state.snapshot(v);
 
