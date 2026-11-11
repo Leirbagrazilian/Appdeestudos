@@ -14,10 +14,9 @@
       "cor": "#1d4f91",
       "prioridade": 1,
       "idade": {
-        "tipo": "menorQue",
-        "limite": 23,
-        "ref": "01-01",
-        "texto": "Ter menos de 23 anos em 1º de janeiro do ano da matrícula."
+        "ref": "06-30",
+        "max": 22,
+        "texto": "Ter menos de 23 anos em 30 de junho do ano da matrícula."
       },
       "link": "https://www.marinha.mil.br/sspm",
       "eventos": [
@@ -42,9 +41,8 @@
       "cor": "#0b7285",
       "prioridade": 2,
       "idade": {
-        "tipo": "menorQue",
-        "limite": 23,
         "ref": "01-01",
+        "max": 22,
         "texto": "23 anos incompletos em 1º de janeiro do ano da matrícula."
       },
       "link": "https://www.marinha.mil.br/ciaga",
@@ -67,6 +65,36 @@
           "inicio": "2027-11-01",
           "fim": "2027-12-15",
           "status": "estimada"
+        }
+      ]
+    },
+    {
+      "id": "esa",
+      "nome": "ESA (área Geral)",
+      "sigla": "ESA",
+      "cor": "#4d7c0f",
+      "prioridade": 5,
+      "idade": {
+        "ref": "12-31",
+        "min": 17,
+        "max": 24,
+        "texto": "De 17 a 24 anos até 31 de dezembro do ano da matrícula (área Geral). Forma sargento e tecnólogo."
+      },
+      "link": "https://esa.eb.mil.br",
+      "eventos": [
+        {
+          "tipo": "inscricao",
+          "inicio": "2027-03-30",
+          "fim": "2027-05-04",
+          "status": "estimada",
+          "obs": "Em 2026 a inscrição foi prorrogada até 18/05."
+        },
+        {
+          "tipo": "prova",
+          "inicio": "2027-07-26",
+          "fim": "2027-07-26",
+          "status": "estimada",
+          "obs": "Em 2026 caiu no mesmo fim de semana da EFOMM."
         }
       ]
     },
@@ -99,9 +127,8 @@
       "cor": "#9d2b5b",
       "prioridade": 4,
       "idade": {
-        "tipo": "menorQue25fim",
-        "limite": 25,
         "ref": "12-31",
+        "max": 24,
         "texto": "Não completar 25 anos até 31 de dezembro do ano da matrícula."
       },
       "link": "https://vestibular.ita.br",
@@ -127,6 +154,21 @@
           "status": "estimada"
         }
       ]
+    },
+    {
+      "id": "ime",
+      "nome": "IME",
+      "sigla": "IME",
+      "cor": "#6d5acd",
+      "prioridade": 6,
+      "plano": false,
+      "idade": {
+        "ref": "12-31",
+        "max": 22,
+        "texto": "Até 22 anos em 31 de dezembro do ano da matrícula (carreira ativa)."
+      },
+      "link": "https://www.ime.eb.br",
+      "eventos": []
     }
   ],
   "rotina": {
@@ -256,9 +298,10 @@
   "provaSabado": {
     "base": "Prova antiga de qualquer concurso naval (a mais recente que você ainda não fez)",
     "desenvolvimento": "Prova antiga alternando EFOMM e Escola Naval (a cada 2 semanas)",
-    "efomm": "Prova antiga da EFOMM, uma por semana",
+    "efomm": "Prova antiga da EFOMM ou da ESA, alternando (uma por semana)",
     "en": "Prova antiga da Escola Naval (CPAEN), uma por semana",
-    "final": "Alternar: prova antiga do ENEM (dia 1 e dia 2) e 1ª fase do ITA"
+    "ita": "Prova antiga do ITA (1ª fase) e questões discursivas",
+    "enem": "Prova antiga do ENEM (dia 1 e dia 2)"
   },
   "fases": {
     "base": {
@@ -272,19 +315,24 @@
       "foco": "Conteúdo completo, uma prova antiga a cada 2 semanas e checklist de inscrições."
     },
     "efomm": {
-      "nome": "Específica EFOMM",
+      "nome": "Específica EFOMM + ESA",
       "numero": 3,
-      "foco": "Uma prova antiga da EFOMM por semana."
+      "foco": "Provas antigas da EFOMM e da ESA, uma por semana. Em caso de conflito de datas, a EFOMM tem prioridade."
     },
     "en": {
       "nome": "Específica Escola Naval",
       "numero": 4,
       "foco": "Provas antigas e redação no estilo da Escola Naval."
     },
-    "final": {
-      "nome": "Reta final ITA e ENEM",
+    "ita": {
+      "nome": "Reta final ITA",
       "numero": 5,
-      "foco": "Química, discursivas do ITA, redação e provas antigas do ENEM."
+      "foco": "Química, discursivas do ITA, redação e provas antigas."
+    },
+    "enem": {
+      "nome": "ENEM (provas antigas)",
+      "numero": 6,
+      "foco": "Só provas antigas do ENEM: rede de segurança para o SISU."
     }
   },
   "diagnostico": {
@@ -770,5 +818,6 @@
       "Preposições",
       "Conectivos"
     ]
-  }
+  },
+  "versaoSeed": 2
 }

@@ -77,7 +77,7 @@
 
 <h2>Datas e status</h2>
 <p class="muted">Quando o edital sair, mude a data e o status. As fases se reajustam sozinhas.</p>
-{#each app.cfg.concursos as c}
+{#each app.cfg.concursos.filter((c) => c.eventos.length) as c}
   <section class="card bloco" style="--c:{c.cor}">
     <strong>{c.nome}</strong>
     {#each c.eventos as e}

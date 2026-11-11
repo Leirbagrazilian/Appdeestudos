@@ -30,7 +30,7 @@
 {:else}
   <form class="card f" class:treme onsubmit={salvar} onanimationend={() => (treme = false)}>
     <label for="dt"><strong>Data</strong></label><input id="dt" type="date" bind:value={data} />
-    <strong>Prova</strong><Chips opcoes={app.cfg.concursos.map((c) => ({ id: c.id, nome: c.sigla }))} bind:valor={concurso} rotulo="Prova" />
+    <strong>Prova</strong><Chips opcoes={app.cfg.concursos.filter((c) => c.plano !== false).map((c) => ({ id: c.id, nome: c.sigla }))} bind:valor={concurso} rotulo="Prova" />
     <strong>Nota por matéria (0 a 100)</strong>
     <div class="grid">{#each app.cfg.materias as m}<label>{m}<input type="number" inputmode="numeric" min="0" max="100" bind:value={notas[m]} /></label>{/each}</div>
     {#if falta}<p class="falta" role="alert">{falta}</p>{/if}
@@ -40,7 +40,7 @@
 
 {#if Object.keys(app.exams).length}
   <h2>Prova</h2>
-  <Chips opcoes={[{ id: '', nome: 'Todas' }, ...app.cfg.concursos.map((c) => ({ id: c.id, nome: c.sigla }))]} bind:valor={filtro} rotulo="Filtrar simulados por prova" />
+  <Chips opcoes={[{ id: '', nome: 'Todas' }, ...app.cfg.concursos.filter((c) => c.plano !== false).map((c) => ({ id: c.id, nome: c.sigla }))]} bind:valor={filtro} rotulo="Filtrar simulados por prova" />
   {#if filtro}
     <label class="corte">Nota de corte de referência (%)
       <input type="number" inputmode="numeric" min="0" max="100" placeholder="ex.: 60" value={app.cfg.notaCorte?.[filtro] ?? ''}

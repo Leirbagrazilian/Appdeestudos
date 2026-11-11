@@ -4,27 +4,32 @@ const prova = (c) => c.eventos.filter((e) => e.tipo === 'prova');
 export const provaInicio = (c) => prova(c).map((e) => e.inicio).sort()[0];
 export const provaFim = (c) => prova(c).map((e) => e.fim).sort().at(-1);
 
-/** Gera as 5 fases a partir das datas de prova. Muda uma data, as fases se reajustam. */
+const menor = (l) => [...l].sort()[0], maior = (l) => [...l].sort().at(-1);
+
+/** Gera as 6 fases a partir das datas de prova. Muda uma data, as fases se reajustam. */
 export function gerarFases(cfg) {
   const get = (id) => cfg.concursos.find((c) => c.id === id);
   const sem = (cfg.perfil.semanasEspecifica ?? 7) * 7;
   const ini = cfg.perfil.inicioPlano;
-  const efomm = get('efomm'), en = get('en'), enem = get('enem'), ita = get('ita');
+  const efomm = get('efomm'), esa = get('esa'), en = get('en'), enem = get('enem'), ita = get('ita');
+  const navais = [efomm, esa].filter(Boolean); // fase 3 serve EFOMM e ESA (a ESA só entra se existir)
 
-  let efommIni = addDays(provaInicio(efomm), -sem);
-  const devIni = efommIni < cfg.perfil.inicioDesenvolvimento ? addDays(efommIni, -1) : cfg.perfil.inicioDesenvolvimento;
-  if (efommIni <= devIni) efommIni = addDays(devIni, 1);
-  const efommFim = provaFim(efomm);
-  const enIni = [addDays(provaInicio(en), -sem), addDays(efommFim, 1)].sort().at(-1);
+  let p3Ini = addDays(menor(navais.map(provaInicio)), -sem);
+  const devIni = p3Ini < cfg.perfil.inicioDesenvolvimento ? addDays(p3Ini, -1) : cfg.perfil.inicioDesenvolvimento;
+  if (p3Ini <= devIni) p3Ini = addDays(devIni, 1);
+  const p3Fim = maior(navais.map(provaFim));
+  const enIni = maior([addDays(provaInicio(en), -sem), addDays(p3Fim, 1)]);
   const enFim = provaFim(en);
-  const ultima = [provaFim(enem), provaFim(ita)].sort().at(-1);
+  const itaFim = maior([provaFim(ita), enFim]);
+  const enemFim = maior([provaFim(enem), addDays(itaFim, 1)]);
 
   const lista = [
     { id: 'base', inicio: ini, fim: addDays(devIni, -1) },
-    { id: 'desenvolvimento', inicio: devIni, fim: addDays(efommIni, -1) },
-    { id: 'efomm', inicio: efommIni, fim: efommFim },
+    { id: 'desenvolvimento', inicio: devIni, fim: addDays(p3Ini, -1) },
+    { id: 'efomm', inicio: p3Ini, fim: p3Fim },
     { id: 'en', inicio: enIni, fim: enFim },
-    { id: 'final', inicio: addDays(enFim, 1), fim: ultima },
+    { id: 'ita', inicio: addDays(enFim, 1), fim: itaFim },
+    { id: 'enem', inicio: addDays(itaFim, 1), fim: enemFim },
   ];
   return lista.map((f) => ({ ...f, ...cfg.fases[f.id] }));
 }

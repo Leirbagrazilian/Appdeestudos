@@ -5,7 +5,7 @@
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
   import { diaNome, fmtCurta, fmtBR, fmtMin, weekday, addDays, startOfWeek, diffDays } from '../lib/dates.js';
-  import { alertasInscricao } from '../lib/alerts.js';
+  import { alertasInscricao, conflitosProvas } from '../lib/alerts.js';
   import { planoSessoes } from '../lib/foco.js';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
@@ -27,6 +27,7 @@
   const prox = $derived(proximaProva(app.cfg, app.dia));
   const leve = $derived(revisaoLeve(app.cfg, app.dia));
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
+  const conflito = $derived(conflitosProvas(app.cfg).find((c) => diffDays(app.dia, c.de) >= 0 && diffDays(app.dia, c.de) <= 120));
   const diag = $derived(blocos.some((b) => b.diagnostico));
   const dificil = $derived(!!app.dificeis[app.dia]);
   // Progresso pelo tempo planejado de cada bloco concluído (os minutos reais aparecem no bloco).
@@ -126,6 +127,9 @@
     <p><Icon nome="clock" />{app.ultimoBackup ? 'Faz uma semana do último backup.' : 'Você ainda não fez nenhum backup.'} Guarde seu progresso fora do tablet.</p>
     <div class="bk"><button class="pri" onclick={fazerBackup}>Fazer backup agora</button><button class="lk" onclick={adiarLembreteBackup}>Amanhã</button></div>
   </div>
+{/if}
+{#if conflito}
+  <a class="nota" href="#/calendario"><Icon nome="clock" />{conflito.a.sigla} e {conflito.b.sigla} caem {conflito.de === conflito.ate ? `em ${fmtBR(conflito.de)}` : `de ${fmtBR(conflito.de)} a ${fmtBR(conflito.ate)}`}. Prioridade: {conflito.vence.sigla}.</a>
 {/if}
 {#if tarde}<p class="nota"><Icon nome="moon" />Já passou das 22h. Feche o caderno: dormir bem fixa o que você estudou hoje.</p>{/if}
 {#each alertas as a}

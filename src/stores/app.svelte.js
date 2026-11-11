@@ -10,6 +10,7 @@ import { conquistas } from '../lib/conquistas.js';
 import * as foco from '../lib/foco.js';
 import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
+import { migrarCfg } from '../lib/migracao.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
 const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
@@ -27,8 +28,9 @@ const snap = (v) => $state.snapshot(v);
 export async function iniciar() {
   const salvo = await db.get('kv', 'config');
   if (salvo) {
-    for (const k of Object.keys(seed)) if (!(k in salvo)) salvo[k] = structuredClone(seed[k]); // campos novos do seed
-    app.cfg = salvo;
+    const antes = salvo.versaoSeed ?? 1;
+    app.cfg = migrarCfg(salvo, seed); // traz conteúdo novo do seed sem perder o que você editou
+    if ((app.cfg.versaoSeed ?? 1) !== antes) await db.put('kv', 'config', snap(app.cfg));
   }
   aplicarPrefs(pf());
   app.done = await db.all('done');
@@ -239,7 +241,7 @@ export async function verCapitulo(id) { app.vistos.capitulos[id] = true; await s
 export async function importar(d) {
   for (const s of ['done', 'reviews', 'errors', 'exams']) { for (const k of Object.keys(await db.all(s))) await db.del(s, k); for (const [k, v] of Object.entries(d[s])) await db.put(s, k, v); app[s] = d[s]; }
   for (const k of Object.keys(EXTRAS)) { app[k] = d.extras?.[k] ?? structuredClone(EXTRAS[k]); await salvarKV(k); }
-  app.cfg = d.cfg; await salvarCfg();
+  app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
 }
 export async function restaurarSeed() {
   const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema };

@@ -40,6 +40,14 @@ Tudo que é conteúdo está em `src/data/seed.json`: datas e status dos concurso
 3. Na pausa, registre as questões (+1 acertei / +1 errei), se refez alguma sem olhar a resolução e o assunto.
 4. No fim, "Concluir bloco" grava os minutos reais e as questões. Elas aparecem em Semana → Questões da semana.
 
+## Concursos e idade (SPEC v2, etapa 1)
+Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calculada, nunca fixa.
+- Escola Naval: menos de 23 anos em 30/06. EFOMM: 23 incompletos em 01/01. ITA: não completar 25 até 31/12.
+- ESA (área Geral): 17 a 24 anos até 31/12. IME: fora do limite (aparece só como informação).
+- Conflito de provas (ex.: EFOMM × ESA em 26/07/2027) aparece no Calendário e na tela Hoje; prioridade EFOMM.
+- Fases: 1 Base · 2 Desenvolvimento · 3 EFOMM+ESA · 4 Escola Naval · 5 ITA · 6 ENEM (só provas antigas).
+- Atualizações do seed (`versaoSeed`) entram no app sem apagar o que você editou (datas, status, carta, links).
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

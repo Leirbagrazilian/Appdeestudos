@@ -21,3 +21,23 @@ export function marcos(cfg) {
   }
   return m.sort((a, b) => a.data.localeCompare(b.data));
 }
+
+/** Provas de concursos diferentes que se sobrepõem no calendário (ex.: EFOMM e ESA no mesmo fim de semana).
+ *  `vence` é o concurso de maior prioridade (menor número). */
+export function conflitosProvas(cfg) {
+  const provas = [];
+  for (const c of cfg.concursos) for (const e of c.eventos) if (e.tipo === 'prova') provas.push({ c, e });
+  const out = [], vistos = new Set();
+  for (let i = 0; i < provas.length; i++) for (let j = i + 1; j < provas.length; j++) {
+    const a = provas[i], b = provas[j];
+    if (a.c.id === b.c.id) continue;
+    const de = a.e.inicio > b.e.inicio ? a.e.inicio : b.e.inicio, ate = a.e.fim < b.e.fim ? a.e.fim : b.e.fim;
+    if (de > ate) continue;
+    const chave = [a.c.id, b.c.id].sort().join('x') + de;
+    if (vistos.has(chave)) continue;
+    vistos.add(chave);
+    const vence = (a.c.prioridade ?? 99) <= (b.c.prioridade ?? 99) ? a.c : b.c;
+    out.push({ a: a.c, b: b.c, de, ate, vence, perde: vence === a.c ? b.c : a.c });
+  }
+  return out.sort((x, y) => x.de.localeCompare(y.de));
+}
