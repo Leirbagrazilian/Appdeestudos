@@ -262,7 +262,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(6);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(2);
+    expect(novo.versaoSeed).toBe(3);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
@@ -292,5 +292,48 @@ describe('backup antigo importado', () => {
     c.concursos = c.concursos.filter((x) => x.id !== 'esa');
     const f = gerarFases(c);
     expect(f.find((x) => x.id === 'efomm')).toMatchObject({ inicio: '2027-06-06', fim: '2027-07-26' });
+  });
+});
+
+import { topicosDe, proximoTopico, cobertura, migrarLacunas, dominio } from '../src/lib/trilha.js';
+describe('trilha', () => {
+  const c = cfg();
+  it('matérias × concursos: Química só ITA, Hist/Geo só ESA, Cálculo só EN', () => {
+    expect(topicosDe(c, 'Química')[0].concursos).toEqual(['ita']);
+    expect(topicosDe(c, 'Hist/Geo')[0].concursos).toEqual(['esa']);
+    const calc = topicosDe(c, 'Matemática').at(-1);
+    expect(calc.nome).toMatch(/Cálculo/); expect(calc.concursos).toEqual(['en']);
+    expect(topicosDe(c, 'Matemática')[0].concursos).toEqual(['en', 'efomm', 'ita', 'esa']);
+    expect(topicosDe(c, 'Física')[0].concursos).toEqual(['en', 'efomm', 'ita']);
+  });
+  it('trilha de Matemática segue a ordem do SPEC', () => {
+    const n = topicosDe(c, 'Matemática').map((t) => t.nome);
+    expect(n[0]).toMatch(/básica/); expect(n[2]).toBe('Trigonometria'); expect(n.at(-1)).toMatch(/Cálculo/);
+    expect(n.indexOf('Geometria plana')).toBeLessThan(n.indexOf('Geometria espacial'));
+  });
+  it('próximo tópico: respeita a ordem e prefere o que serve a mais concursos dentro da janela', () => {
+    expect(proximoTopico(c, {}, 'Matemática').ordem).toBe(0);
+    // primeiros 9 dominados: sobram complexos (4 concursos) e cálculo (1): vem complexos
+    const todos = Object.fromEntries(topicosDe(c, 'Matemática').slice(0, 8).map((t) => [t.nome, 3]));
+    expect(proximoTopico(c, { Matemática: todos }, 'Matemática').nome).toMatch(/complexos/);
+    // tópico de 1 concurso não passa na frente de um de 3 que está na janela
+    const cc = cfg(); cc.topicos['Física'][0].concursos = ['en']; // grandezas só EN
+    expect(proximoTopico(cc, {}, 'Física').ordem).toBe(1); // cinemática serve a 3
+    expect(proximoTopico(c, { 'Hist/Geo': Object.fromEntries(topicosDe(c, 'Hist/Geo').map((t) => [t.nome, 3])) }, 'Hist/Geo')).toBeNull();
+  });
+  it('cobertura e domínio', () => {
+    const l = { Física: Object.fromEntries(topicosDe(c, 'Física').map((t) => [t.nome, 3])) };
+    expect(cobertura(c, l, 'Física')).toBe(1);
+    expect(cobertura(c, {}, 'Física')).toBe(0);
+    expect(dominio({}, 'Física', 'x')).toBe(0);
+  });
+  it('notas do mapa de lacunas antigo são aproveitadas (menor nota entre os tópicos antigos)', () => {
+    const velho = { Matemática: { Funções: 3, 'Logaritmos e exponenciais': 1, 'PA e PG': 2, 'Matrizes e sistemas': 3 }, Física: { Cinemática: 2 } };
+    const novo = migrarLacunas(velho, c.topicos);
+    expect(novo.Matemática['Conjuntos, lógica e funções']).toBe(1);
+    expect(novo.Matemática['PA, PG, matrizes e sistemas']).toBe(2);
+    expect(novo.Física.Cinemática).toBe(2);
+    expect(novo.Matemática.Trigonometria).toBeUndefined();
+    expect(migrarLacunas(novo, c.topicos)).toEqual(novo); // idempotente
   });
 });

@@ -22,7 +22,7 @@ export function filaTreino(erros, limite = 10) {
 
 const norm = (s) => (s ?? '').trim().toLowerCase();
 const DICAS = {
-  conteudo: 'Muitos erros de conteúdo: volte à teoria desses assuntos e atualize o mapa de lacunas.',
+  conteudo: 'Muitos erros de conteúdo: volte à teoria desses assuntos e atualize a nota na Trilha.',
   atencao: 'Muitos erros de atenção: leia o enunciado duas vezes e circule "não", "exceto" e "incorreta".',
   tempo: 'Muitos erros de tempo: treine mais questões com cronômetro e pule as que travarem.',
 };

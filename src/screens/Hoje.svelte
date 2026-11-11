@@ -140,7 +140,7 @@
     <summary><Icon nome="bulb" />{app.cfg.diagnostico.titulo}: leia antes de começar</summary>
     <p>{app.cfg.diagnostico.intro}</p>
     <ol>{#each app.cfg.diagnostico.como as c}<li>{c}</li>{/each}</ol>
-    <p><a class="lk" href="#/questoes">Onde achar provas e gabaritos →</a> · <a class="lk" href="#/lacunas">Mapa de lacunas →</a></p>
+    <p><a class="lk" href="#/questoes">Onde achar provas e gabaritos →</a> · <a class="lk" href="#/trilha">Trilha →</a></p>
   </details>
 {/if}
 {#if leve}<p class="nota"><Icon nome="moon" />Última semana antes da prova de {leve.nome}: revisão leve. Sem conteúdo novo, durma bem.</p>{/if}

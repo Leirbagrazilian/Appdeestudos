@@ -11,6 +11,7 @@ import * as foco from '../lib/foco.js';
 import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
+import { migrarLacunas } from '../lib/trilha.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
 const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
@@ -27,8 +28,9 @@ const snap = (v) => $state.snapshot(v);
 
 export async function iniciar() {
   const salvo = await db.get('kv', 'config');
+  let antes = seed.versaoSeed ?? 1;
   if (salvo) {
-    const antes = salvo.versaoSeed ?? 1;
+    antes = salvo.versaoSeed ?? 1;
     app.cfg = migrarCfg(salvo, seed); // traz conteúdo novo do seed sem perder o que você editou
     if ((app.cfg.versaoSeed ?? 1) !== antes) await db.put('kv', 'config', snap(app.cfg));
   }
@@ -38,6 +40,7 @@ export async function iniciar() {
   app.errors = await db.all('errors');
   app.exams = await db.all('exams');
   for (const k of Object.keys(EXTRAS)) app[k] = (await db.get('kv', k)) ?? structuredClone(EXTRAS[k]);
+  if (antes < 3) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); } // notas do mapa de lacunas antigo
   app.timer = (await db.get('kv', 'timer')) ?? null;
   app.ultimoBackup = (await db.get('kv', 'ultimoBackup')) ?? null;
   app.lembreteAdiado = (await db.get('kv', 'lembreteAdiado')) ?? null;
@@ -241,7 +244,9 @@ export async function verCapitulo(id) { app.vistos.capitulos[id] = true; await s
 export async function importar(d) {
   for (const s of ['done', 'reviews', 'errors', 'exams']) { for (const k of Object.keys(await db.all(s))) await db.del(s, k); for (const [k, v] of Object.entries(d[s])) await db.put(s, k, v); app[s] = d[s]; }
   for (const k of Object.keys(EXTRAS)) { app[k] = d.extras?.[k] ?? structuredClone(EXTRAS[k]); await salvarKV(k); }
+  const antes = d.cfg.versaoSeed ?? 1;
   app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
+  if (antes < 3) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); }
 }
 export async function restaurarSeed() {
   const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema };

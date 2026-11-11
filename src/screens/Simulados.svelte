@@ -4,7 +4,7 @@
   import Chips from '../components/Chips.svelte';
   import { fmtBR } from '../lib/dates.js';
 
-  const CORES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
+  const CORES = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)', 'var(--s7)'];
   let form = $state(false), data = $state(app.dia), concurso = $state('efomm'), notas = $state({}), filtro = $state(''), treme = $state(false), falta = $state('');
   const exs = $derived(Object.values(app.exams).filter((e) => !filtro || e.concurso === filtro).sort((a, b) => a.data.localeCompare(b.data)));
   const corte = $derived(filtro ? app.cfg.notaCorte?.[filtro] : null);

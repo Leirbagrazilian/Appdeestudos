@@ -409,7 +409,7 @@
             "Abra o edital/programa da Escola Naval e da EFOMM e copie os tópicos de Matemática, Física, Português e Inglês.",
             "Dê uma nota de 0 a 3 para cada tópico (0 = nunca vi, 3 = domino).",
             "Os tópicos com nota 0 e 1 viram a prioridade da Fase 1.",
-            "Marque as notas também no app: Mais → Mapa de lacunas."
+            "Marque as notas também no app: QG → Trilha."
           ],
           "onde": [
             "Edital: sites da Marinha (SSPM e CIAGA, links no app).",
@@ -640,9 +640,10 @@
   "materias": [
     "Matemática",
     "Física",
+    "Química",
     "Português",
     "Inglês",
-    "Química",
+    "Hist/Geo",
     "Redação"
   ],
   "tiposErro": [
@@ -765,59 +766,313 @@
   ],
   "topicos": {
     "Matemática": [
-      "Funções",
-      "Trigonometria",
-      "Geometria plana",
-      "Geometria espacial",
-      "Geometria analítica",
-      "PA e PG",
-      "Análise combinatória",
-      "Probabilidade",
-      "Matrizes e sistemas",
-      "Logaritmos e exponenciais",
-      "Números complexos",
-      "Polinômios"
+      {
+        "nome": "Matemática básica (aritmética e álgebra)"
+      },
+      {
+        "nome": "Conjuntos, lógica e funções",
+        "antigos": [
+          "Funções",
+          "Logaritmos e exponenciais"
+        ]
+      },
+      {
+        "nome": "Trigonometria",
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "nome": "PA, PG, matrizes e sistemas",
+        "antigos": [
+          "PA e PG",
+          "Matrizes e sistemas"
+        ]
+      },
+      {
+        "nome": "Combinatória, probabilidade e estatística",
+        "antigos": [
+          "Análise combinatória",
+          "Probabilidade"
+        ]
+      },
+      {
+        "nome": "Geometria plana",
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "nome": "Geometria espacial",
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "nome": "Analítica, vetores, cônicas e quádricas",
+        "antigos": [
+          "Geometria analítica"
+        ]
+      },
+      {
+        "nome": "Números complexos e polinômios",
+        "antigos": [
+          "Números complexos",
+          "Polinômios"
+        ]
+      },
+      {
+        "nome": "Cálculo (só Escola Naval)",
+        "concursos": [
+          "en"
+        ]
+      }
     ],
     "Física": [
-      "Cinemática",
-      "Dinâmica",
-      "Trabalho e energia",
-      "Hidrostática",
-      "Termologia",
-      "Óptica",
-      "Ondulatória",
-      "Eletricidade",
-      "Magnetismo"
+      {
+        "nome": "Grandezas e vetores"
+      },
+      {
+        "nome": "Cinemática",
+        "antigos": [
+          "Cinemática"
+        ]
+      },
+      {
+        "nome": "Dinâmica, energia, impulso e colisões",
+        "antigos": [
+          "Dinâmica",
+          "Trabalho e energia"
+        ]
+      },
+      {
+        "nome": "Gravitação e estática"
+      },
+      {
+        "nome": "Fluidos",
+        "antigos": [
+          "Hidrostática"
+        ]
+      },
+      {
+        "nome": "Termologia e termodinâmica",
+        "antigos": [
+          "Termologia"
+        ]
+      },
+      {
+        "nome": "MHS, ondas, som e luz",
+        "antigos": [
+          "Ondulatória",
+          "Óptica"
+        ]
+      },
+      {
+        "nome": "Eletrostática",
+        "antigos": [
+          "Eletricidade"
+        ]
+      },
+      {
+        "nome": "Eletrodinâmica",
+        "antigos": [
+          "Eletricidade"
+        ]
+      },
+      {
+        "nome": "Magnetismo e indução",
+        "antigos": [
+          "Magnetismo"
+        ]
+      }
     ],
     "Química": [
-      "Atomística",
-      "Tabela periódica e ligações",
-      "Estequiometria",
-      "Soluções",
-      "Termoquímica",
-      "Cinética",
-      "Equilíbrio",
-      "Eletroquímica",
-      "Química orgânica"
+      {
+        "nome": "Estrutura atômica e ligações",
+        "antigos": [
+          "Atomística",
+          "Tabela periódica e ligações"
+        ]
+      },
+      {
+        "nome": "Estequiometria e soluções",
+        "antigos": [
+          "Estequiometria",
+          "Soluções"
+        ]
+      },
+      {
+        "nome": "Termoquímica",
+        "antigos": [
+          "Termoquímica"
+        ]
+      },
+      {
+        "nome": "Cinética",
+        "antigos": [
+          "Cinética"
+        ]
+      },
+      {
+        "nome": "Equilíbrio",
+        "antigos": [
+          "Equilíbrio"
+        ]
+      },
+      {
+        "nome": "Eletroquímica",
+        "antigos": [
+          "Eletroquímica"
+        ]
+      },
+      {
+        "nome": "Química orgânica",
+        "antigos": [
+          "Química orgânica"
+        ]
+      }
     ],
     "Português": [
-      "Interpretação de texto",
-      "Classes de palavras",
-      "Sintaxe",
-      "Concordância",
-      "Regência",
-      "Crase",
-      "Pontuação",
-      "Semântica"
+      {
+        "nome": "Interpretação de texto",
+        "antigos": [
+          "Interpretação de texto"
+        ]
+      },
+      {
+        "nome": "Sintaxe",
+        "antigos": [
+          "Sintaxe"
+        ]
+      },
+      {
+        "nome": "Concordância, regência, crase, colocação e pontuação",
+        "antigos": [
+          "Concordância",
+          "Regência",
+          "Crase",
+          "Pontuação"
+        ]
+      },
+      {
+        "nome": "Classes de palavras",
+        "antigos": [
+          "Classes de palavras"
+        ]
+      },
+      {
+        "nome": "Semântica",
+        "antigos": [
+          "Semântica"
+        ]
+      }
     ],
     "Inglês": [
-      "Interpretação de texto",
-      "Vocabulário",
-      "Tempos verbais",
-      "Falsos cognatos",
-      "Preposições",
-      "Conectivos"
+      {
+        "nome": "Leitura e vocabulário",
+        "antigos": [
+          "Interpretação de texto",
+          "Vocabulário",
+          "Falsos cognatos"
+        ]
+      },
+      {
+        "nome": "Tempos verbais e modais",
+        "antigos": [
+          "Tempos verbais"
+        ]
+      },
+      {
+        "nome": "Condicionais, voz passiva e discurso indireto"
+      },
+      {
+        "nome": "Phrasal verbs, tags, causativos e comparativos",
+        "antigos": [
+          "Preposições",
+          "Conectivos"
+        ]
+      }
+    ],
+    "Hist/Geo": [
+      {
+        "nome": "História: Colônia"
+      },
+      {
+        "nome": "História: Império"
+      },
+      {
+        "nome": "História: República"
+      },
+      {
+        "nome": "Geografia: relevo, clima e hidrografia"
+      },
+      {
+        "nome": "Geografia: geopolítica e meio ambiente"
+      }
     ]
   },
-  "versaoSeed": 2
+  "versaoSeed": 3,
+  "materiasInfo": {
+    "Matemática": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "esaQuestoes": 14
+    },
+    "Física": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita"
+      ]
+    },
+    "Química": {
+      "concursos": [
+        "ita"
+      ]
+    },
+    "Português": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "esaQuestoes": 14
+    },
+    "Inglês": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "esaQuestoes": 10
+    },
+    "Hist/Geo": {
+      "concursos": [
+        "esa"
+      ],
+      "esaQuestoes": 12,
+      "nome": "História e Geografia do Brasil"
+    },
+    "Redação": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "obs": "Na ESA a redação só elimina (não soma nota)."
+    }
+  },
+  "regras": {
+    "en": {
+      "minPorMateriaPct": 50,
+      "minRedacaoDe100": 50
+    }
+  }
 }

@@ -48,6 +48,11 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - Fases: 1 Base · 2 Desenvolvimento · 3 EFOMM+ESA · 4 Escola Naval · 5 ITA · 6 ENEM (só provas antigas).
 - Atualizações do seed (`versaoSeed`) entram no app sem apagar o que você editou (datas, status, carta, links).
 
+## Matérias × concursos e Trilha (SPEC v2, etapa 2)
+- Matemática, Português e Inglês servem a EN, EFOMM, ITA e ESA; Física a EN, EFOMM e ITA; Química só ao ITA; Hist/Geo só à ESA; Cálculo só à EN. A Escola Naval elimina com menos de 50% em qualquer matéria ou redação abaixo de 50/100.
+- A tela **Trilha** (substitui o Mapa de lacunas) lista os tópicos de cada matéria na ordem de estudo, com os concursos que cada um serve e a sua nota de domínio (0 a 3). As notas antigas do mapa foram aproveitadas.
+- "O que estudar a seguir": dentro da janela dos próximos 3 tópicos, vale primeiro o que serve a mais concursos.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.
