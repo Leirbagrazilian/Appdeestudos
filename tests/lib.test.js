@@ -88,7 +88,7 @@ describe('planner', () => {
     const f = gerarFases(cfg());
     const b = blocosDoDia(cfg(), f, '2026-11-23');
     expect(b[0]).toMatchObject({ ini: '06:00', fim: '06:50', min: 50, bruto: 50 });
-    expect(b.every((x) => /^2026-11-23:[a-z]+\d*$/.test(x.id))).toBe(true);
+    expect(b.every((x) => /^2026-11-23:[a-z]+(@\d{4})?$/.test(x.id))).toBe(true);
     expect(new Set(b.map((x) => x.id)).size).toBe(b.length);
     expect(b.at(-1).cat).toBe('erros'); // caderno de erros: 10 min, sem horário fixo
   });
@@ -335,7 +335,8 @@ describe('trilha', () => {
   });
 });
 
-import { planoSemana, orcamentoSemana, slotsDaJanela, brutoDeSlots, toMin, repartir } from '../src/lib/semana.js';
+import { planoSemana, orcamentoSemana, slotsDaJanela, brutoDeSlots, toMin, repartir, janelasValidas } from '../src/lib/semana.js';
+import { planoDoBloco, iniciar as foco_iniciar } from '../src/lib/foco.js';
 describe('planner v2: janelas, horas por fase e regras', () => {
   const f = gerarFases(cfg());
   const semana = (seg, c = cfg(), ctx = {}) => planoSemana(c, f, seg, ctx);
@@ -389,12 +390,14 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     expect(dias[6].blocos.map((b) => b.cat)).toEqual(['red', 'plan']);
     expect(dias[6].blocos[1].fim).toBe(toMin('12:00'));
   });
-  it('rampa de 75% nas 2 primeiras semanas (quando ligada)', () => {
+  it('rampa de 75% nas 2 primeiras semanas do planner (depois da semana diagnóstica), quando ligada', () => {
     const c = cfg(); c.rotina.rampa.ativa = true;
-    const r = orcamentoSemana(c, 'base', '2026-11-16'); // semana 2 do plano
-    expect(r.mat).toBe(Math.round(20 * 0.86 * 60 * 0.75));
-    expect(orcamentoSemana(c, 'base', '2026-11-23').mat).toBe(1032); // a partir da 3ª semana, cheio
-    expect(orcamentoSemana(cfg(), 'base', '2026-11-16').mat).toBe(1032); // desligada
+    const cheio = Math.round(20 * 0.86 * 60), rampa = Math.round(20 * 0.86 * 60 * 0.75);
+    expect(orcamentoSemana(c, 'base', '2026-11-16').mat).toBe(rampa); // 1ª semana do planner
+    expect(orcamentoSemana(c, 'base', '2026-11-23').mat).toBe(rampa); // 2ª
+    expect(orcamentoSemana(c, 'base', '2026-11-30').mat).toBe(cheio); // a partir da 3ª, cheio
+    expect(orcamentoSemana(c, 'base', '2026-11-09').mat).toBe(cheio); // semana diagnóstica não entra
+    expect(orcamentoSemana(cfg(), 'base', '2026-11-16').mat).toBe(cheio); // desligada
   });
   it('matéria abaixo de 50% no último simulado: +2h na semana seguinte, tiradas da mais forte', () => {
     const exams = { a: { id: 'a', data: '2026-11-21', concurso: 'efomm', notas: { Matemática: 80, Física: 40, Português: 60 } } };
@@ -431,5 +434,86 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     // aulas editadas por você são mantidas
     const editado = cfg(); delete editado.versaoSeed; editado.rotina = { aulas: [{ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' }] };
     expect(migrarCfg(editado, cfg()).rotina.aulas).toEqual([{ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' }]);
+  });
+});
+
+describe('planner v2: casos de borda (revisão)', () => {
+  const f = gerarFases(cfg());
+  const sem = (c, seg = '2026-11-23', ctx = {}) => planoSemana(c, f, seg, ctx);
+  const sessoes = (dias) => dias.flatMap((d) => d.blocos).reduce((n, b) => n + (b.sessoes || 0), 0); // total de sessões de 50 min
+  const semOverlap = (dias) => dias.forEach((d) => { for (let i = 1; i < d.blocos.length; i++) expect(d.blocos[i].ini).toBeGreaterThanOrEqual(d.blocos[i - 1].fim); });
+
+  it('hora vazia, inválida ou fim antes do início: a janela é ignorada e a semana não zera', () => {
+    const c = cfg();
+    const base = sessoes(sem(cfg()));
+    c.rotina.janelas[3][1].fim = ''; // apagou o fim da janela de quarta
+    c.rotina.janelas[4][0].ini = '25:99';
+    c.rotina.janelas[2][2] = { ini: '18:00', fim: '16:00' }; // fim antes do início
+    const dias = sem(c);
+    expect(sessoes(dias)).toBeGreaterThan(20);
+    expect(sessoes(dias)).toBeLessThanOrEqual(base);
+    dias.forEach((d) => d.blocos.forEach((b) => { expect(Number.isFinite(b.ini)).toBe(true); expect(Number.isFinite(b.fim)).toBe(true); }));
+    expect(janelasValidas([{ ini: '', fim: '10:00' }, { ini: '09:00', fim: '08:00' }, {}, null])).toEqual([]);
+  });
+  it('janelas que se sobrepõem são juntadas: nenhum bloco sobreposto', () => {
+    const c = cfg();
+    c.rotina.janelas[2].push({ ini: '10:00', fim: '11:00' }); // dentro da janela 7–12 de terça
+    c.rotina.janelas[2].push({ ini: '11:30', fim: '13:30' }); // atravessa o intervalo até 13–15
+    const dias = sem(c);
+    semOverlap(dias);
+    expect(janelasValidas([{ ini: '07:00', fim: '12:00' }, { ini: '10:00', fim: '11:00' }, { ini: '11:30', fim: '13:30' }])).toEqual([{ ini: 420, fim: 810, tipo: undefined }]);
+  });
+  it('janelas extras de sábado e domingo viram estudo normal (e sábado tem pausa depois da correção)', () => {
+    const c = cfg();
+    c.rotina.janelas[6].push({ ini: '18:00', fim: '20:00' });
+    c.rotina.janelas[0].push({ ini: '14:00', fim: '16:00' });
+    const dias = sem(c);
+    expect(dias[5].blocos.some((b) => b.sessoes && b.ini >= toMin('18:00'))).toBe(true);
+    expect(dias[6].blocos.some((b) => b.sessoes && b.ini >= toMin('14:00'))).toBe(true);
+    const sab = dias[5].blocos, corr = sab.find((b) => b.cat === 'corr'), prox = sab.find((b) => b.sessoes);
+    expect(prox.ini - corr.fim).toBe(10);
+    semOverlap(dias);
+  });
+  it('regra dos 50% inclui a Redação e funciona com um simulado de uma matéria só', () => {
+    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
+    const red = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams: { a: { id: 'a', data: '2026-11-21', concurso: 'en', notas: { Redação: 40, Matemática: 80 } } } });
+    expect(red.red - base.red).toBe(120); expect(base.mat - red.mat).toBe(120);
+    // simulado só de Física, fraca: a doadora é a matéria com mais horas (Matemática)
+    const so = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams: { a: { id: 'a', data: '2026-11-22', concurso: 'ita', notas: { Física: 40 } } } });
+    expect(so.fis - base.fis).toBe(120); expect(base.mat - so.mat).toBe(120);
+  });
+  it('limites da regra dos 50%: simulado na própria segunda ou 8 dias antes não vale', () => {
+    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
+    const com = (data) => orcamentoSemana(cfg(), 'base', '2026-11-23', { exams: { a: { id: 'a', data, concurso: 'en', notas: { Física: 40, Matemática: 90 } } } }).fis - base.fis;
+    expect(com('2026-11-22')).toBe(120); // 1 dia antes
+    expect(com('2026-11-16')).toBe(120); // 7 dias antes
+    expect(com('2026-11-15')).toBe(0);   // 8 dias antes
+    expect(com('2026-11-23')).toBe(0);   // na própria segunda
+  });
+  it('bloco contínuo (prova, correção, redação) vira uma sessão só no cronômetro, sem descontar pausa', () => {
+    const dias = sem(cfg());
+    const red = dias[6].blocos.find((b) => b.cat === 'red'), corr = dias[5].blocos.find((b) => b.cat === 'corr');
+    expect(planoDoBloco(red)).toMatchObject({ sessoes: 1, len: red.min });
+    expect(planoDoBloco(corr)).toMatchObject({ sessoes: 1, len: corr.min });
+    const dois = { sessoes: 2, bruto: 110, min: 100 };
+    expect(planoDoBloco(dois)).toMatchObject({ sessoes: 2, len: 50 });
+    expect(foco_iniciar({ id: 'x', titulo: 't', materia: 'm', ...red }, undefined, 0)).toMatchObject({ sessoes: 1, len: red.min });
+  });
+  it('o id do bloco usa o horário: editar outra janela não troca o id dos blocos que não mudaram', () => {
+    const c = cfg(); const g = gerarFases(c);
+    const antes = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:00');
+    c.rotina.janelas[2][0].fim = '11:00'; // mexe só na terça
+    const depois = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:00');
+    expect(depois.id).toBe(antes.id);
+    expect(antes.id).toMatch(/^2026-11-23:[a-z]+@0600$/);
+  });
+  it('migração: janelas e meta que você editou sobrevivem a uma nova versão do seed', () => {
+    const salvo = cfg(); salvo.versaoSeed = 3;
+    salvo.rotina.janelas[1] = [{ ini: '05:00', fim: '07:00' }]; salvo.rotina.metaLiquida = 38; salvo.rotina.rampa.ativa = true;
+    salvo.modeloSemana = { util: [] };
+    const novo = migrarCfg(salvo, cfg());
+    expect(novo.rotina.janelas[1]).toEqual([{ ini: '05:00', fim: '07:00' }]);
+    expect(novo.rotina.metaLiquida).toBe(38); expect(novo.rotina.rampa.ativa).toBe(true);
+    expect(novo.modeloSemana).toBeUndefined();
   });
 });

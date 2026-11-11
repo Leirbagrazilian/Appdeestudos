@@ -3,7 +3,19 @@
 import { addDays, diffDays, startOfWeek } from './dates.js';
 import { faseDoDia } from './phases.js';
 
-export const toMin = (s) => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+export const toMin = (s) => { const [h, m] = String(s).split(':').map(Number); return h * 60 + m; };
+const horaOk = (s) => typeof s === 'string' && /^\d{1,2}:\d{2}$/.test(s) && toMin(s) <= 1440;
+/** Janelas utilizáveis: ignora hora vazia ou inválida e fim <= início; junta as que se sobrepõem (do mesmo tipo). */
+export function janelasValidas(lista) {
+  const v = (lista ?? []).filter((j) => horaOk(j?.ini) && horaOk(j?.fim) && toMin(j.fim) > toMin(j.ini))
+    .map((j) => ({ ini: toMin(j.ini), fim: toMin(j.fim), tipo: j.tipo })).sort((a, b) => a.ini - b.ini);
+  const out = [];
+  for (const j of v) {
+    const u = out.at(-1);
+    if (u && j.ini <= u.fim && (u.tipo ?? '') === (j.tipo ?? '')) u.fim = Math.max(u.fim, j.fim); else out.push({ ...j });
+  }
+  return out;
+}
 export const toHHMM = (n) => `${String(Math.floor(n / 60)).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
 const r10 = (x) => Math.round(x / 10) * 10;
 
@@ -34,7 +46,10 @@ export function repartir(pesos, total) {
 export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
   const hf = cfg.horasFase?.[faseId] ?? cfg.horasFase?.base ?? {};
   const nominal = cfg.rotina?.metaNominal ?? 50, liquida = cfg.rotina?.metaLiquida ?? 43;
-  const semIdx = Math.floor(diffDays(startOfWeek(cfg.perfil.inicioPlano), segunda) / 7);
+  // a rampa vale nas primeiras semanas do planner, depois da semana diagnóstica (que tem blocos escritos à mão)
+  const diag = Object.keys(cfg.diagnostico?.dias ?? {}).sort();
+  const primeira = diag.length ? addDays(startOfWeek(diag.at(-1)), 7) : startOfWeek(cfg.perfil.inicioPlano);
+  const semIdx = Math.floor(diffDays(primeira, segunda) / 7);
   const r = cfg.rotina?.rampa;
   const rampa = r?.ativa && semIdx >= 0 && semIdx < (r.semanas ?? 2) ? (r.fator ?? 0.75) : 1;
   const f = (liquida / nominal) * rampa * 60;
@@ -52,10 +67,12 @@ export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
   // Matéria abaixo de 50% no último simulado (da semana anterior): +2h, tiradas da mais forte.
   const ult = exs[0];
   if (ult && diffDays(ult.data, segunda) <= 7) {
-    const dentro = POOL.filter((c) => nota(ult, c) != null);
+    const dentro = [...POOL, 'red'].filter((c) => nota(ult, c) != null);
     const fracas = dentro.filter((c) => nota(ult, c) < 50).sort((a, b) => nota(ult, a) - nota(ult, b));
     for (const c of fracas) {
-      const doadora = dentro.filter((x) => !fracas.includes(x) && min[x] >= 120).sort((a, b) => nota(ult, b) - nota(ult, a))[0];
+      // a mais forte do simulado; sem nota (ou sem horas sobrando), a que tiver mais horas
+      const doadora = POOL.filter((x) => !fracas.includes(x) && min[x] >= 120)
+        .sort((a, b) => (nota(ult, b) ?? -1) - (nota(ult, a) ?? -1) || min[b] - min[a])[0];
       if (!doadora) continue;
       min[doadora] -= 120; min[c] += 120;
     }
@@ -75,7 +92,7 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   const fase = faseDoDia(fases, addDays(segunda, 3));
   const min = orcamentoSemana(cfg, fase.id, segunda, ctx);
   const dias = Array.from({ length: 7 }, (_, i) => ({ dia: addDays(segunda, i), wd: (i + 1) % 7, blocos: [] }));
-  const janelas = (wd) => (cfg.rotina?.janelas?.[wd] ?? []).map((j) => ({ ini: toMin(j.ini), fim: toMin(j.fim), tipo: j.tipo }));
+  const janelas = (wd) => janelasValidas(cfg.rotina?.janelas?.[wd]);
   const bloco = (cat, ini, dur, sessoes = 1) => ({ cat, ini, fim: ini + dur, min: sessoes ? sessoes * s : dur, bruto: dur, sessoes });
   const excedente = { prova: 0, red: 0 };
   const janelasLivres = []; // janelas de estudo em ordem cronológica
@@ -89,17 +106,19 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
     excedente.prova = Math.max(0, P - prova - cor);
     if (prova > 0) dias[5].blocos.push(bloco('prova', sab.ini, prova, 0));
     if (cor > 0) dias[5].blocos.push(bloco('corr', sab.ini + prova, cor, 0));
-    const ini = sab.ini + prova + cor;
+    const ini = sab.ini + prova + cor + (prova + cor > 0 ? p : 0); // 10 min de pausa depois da correção
     if (sab.fim - ini >= s) janelasLivres.push({ i: 5, ini, fim: sab.fim });
+    for (const j of janelas(6)) if (j !== sab && (j.fim <= sab.ini || j.ini >= sab.fim)) janelasLivres.push({ i: 5, ini: j.ini, fim: j.fim });
   }
   // Domingo: redação + planejamento da semana (o que passar da janela vira estudo na semana).
-  const dom = janelas(0)[0];
+  const dom = janelas(0).find((j) => j.tipo === 'domingo') ?? janelas(0)[0];
   if (dom) {
     const dur = dom.fim - dom.ini, plano = Math.min(30, dur);
     const red = Math.max(0, Math.min(r10(min.red), dur - plano));
     excedente.red = Math.max(0, min.red - red);
     if (red > 0) dias[6].blocos.push(bloco('red', dom.ini, red, 0));
     if (plano > 0) dias[6].blocos.push(bloco('plan', dom.fim - plano, plano, 0));
+    for (const j of janelas(0)) if (j !== dom && (j.fim <= dom.ini || j.ini >= dom.fim)) janelasLivres.push({ i: 6, ini: j.ini, fim: j.fim });
   }
   // Segunda a sexta.
   for (let i = 0; i < 5; i++) for (const j of janelas(i + 1)) janelasLivres.push({ i, ini: j.ini, fim: j.fim });

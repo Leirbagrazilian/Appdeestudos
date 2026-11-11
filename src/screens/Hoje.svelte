@@ -6,7 +6,7 @@
   import { revisoesDoDia } from '../lib/spaced.js';
   import { diaNome, fmtCurta, fmtBR, fmtMin, weekday, addDays, startOfWeek, diffDays } from '../lib/dates.js';
   import { alertasInscricao, conflitosProvas } from '../lib/alerts.js';
-  import { planoSessoes } from '../lib/foco.js';
+  import { planoDoBloco } from '../lib/foco.js';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
   import Check from '../components/Check.svelte';
@@ -77,7 +77,7 @@
     location.hash = '#/foco';
   }
   const fotoDe = (r) => (r.origem?.startsWith('erro:') ? app.errors[r.origem.slice(5)]?.foto : null);
-  const descSessoes = (b) => { const p = planoSessoes(b.bruto ?? b.min, app.cfg.foco); return p.sessoes > 1 ? `${p.sessoes} × ${p.len} min` : fmtMin(b.min); };
+  const descSessoes = (b) => { const p = planoDoBloco(b, app.cfg.foco); return p.sessoes > 1 ? `${p.sessoes} × ${p.len} min` : fmtMin(b.min); };
 </script>
 
 <header>

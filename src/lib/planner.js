@@ -40,7 +40,7 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
     if (b.cat === 'prova' && b.sessoes) titulo = 'Questões de provas antigas (cronometradas)'; // excedente durante a semana
     else if (b.cat === 'prova') titulo = leve ? 'Revisão leve: refazer erros da última prova (sem prova nova)' : `Prova antiga: ${cfg.provaSabado[fase.id]}`;
     return {
-      id: `${dia}:${b.cat}${cont[b.cat]}`, chave: `${b.cat}${cont[b.cat]}`, cat: b.cat,
+      id: `${dia}:${b.cat}@${toHHMM(b.ini).replace(':', '')}`, chave: `${b.cat}${cont[b.cat]}`, cat: b.cat,
       materia: c.materia, titulo, min: b.min, bruto: b.bruto, ini: toHHMM(b.ini), fim: toHHMM(b.fim), sessoes: b.sessoes,
       metodo: c.metodo, dica: cfg.metodos[c.metodo], diagnostico: false, comAssunto: COM_ASSUNTO.includes(b.cat),
     };

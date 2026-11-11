@@ -57,6 +57,8 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - **Janelas de estudo** por dia (editáveis em Ajustes). Os blocos entram nelas com **50 min de foco e 10 de pausa**; cada bloco mostra o horário.
 - **Horas por semana** vêm da tabela da fase (base de 50 h) escalada para a **meta líquida de 43 h**. Sábado: prova antiga cronometrada + correção; domingo: redação + planejamento.
 - Regras: matéria abaixo de 50% no último simulado ganha +2 h na semana seguinte (tiradas da mais forte); inglês com 75% ou mais fica em 1 h de manutenção; rampa opcional de 75% nas 2 primeiras semanas; semana antes da prova = revisão leve.
+- Janelas com horário vazio, inválido ou sobreposto são ignoradas (e avisadas em Ajustes). A meta diária antiga (`metaHoras`) foi substituída pela meta líquida semanal e não é migrada.
+- A rampa vale nas 2 primeiras semanas do planner, depois da semana diagnóstica.
 - A Fase 6 (ENEM) usa uma tabela estimada (muita prova antiga); ajuste em `horasFase.enem` no seed se quiser.
 
 ## Notas

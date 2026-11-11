@@ -6,7 +6,7 @@
   import { baixar, validar } from '../lib/backup.js';
   import { pedir, suportado } from '../lib/notify.js';
   import { fmtBR } from '../lib/dates.js';
-  import { slotsDaJanela, toMin } from '../lib/semana.js';
+  import { slotsDaJanela, janelasValidas, toHHMM } from '../lib/semana.js';
 
   const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
   const ordem = [1, 2, 3, 4, 5, 6, 0];
@@ -31,11 +31,13 @@
     texto: [['normal', 'Normal'], ['grande', 'Grande'], ['muito', 'Muito grande']],
   };
   const capacidade = (d) => {
-    const js = app.cfg.rotina.janelas[d] ?? [];
-    if (!js.length) return 'sem estudo';
-    const n = js.filter((j) => !j.tipo).reduce((a, j) => a + slotsDaJanela(toMin(j.fim) - toMin(j.ini), app.cfg.foco.sessaoMin, app.cfg.foco.pausaMin), 0);
-    const nome = (j) => `${j.ini}–${j.fim}${j.tipo === 'prova' ? ' (prova antiga e correção)' : j.tipo === 'domingo' ? ' (redação e planejamento)' : ''}`;
-    return `${js.map(nome).join(' · ')}${n ? ` · ${n} sessões` : ''}`;
+    const bruto = app.cfg.rotina.janelas[d] ?? [];
+    const js = janelasValidas(bruto);
+    if (!bruto.length) return 'sem estudo';
+    const ignoradas = bruto.length - js.length;
+    const n = js.filter((j) => !j.tipo).reduce((a, j) => a + slotsDaJanela(j.fim - j.ini, app.cfg.foco.sessaoMin, app.cfg.foco.pausaMin), 0);
+    const nome = (j) => `${toHHMM(j.ini)}–${toHHMM(j.fim)}${j.tipo === 'prova' ? ' (prova antiga e correção)' : j.tipo === 'domingo' ? ' (redação e planejamento)' : ''}`;
+    return `${js.map(nome).join(' · ') || 'nenhuma janela válida'}${n ? ` · ${n} sessões` : ''}${ignoradas > 0 ? ` · ${ignoradas} ignorada(s): horário vazio, inválido ou sobreposto` : ''}`;
   };
   const addJanela = (d) => { (app.cfg.rotina.janelas[d] ??= []).push({ ini: '19:00', fim: '20:00' }); salvar(); };
   const delJanela = (d, i) => { app.cfg.rotina.janelas[d].splice(i, 1); salvar(); };
