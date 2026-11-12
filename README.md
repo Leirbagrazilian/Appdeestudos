@@ -40,6 +40,46 @@ Tudo que é conteúdo está em `src/data/seed.json`: datas e status dos concurso
 3. Na pausa, registre as questões (+1 acertei / +1 errei), se refez alguma sem olhar a resolução e o assunto.
 4. No fim, "Concluir bloco" grava os minutos reais e as questões. Elas aparecem em Semana → Questões da semana.
 
+## Concursos e idade (SPEC v2, etapa 1)
+Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calculada, nunca fixa.
+- Escola Naval: menos de 23 anos em 30/06. EFOMM: 23 incompletos em 01/01. ITA: não completar 25 até 31/12.
+- ESA (área Geral): 17 a 24 anos até 31/12. IME: fora do limite (aparece só como informação).
+- Conflito de provas (ex.: EFOMM × ESA em 26/07/2027) aparece no Calendário e na tela Hoje; prioridade EFOMM.
+- Fases: 1 Base · 2 Desenvolvimento · 3 EFOMM+ESA · 4 Escola Naval · 5 ITA · 6 ENEM (só provas antigas).
+- Atualizações do seed (`versaoSeed`) entram no app sem apagar o que você editou (datas, status, carta, links).
+
+## Matérias × concursos e Trilha (SPEC v2, etapa 2)
+- Matemática, Português e Inglês servem a EN, EFOMM, ITA e ESA; Física a EN, EFOMM e ITA; Química só ao ITA; Hist/Geo só à ESA; Cálculo só à EN. A Escola Naval elimina com menos de 50% em qualquer matéria ou redação abaixo de 50/100.
+- A tela **Trilha** (substitui o Mapa de lacunas) lista os tópicos de cada matéria na ordem de estudo, com os concursos que cada um serve e a sua nota de domínio (0 a 3). As notas antigas do mapa foram aproveitadas.
+- "O que estudar a seguir": dentro da janela dos próximos 3 tópicos, vale primeiro o que serve a mais concursos.
+
+## Rotina e planner v2 (SPEC v2, etapa 3)
+- **Janelas de estudo** por dia (editáveis em Ajustes). Os blocos entram nelas com **50 min de foco e 10 de pausa**; cada bloco mostra o horário.
+- **Horas por semana** vêm da tabela da fase (base de 50 h) escalada para a **meta líquida de 43 h**. Sábado: prova antiga cronometrada + correção; domingo: redação + planejamento.
+- Regras: matéria abaixo de 50% no último simulado ganha +2 h na semana seguinte (tiradas da mais forte); inglês com 75% ou mais fica em 1 h de manutenção; rampa opcional de 75% nas 2 primeiras semanas; semana antes da prova = revisão leve.
+- Janelas com horário vazio, inválido ou sobreposto são ignoradas (e avisadas em Ajustes). A meta diária antiga (`metaHoras`) foi substituída pela meta líquida semanal e não é migrada.
+- A rampa vale nas 2 primeiras semanas do planner, depois da semana diagnóstica.
+- A Fase 6 (ENEM) usa uma tabela estimada (muita prova antiga); ajuste em `horasFase.enem` no seed se quiser.
+
+## Meus livros (SPEC v2, etapa 4)
+- Tela **QG → Meus livros**: por matéria, escolha o **livro principal** (Física Clássica por padrão; Tópicos de Física como opção; Química: Feltre, editável), veja os volumes e vincule cada um a tópicos da Trilha.
+- Cadastre **uma vez** capítulo, páginas e exercícios de cada tópico. O app calcula a **cota do bloco** (teoria 10 pág/h, gramática 15 pág/h, ajustados pelo que você registrar) e **continua de onde você parou**: o que não foi lido fica para o próximo bloco.
+- A biblioteca do SPEC vem cadastrada **sem páginas**. Links: só entram os que apareceram na busca ("link visto na busca"); os demais ficam "a confirmar" e você cola o seu. Questões por hora: 6 (EN/EFOMM) e 3 (ITA).
+- Os temas de redação já cobrados na Escola Naval aparecem na tela Redação (lista do SPEC, não verificada).
+
+## Bloco = tarefa exata (SPEC v2, etapa 5)
+- Cada bloco de estudo vira uma tarefa: **vídeo → páginas do livro → exercícios → questões do tópico**. O tópico vem da Trilha (o próximo, pela regra dos concursos), as páginas da biblioteca (Meus livros) e os minutos são divididos 25% vídeo, 45% páginas/exercícios e 30% questões, só entre o que existe. Vários blocos da mesma matéria no dia continuam de onde o anterior parou.
+- **Questões: o app não guarda nem gera questões.** Em cada tópico (Trilha → "Links de questões e vídeo") você cola o link de uma lista já filtrada: QConcursos, Estuda.com, prova em PDF ou outro. O bloco mostra os links com a cota grátis do dia (padrão 10 + 5, editável em Ajustes) e, quando acaba, sugere a prova em PDF ou os exercícios do livro.
+- **Registro em uma tela:** marcar o bloco é 1 toque; "Registrar" (no aviso ou no bloco) abre: questões feitas e acertadas, onde fez, páginas lidas e os erros (assunto + tipo) que vão para o caderno. Corrigir depois não duplica páginas, cota nem erros. Daí saem o **acerto por tópico** (na Trilha) e a leitura "de onde parei".
+- Sem páginas cadastradas, o bloco mostra vídeo e questões e um botão "Cadastrar páginas". O cronômetro mostra a mesma tarefa e, ao concluir, abre o registro só dos erros.
+
+## Extras e telas (SPEC v2, etapa 6)
+- **Dia mínimo** (substitui o "dia difícil"): um único bloco de 45 min com 20 questões da matéria mais fraca + revisões vencidas. Conta como dia cumprido. Botão na tela Hoje.
+- **Revisão de domingo** (QG → Revisão da semana): 3 perguntas (o que foi bem, o que faltou, foco da próxima), resumo automático (horas, questões, erros, dias cumpridos) e histórico. O foco aparece na Hoje durante a semana seguinte.
+- **Cobertura do conteúdo** (Trilha): % de tópicos dominados e % de páginas lidas por matéria.
+- **Ajustes**: janelas de estudo, meta, rampa e livro principal de cada matéria.
+- O lembrete de sono/exercício foi removido.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

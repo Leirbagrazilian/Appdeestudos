@@ -1,6 +1,6 @@
 <script>
   import { app, fases } from '../stores/app.svelte.js';
-  import { marcos, alertasInscricao } from '../lib/alerts.js';
+  import { marcos, alertasInscricao, conflitosProvas } from '../lib/alerts.js';
   import { diffDays, fmtBR, fmtCurta, parse } from '../lib/dates.js';
   import { idadeOk } from '../lib/age.js';
   import Icon from '../components/Icon.svelte';
@@ -18,6 +18,8 @@
   const STATUS = ['estimada', 'edital publicado', 'confirmada'];
   const anosProva = (c) => [...new Set(c.eventos.filter((e) => e.tipo === 'prova').map((e) => +e.inicio.slice(0, 4)))];
   const idade = (c) => (c.idade ? [2027, 2028].map((a) => ({ a, ...idadeOk(app.cfg.perfil.nascimento, c.idade, a) })) : null);
+  const comPlano = $derived(app.cfg.concursos.filter((c) => c.plano !== false && c.eventos.length));
+  const conflitos = $derived(conflitosProvas(app.cfg));
   let scroller;
   
 </script>
@@ -28,18 +30,21 @@
   <p class="sub">Datas de 2027 estimadas até sair o edital.</p>
 </header>
 
+{#each conflitos as c}
+  <p class="nota conflito"><Icon nome="clock" />Conflito: {c.a.sigla} e {c.b.sigla} caem {c.de === c.ate ? `em ${fmtBR(c.de)}` : `de ${fmtBR(c.de)} a ${fmtBR(c.ate)}`}. Prioridade: <strong>{c.vence.sigla}</strong>.</p>
+{/each}
 {#each alertas as a}
   <a class="nota" href="#/calendario"><Icon nome="clock" />Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`} · {fmtBR(a.evento.fim)}</a>
 {/each}
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div class="card tl" bind:this={scroller} tabindex="0" role="group" aria-label="Linha do tempo, role para o lado">
-  <div class="canvas" style="width:{W}px">
+  <div class="canvas" style="width:{W}px;height:{86 + comPlano.length * 38}px">
     {#each meses as m}<span class="mes" style="left:{x(m.d)}px">{m.n}</span>{/each}
     <div class="fases">
       {#each fs as f}<span class:atual={f.id === atual} style="left:{x(f.inicio)}px;width:{(diffDays(f.inicio, f.fim) + 1) * PX}px" title={f.nome}>{f.nome.replace('Específica ', '')}</span>{/each}
     </div>
-    {#each app.cfg.concursos as c, n}
+    {#each comPlano as c, n}
       <div class="faixa" style="--c:{c.cor};top:{70 + n * 38}px">
         {#each c.eventos as e}
           {#if e.tipo === 'inscricao'}<i class="insc" style="left:{x(e.inicio)}px;width:{(diffDays(e.inicio, e.fim) + 1) * PX}px"></i>
@@ -58,7 +63,7 @@
   {#each lista as m}
     <li style="--c:{m.c.cor}">
       <span class="g" aria-hidden="true">{m.glifo}</span>
-      <span class="t"><strong>{m.c.nome} · {m.rotulo}</strong><span class="sub">{fmtBR(m.data)} · {quando(m)}</span></span>
+      <span class="t"><strong>{m.c.nome} · {m.rotulo}</strong><span class="sub">{fmtBR(m.data)} · {quando(m)}{m.e.obs ? ` · ${m.e.obs}` : ''}</span></span>
       <span class="st" class:ok={m.e.status !== 'estimada'}>{m.e.status}</span>
     </li>
   {/each}
@@ -72,7 +77,7 @@
         <a class="btn" href={c.link} target="_blank" rel="noopener">Verificar edital <Icon nome="ext" size={16} /></a></div>
       {#if c.idade}
         <p class="sub">{c.idade.texto}</p>
-        <p class="idades">{#each idade(c) as i}<span class:no={!i.ok}>Prova {i.a}: {i.ok ? 'dentro do limite' : 'fora do limite'} ({i.idade} anos)</span>{/each}</p>
+        <p class="idades">{#if c.plano === false}<span class="sub">Sem plano: só para você ver o limite.</span>{/if}{#each idade(c) as i}<span class:no={!i.ok}>Prova {i.a} (matrícula {i.anoMat}): {i.ok ? 'dentro do limite' : 'fora do limite'}, {i.idade} anos em {i.ref.slice(8)}/{i.ref.slice(5, 7)}</span>{/each}</p>
       {:else}<p class="sub">Sem limite de idade.</p>{/if}
     </li>
   {/each}
@@ -86,8 +91,9 @@
   header .sub { margin-top: 4px; }
   .nota { display: block; margin-top: 12px; padding: 12px 16px; border-radius: 14px; background: var(--warn-bg); color: var(--warn); font-size: .9rem; text-decoration: none; font-weight: 600; }
   .nota :global(svg) { vertical-align: -3px; margin-right: 8px; }
+  .conflito { background: var(--ac-bg); color: var(--tx); border: 1px solid var(--ac); } .conflito :global(svg) { color: var(--ac); }
   .tl { margin-top: 16px; overflow-x: auto; padding: 8px 0 12px; scrollbar-width: thin; }
-  .canvas { position: relative; height: 230px; }
+  .canvas { position: relative; }
   .mes { position: absolute; top: 0; font-size: .8125rem; color: var(--tx2); padding-left: 4px; border-left: 1px solid var(--line); height: 100%; text-transform: uppercase; letter-spacing: .08em; }
   .fases span { position: absolute; top: 26px; height: 28px; background: var(--line); color: var(--tx); font-size: .8125rem; font-weight: 600; line-height: 28px; padding: 0 8px; overflow: hidden; white-space: nowrap; border-radius: 8px; border: 1px solid var(--card); }
   .fases span.atual { background: var(--ac); color: var(--ac-tx); }

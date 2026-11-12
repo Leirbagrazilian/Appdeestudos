@@ -27,7 +27,7 @@
       .sort((a, b) => b.id.localeCompare(a.id));
   });
   // Sugestões de assunto: tópicos da matéria + assuntos já usados (ajuda os vilões a se agruparem).
-  const sugestoes = $derived([...new Set([...(app.cfg.topicos?.[materia] ?? []), ...todos.filter((e) => !materia || e.materia === materia).map((e) => e.assunto)])]);
+  const sugestoes = $derived([...new Set([...(app.cfg.topicos?.[materia] ?? []).map((t) => t.nome), ...todos.filter((e) => !materia || e.materia === materia).map((e) => e.assunto)])]);
 
   async function lerFoto(ev) {
     const f = ev.currentTarget.files?.[0]; if (!f) return;

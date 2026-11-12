@@ -2,6 +2,7 @@
   import { app, listaConquistas, fazerBackup } from '../stores/app.svelte.js';
   import { situacao, totalRedacao } from '../lib/erros.js';
   import { diffDays } from '../lib/dates.js';
+  import { coberturaGeral } from '../lib/trilha.js';
   import Icon from '../components/Icon.svelte';
   import Ring from '../components/Ring.svelte';
 
@@ -10,10 +11,7 @@
   const ultSim = $derived(sims.at(-1));
   const deltaSim = $derived(sims.length > 1 ? Math.round(media(sims.at(-1)) - media(sims.at(-2))) : null);
   const reds = $derived(Object.values(app.redacoes ?? {}).sort((a, b) => a.data.localeCompare(b.data)));
-  const lacunasPct = $derived.by(() => {
-    const ts = Object.entries(app.cfg.topicos ?? {}).flatMap(([m, l]) => l.map((t) => app.lacunas[m]?.[t] ?? 0));
-    return ts.length ? ts.reduce((a, b) => a + b, 0) / (3 * ts.length) : 0;
-  });
+  const lacunasPct = $derived(coberturaGeral(app.cfg, app.lacunas));
   const ins = $derived(listaConquistas());
   const insOk = $derived(ins.filter((c) => c.ok).length);
   const paraTreinar = $derived(Object.values(app.errors).filter((e) => situacao(e) !== 'dominado').length);
@@ -38,8 +36,8 @@
     {#if reds.length}<strong>{totalRedacao(reds.at(-1))}</strong><span class="sub">de 1000</span>
     {:else}<strong>–</strong><span class="sub">registre a de domingo</span>{/if}
   </a>
-  <a class="card c anel" href="#/lacunas">
-    <span class="rot">Mapa de lacunas</span>
+  <a class="card c anel" href="#/trilha">
+    <span class="rot">Trilha</span>
     <span class="r"><Ring pct={lacunasPct} size={48} stroke={5} /><strong>{Math.round(lacunasPct * 100)}%</strong></span>
   </a>
   <a class="card c" href="#/erros">
@@ -67,13 +65,15 @@
 <h2>Desempenho</h2>
 <ul class="grupo card">
   <li><a href="#/simulados"><span class="t"><strong>Simulados</strong><span class="sub">Notas por matéria, nota de corte e evolução</span></span><Icon nome="ext" size={18} /></a></li>
+  <li><a href="#/revisao"><span class="t"><strong>Revisão da semana</strong><span class="sub">3 perguntas de domingo, resumo e o foco da próxima semana</span></span><Icon nome="clock" size={18} /></a></li>
   <li><a href="#/redacao"><span class="t"><strong>Redação</strong><span class="sub">Nota por competência, checklist e evolução</span></span><Icon nome="ext" size={18} /></a></li>
-  <li><a href="#/lacunas"><span class="t"><strong>Mapa de lacunas</strong><span class="sub">Nota de 0 a 3 por tópico e as prioridades</span></span><Icon nome="mapa" size={18} /></a></li>
+  <li><a href="#/trilha"><span class="t"><strong>Trilha</strong><span class="sub">Tópicos de cada matéria, seu domínio e o que estudar a seguir</span></span><Icon nome="mapa" size={18} /></a></li>
   <li><a href="#/conquistas"><span class="t"><strong>Insígnias e capítulos</strong><span class="sub">Suas conquistas e as fases concluídas</span></span><Icon nome="trofeu" size={18} /></a></li>
 </ul>
 
 <h2>Recursos</h2>
 <ul class="grupo card">
+  <li><a href="#/livros"><span class="t"><strong>Meus livros</strong><span class="sub">Livros, vídeos e sites por matéria; páginas e ritmo de leitura</span></span><Icon nome="mapa" size={18} /></a></li>
   <li><a href="#/questoes"><span class="t"><strong>Onde achar questões</strong><span class="sub">Provas e gabaritos: Escola Naval, EFOMM, ITA e ENEM</span></span><Icon nome="ext" size={18} /></a></li>
 </ul>
 

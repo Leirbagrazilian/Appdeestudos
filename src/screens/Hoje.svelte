@@ -4,11 +4,15 @@
   import { blocosAjustados } from '../lib/planner.js';
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
-  import { diaNome, fmtCurta, fmtBR, fmtMin, weekday, addDays, startOfWeek, diffDays } from '../lib/dates.js';
-  import { alertasInscricao } from '../lib/alerts.js';
-  import { planoSessoes } from '../lib/foco.js';
+  import { diaNome, fmtCurta, fmtBR, fmtMin, addDays, startOfWeek, diffDays } from '../lib/dates.js';
+  import { alertasInscricao, conflitosProvas } from '../lib/alerts.js';
+  import { planoDoBloco } from '../lib/foco.js';
+  import { tarefasDoDia } from '../lib/tarefas.js';
+  import Registro from '../components/Registro.svelte';
+  import Tarefa from '../components/Tarefa.svelte';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
+  import { focoDaSemana } from '../lib/revisao.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
   import Sinal from '../components/Sinal.svelte';
@@ -23,10 +27,18 @@
   const fs = $derived(fases());
   const fase = $derived(faseDoDia(fs, app.dia));
   const blocos = $derived(blocosAjustados(app.cfg, fs, app.dia, ajustes()));
+  // tarefa exata de cada bloco de estudo: tópico da Trilha, vídeo, páginas, exercícios e questões
+  const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id }));
+  const bRegistro = $derived(app.registroAberto ? blocos.find((x) => x.id === app.registroAberto.id) : null);
+  const tituloDe = (b) => {
+    const topico = tarefas[b.id]?.topico ?? app.done[b.id]?.topico;
+    return topico ? `${b.materia} · ${topico}` : b.titulo;
+  };
   const revs = $derived(revisoesDoDia(Object.values(app.reviews), app.dia));
   const prox = $derived(proximaProva(app.cfg, app.dia));
   const leve = $derived(revisaoLeve(app.cfg, app.dia));
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
+  const conflito = $derived(conflitosProvas(app.cfg).find((c) => diffDays(app.dia, c.de) >= 0 && diffDays(app.dia, c.de) <= 120));
   const diag = $derived(blocos.some((b) => b.diagnostico));
   const dificil = $derived(!!app.dificeis[app.dia]);
   // Progresso pelo tempo planejado de cada bloco concluído (os minutos reais aparecem no bloco).
@@ -57,6 +69,7 @@
   // Lembrete de backup: 7 dias depois do último (ou nunca feito depois de 3 dias de uso).
   const diasDeUso = $derived(new Set(Object.entries(app.done).map(([k, v]) => v.dia ?? k.slice(0, 10))).size);
   const lembrarBackup = $derived(app.lembreteAdiado !== app.dia && precisaBackup(app.ultimoBackup, app.dia, diasDeUso));
+  const focoSemana = $derived(focoDaSemana(app.revisoes, app.dia));
   const noite = $derived(hora >= 18 || hora < 6);
   const tarde = $derived(hora >= 22 || hora < 4);
   const mostrarCarta = $derived(verCarta || (app.cfg.carta && (dificil || (hora >= 19 && pct < 0.3))));
@@ -67,16 +80,15 @@
     'Cada bloco marcado é uma janela acesa na cidade.', 'Disciplina é o seu maior gadget.', 'Quem aparece todo dia não precisa de sorte.',
     'Respeito se constrói em silêncio, bloco a bloco.', 'A aprovação é uma missão de longo prazo. Hoje é só mais uma etapa.',
     'Treine como quem vai ser chamado ao amanhecer.', 'Pequenas vitórias, todos os dias, constroem um império.'];
-  const frase = $derived(dificil ? 'Dia difícil também conta. Faça o essencial e descanse.' : FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
-  const lembrete = $derived(weekday(app.dia) === 0 || weekday(app.dia) === 3 ? app.cfg.metodos.exercicio : app.cfg.metodos.sono);
+  const frase = $derived(dificil ? 'O dia mínimo também conta. Faça as questões e descanse.' : FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
-    if (!app.timer || app.timer.id !== b.id) iniciarFoco(b);
+    if (!app.timer || app.timer.id !== b.id) iniciarFoco({ ...b, tarefa: tarefas[b.id] ?? null });
     location.hash = '#/foco';
   }
   const fotoDe = (r) => (r.origem?.startsWith('erro:') ? app.errors[r.origem.slice(5)]?.foto : null);
-  const descSessoes = (b) => { const p = planoSessoes(b.min, app.cfg.foco); return p.sessoes > 1 ? `${p.sessoes} × ${p.len} min` : fmtMin(b.min); };
+  const descSessoes = (b) => { const p = planoDoBloco(b, app.cfg.foco); return p.sessoes > 1 ? `${p.sessoes} × ${p.len} min` : fmtMin(b.min); };
 </script>
 
 <header>
@@ -114,18 +126,24 @@
   <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
   <p class="sr" aria-live="polite">{Math.round(pct * 100)}% do dia concluído</p>
   {#if dificil}
-    <p class="dif"><Icon nome="moon" size={16} />Modo dia difícil: só o essencial. Isso conta como dia cumprido.
+    <p class="dif"><Icon nome="moon" size={16} />Dia mínimo: 45 min de questões e as revisões vencidas. Isso conta como dia cumprido.
       <button class="lk" onclick={() => diaDificil(app.dia, false)}>Voltar ao dia completo</button></p>
   {:else if pct < 1 && blocos.length > 2}
-    <button class="lk dif-bt" onclick={() => diaDificil(app.dia, true)}>Dia difícil? Reduzir para o essencial</button>
+    <button class="lk dif-bt" onclick={() => diaDificil(app.dia, true)}>Dia corrido? Fazer só o dia mínimo (45 min)</button>
   {/if}
 </section>
 
+{#if focoSemana}
+  <p class="foco-sem"><span class="data">Foco da semana</span>{focoSemana.foco}</p>
+{/if}
 {#if lembrarBackup}
   <div class="nota backup entra">
     <p><Icon nome="clock" />{app.ultimoBackup ? 'Faz uma semana do último backup.' : 'Você ainda não fez nenhum backup.'} Guarde seu progresso fora do tablet.</p>
     <div class="bk"><button class="pri" onclick={fazerBackup}>Fazer backup agora</button><button class="lk" onclick={adiarLembreteBackup}>Amanhã</button></div>
   </div>
+{/if}
+{#if conflito}
+  <a class="nota" href="#/calendario"><Icon nome="clock" />{conflito.a.sigla} e {conflito.b.sigla} caem {conflito.de === conflito.ate ? `em ${fmtBR(conflito.de)}` : `de ${fmtBR(conflito.de)} a ${fmtBR(conflito.ate)}`}. Prioridade: {conflito.vence.sigla}.</a>
 {/if}
 {#if tarde}<p class="nota"><Icon nome="moon" />Já passou das 22h. Feche o caderno: dormir bem fixa o que você estudou hoje.</p>{/if}
 {#each alertas as a}
@@ -136,7 +154,7 @@
     <summary><Icon nome="bulb" />{app.cfg.diagnostico.titulo}: leia antes de começar</summary>
     <p>{app.cfg.diagnostico.intro}</p>
     <ol>{#each app.cfg.diagnostico.como as c}<li>{c}</li>{/each}</ol>
-    <p><a class="lk" href="#/questoes">Onde achar provas e gabaritos →</a> · <a class="lk" href="#/lacunas">Mapa de lacunas →</a></p>
+    <p><a class="lk" href="#/questoes">Onde achar provas e gabaritos →</a> · <a class="lk" href="#/trilha">Trilha →</a></p>
   </details>
 {/if}
 {#if leve}<p class="nota"><Icon nome="moon" />Última semana antes da prova de {leve.nome}: revisão leve. Sem conteúdo novo, durma bem.</p>{/if}
@@ -149,12 +167,13 @@
   {#each blocos as b (b.id)}
     {@const feito = !!app.done[b.id]}
     {@const rodando = app.timer?.id === b.id}
+    {@const tarefa = tarefas[b.id]}
     <li class:feito>
       <div class="linha">
-        <Check {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onclick={() => alternarBloco(b, assuntos[b.id] ?? '')} />
+        <Check {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onclick={() => alternarBloco(b, assuntos[b.id] ?? '', tarefas[b.id])} />
         <button class="txt" aria-expanded={aberto === b.id} onclick={() => (aberto = aberto === b.id ? null : b.id)}>
-          <span class="tit">{b.titulo}</span>
-          <span class="sub">{feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}{app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}{app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}{b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}</span>
+          <span class="tit">{tituloDe(b)}</span>
+          <span class="sub">{b.ini ? `${b.ini}–${b.fim} · ` : ''}{feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}{app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}{app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}{b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}</span>
         </button>
         {#if !feito}
           <button class="play" class:rodando aria-label={rodando ? `Abrir cronômetro de ${b.titulo}` : `Começar cronômetro de ${b.titulo}`} onclick={() => comecar(b)}>
@@ -165,6 +184,13 @@
       </div>
       {#if aberto === b.id}
         <div class="det" transition:slide={{ duration: dur(220) }}>
+          <Tarefa {tarefa} materia={b.materia} />
+          {#if b.cat === 'plan'}
+            <a class="pri" href="#/revisao">Fazer a revisão da semana (3 perguntas)</a>
+          {/if}
+          {#if feito && b.comAssunto}
+            <button class="sec" onclick={() => (app.registroAberto = { id: b.id })}>{app.done[b.id].resultado ? 'Corrigir o resultado' : 'Registrar resultado (questões, páginas, erros)'}</button>
+          {/if}
           <p class="dica"><Icon nome="bulb" />{b.dica}</p>
           {#if b.como}<strong>Como fazer</strong><ul>{#each b.como as c}<li>{c}</li>{/each}</ul>{/if}
           {#if b.onde}<strong>Onde achar</strong><ul>{#each b.onde as c}<li>{c}</li>{/each}</ul>{/if}
@@ -215,7 +241,8 @@
   </ul>
 {/if}
 
-<p class="lembrete"><Icon nome={weekday(app.dia) === 0 || weekday(app.dia) === 3 ? 'run' : 'moon'} size={16} />{lembrete}</p>
+{#if bRegistro}<Registro b={bRegistro} tarefa={tarefas[bRegistro.id] ?? null} soErros={!!app.registroAberto?.soErros} />{/if}
+
 <p class="lembrete">
   {#if app.cfg.carta}<button class="lk" onclick={() => (verCarta = !verCarta)}>{verCarta ? 'Fechar minha carta' : 'Ler minha carta'}</button>
   {:else}<a class="lk" href="#/ajustes">Escreva sua carta: por que você quer a farda?</a>{/if}
@@ -290,5 +317,6 @@
   .mini-foto { width: 44px; height: 44px; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
   .mini-foto img { width: 100%; height: 100%; object-fit: cover; }
   .foto { display: block; width: calc(100% - 48px); margin: 0 0 12px 48px; border-radius: 12px; }
+  .foco-sem { margin-top: 12px; padding: 12px 16px; border-left: 3px solid var(--ac2); background: var(--ac-bg); border-radius: 0 14px 14px 0; display: grid; gap: 2px; font-weight: 600; }
   .lembrete { display: flex; gap: 8px; justify-content: center; align-items: center; color: var(--tx2); font-size: .85rem; margin: 20px 0 0; text-align: center; }
 </style>

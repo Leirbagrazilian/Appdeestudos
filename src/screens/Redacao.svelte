@@ -41,6 +41,14 @@
 <header class="pg"><p class="data">Toda semana</p><h1>Redação</h1>
   <p class="sub">Correção no modelo do ENEM (5 competências, até 1000). Para a Escola Naval, acompanhe o total e as observações.</p></header>
 
+{#if app.cfg.temasRedacao?.length}
+  <section class="card temas">
+    <p class="data">Temas já cobrados na Escola Naval</p>
+    <ul>{#each app.cfg.temasRedacao as t}<li><button onclick={() => { form = true; tema = t.tema; }}><strong>{t.tema}</strong><span class="sub">{t.ano}</span></button></li>{/each}</ul>
+    <p class="sub">Toque para treinar um deles. A lista vem do seu SPEC; confira no site da Marinha.</p>
+  </section>
+{/if}
+
 <details class="card check">
   <summary>Antes de entregar: checklist ({Object.values(feitos).filter(Boolean).length}/{CHECK.length})</summary>
   <ul>
@@ -103,6 +111,9 @@
 <style>
   .pri, .sec { min-height: 48px; border-radius: 14px; font-weight: 700; width: 100%; }
   .pri { background: var(--ac); color: var(--ac-tx); margin-top: 12px; } .sec { border: 1px solid var(--line); font-weight: 600; }
+  .temas { padding: 14px 16px; margin-top: 8px; display: grid; gap: 8px; }
+  .temas ul { list-style: none; padding: 0; display: grid; gap: 6px; }
+  .temas li button { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; text-align: left; }
   .check { padding: 12px 16px; margin-top: 8px; }
   .check summary { cursor: pointer; font-weight: 600; min-height: 32px; display: flex; align-items: center; }
   .check ul { list-style: none; padding: 0; display: grid; gap: 4px; margin-top: 8px; }

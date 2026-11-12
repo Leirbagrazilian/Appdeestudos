@@ -14,10 +14,9 @@
       "cor": "#1d4f91",
       "prioridade": 1,
       "idade": {
-        "tipo": "menorQue",
-        "limite": 23,
-        "ref": "01-01",
-        "texto": "Ter menos de 23 anos em 1º de janeiro do ano da matrícula."
+        "ref": "06-30",
+        "max": 22,
+        "texto": "Ter menos de 23 anos em 30 de junho do ano da matrícula."
       },
       "link": "https://www.marinha.mil.br/sspm",
       "eventos": [
@@ -42,9 +41,8 @@
       "cor": "#0b7285",
       "prioridade": 2,
       "idade": {
-        "tipo": "menorQue",
-        "limite": 23,
         "ref": "01-01",
+        "max": 22,
         "texto": "23 anos incompletos em 1º de janeiro do ano da matrícula."
       },
       "link": "https://www.marinha.mil.br/ciaga",
@@ -67,6 +65,36 @@
           "inicio": "2027-11-01",
           "fim": "2027-12-15",
           "status": "estimada"
+        }
+      ]
+    },
+    {
+      "id": "esa",
+      "nome": "ESA (área Geral)",
+      "sigla": "ESA",
+      "cor": "#4d7c0f",
+      "prioridade": 5,
+      "idade": {
+        "ref": "12-31",
+        "min": 17,
+        "max": 24,
+        "texto": "De 17 a 24 anos até 31 de dezembro do ano da matrícula (área Geral). Forma sargento e tecnólogo."
+      },
+      "link": "https://esa.eb.mil.br",
+      "eventos": [
+        {
+          "tipo": "inscricao",
+          "inicio": "2027-03-30",
+          "fim": "2027-05-04",
+          "status": "estimada",
+          "obs": "Em 2026 a inscrição foi prorrogada até 18/05."
+        },
+        {
+          "tipo": "prova",
+          "inicio": "2027-07-26",
+          "fim": "2027-07-26",
+          "status": "estimada",
+          "obs": "Em 2026 caiu no mesmo fim de semana da EFOMM."
         }
       ]
     },
@@ -99,9 +127,8 @@
       "cor": "#9d2b5b",
       "prioridade": 4,
       "idade": {
-        "tipo": "menorQue25fim",
-        "limite": 25,
         "ref": "12-31",
+        "max": 24,
         "texto": "Não completar 25 anos até 31 de dezembro do ano da matrícula."
       },
       "link": "https://vestibular.ita.br",
@@ -127,6 +154,21 @@
           "status": "estimada"
         }
       ]
+    },
+    {
+      "id": "ime",
+      "nome": "IME",
+      "sigla": "IME",
+      "cor": "#6d5acd",
+      "prioridade": 6,
+      "plano": false,
+      "idade": {
+        "ref": "12-31",
+        "max": 22,
+        "texto": "Até 22 anos em 31 de dezembro do ano da matrícula (carreira ativa)."
+      },
+      "link": "https://www.ime.eb.br",
+      "eventos": []
     }
   ],
   "rotina": {
@@ -139,25 +181,113 @@
       },
       {
         "dia": 3,
-        "inicio": "09:30",
-        "fim": "10:10",
+        "inicio": "09:00",
+        "fim": "11:00",
         "nome": "Faculdade"
       },
       {
         "dia": 4,
-        "inicio": "13:00",
-        "fim": "18:00",
+        "inicio": "13:30",
+        "fim": "17:00",
         "nome": "Faculdade"
+      },
+      {
+        "dia": 2,
+        "inicio": "15:00",
+        "fim": "16:00",
+        "nome": "Academia"
+      },
+      {
+        "dia": 2,
+        "inicio": "18:30",
+        "fim": "20:00",
+        "nome": "Jiu-jitsu"
       }
     ],
-    "metaHoras": {
-      "0": 4,
-      "1": 4,
-      "2": 4,
-      "3": 2,
-      "4": 4,
-      "5": 4,
-      "6": 6
+    "janelas": {
+      "1": [
+        {
+          "ini": "06:00",
+          "fim": "07:00"
+        },
+        {
+          "ini": "12:30",
+          "fim": "18:30"
+        },
+        {
+          "ini": "20:00",
+          "fim": "21:00"
+        }
+      ],
+      "2": [
+        {
+          "ini": "07:00",
+          "fim": "12:00"
+        },
+        {
+          "ini": "13:00",
+          "fim": "15:00"
+        },
+        {
+          "ini": "16:00",
+          "fim": "18:00"
+        }
+      ],
+      "3": [
+        {
+          "ini": "06:30",
+          "fim": "08:30"
+        },
+        {
+          "ini": "12:00",
+          "fim": "18:00"
+        },
+        {
+          "ini": "19:00",
+          "fim": "20:00"
+        }
+      ],
+      "4": [
+        {
+          "ini": "06:30",
+          "fim": "12:30"
+        },
+        {
+          "ini": "18:00",
+          "fim": "20:00"
+        }
+      ],
+      "5": [
+        {
+          "ini": "08:00",
+          "fim": "12:00"
+        },
+        {
+          "ini": "13:00",
+          "fim": "17:00"
+        }
+      ],
+      "6": [
+        {
+          "ini": "08:00",
+          "fim": "15:00",
+          "tipo": "prova"
+        }
+      ],
+      "0": [
+        {
+          "ini": "09:00",
+          "fim": "12:00",
+          "tipo": "domingo"
+        }
+      ]
+    },
+    "metaNominal": 50,
+    "metaLiquida": 43,
+    "rampa": {
+      "ativa": false,
+      "semanas": 2,
+      "fator": 0.75
     }
   },
   "metodos": {
@@ -165,100 +295,15 @@
     "espacada": "Revisão espaçada: rever em 1, 7 e 30 dias faz o assunto durar de verdade.",
     "intercalada": "Prática intercalada: misture tipos de exercício. Parece mais difícil, e é por isso que funciona.",
     "autoexplicacao": "Autoexplicação: explique com suas palavras, em voz alta ou no papel, por que cada passo funciona.",
-    "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil.",
-    "sono": "Sono de 7 a 9h consolida o que você estudou hoje.",
-    "exercicio": "Se mexer 30 minutos hoje melhora foco e memória (e você é de Educação Física)."
-  },
-  "modeloSemana": {
-    "util": [
-      {
-        "chave": "mat",
-        "materia": "Matemática",
-        "min": 120,
-        "metodo": "recuperacao"
-      },
-      {
-        "chave": "fis",
-        "materia": "Física",
-        "min": 60,
-        "metodo": "autoexplicacao"
-      },
-      {
-        "chave": "lingua",
-        "materia": "Português/Inglês",
-        "min": 60,
-        "metodo": "intercalada"
-      },
-      {
-        "chave": "erros",
-        "materia": "Caderno de erros",
-        "titulo": "Caderno de erros",
-        "min": 10,
-        "metodo": "espacada"
-      }
-    ],
-    "3": [
-      {
-        "chave": "rev",
-        "materia": "Revisão",
-        "titulo": "Revisão espaçada",
-        "min": 60,
-        "metodo": "espacada"
-      },
-      {
-        "chave": "mix",
-        "materia": "Misto",
-        "titulo": "Questões misturadas",
-        "min": 60,
-        "metodo": "intercalada"
-      }
-    ],
-    "6": [
-      {
-        "chave": "prova",
-        "materia": "Prova antiga",
-        "titulo": "Prova antiga cronometrada",
-        "min": 240,
-        "metodo": "recuperacao"
-      },
-      {
-        "chave": "corr",
-        "materia": "Correção",
-        "titulo": "Correção e caderno de erros",
-        "min": 120,
-        "metodo": "autoexplicacao"
-      }
-    ],
-    "0": [
-      {
-        "chave": "red",
-        "materia": "Redação",
-        "titulo": "Redação",
-        "min": 90,
-        "metodo": "autoexplicacao"
-      },
-      {
-        "chave": "qui",
-        "materia": "Química",
-        "titulo": "Química",
-        "min": 90,
-        "metodo": "recuperacao"
-      },
-      {
-        "chave": "plan",
-        "materia": "Planejamento",
-        "titulo": "Planejar a semana",
-        "min": 30,
-        "metodo": "autoexplicacao"
-      }
-    ]
+    "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil."
   },
   "provaSabado": {
     "base": "Prova antiga de qualquer concurso naval (a mais recente que você ainda não fez)",
     "desenvolvimento": "Prova antiga alternando EFOMM e Escola Naval (a cada 2 semanas)",
-    "efomm": "Prova antiga da EFOMM, uma por semana",
+    "efomm": "Prova antiga da EFOMM ou da ESA, alternando (uma por semana)",
     "en": "Prova antiga da Escola Naval (CPAEN), uma por semana",
-    "final": "Alternar: prova antiga do ENEM (dia 1 e dia 2) e 1ª fase do ITA"
+    "ita": "Prova antiga do ITA (1ª fase) e questões discursivas",
+    "enem": "Prova antiga do ENEM (dia 1 e dia 2)"
   },
   "fases": {
     "base": {
@@ -272,19 +317,24 @@
       "foco": "Conteúdo completo, uma prova antiga a cada 2 semanas e checklist de inscrições."
     },
     "efomm": {
-      "nome": "Específica EFOMM",
+      "nome": "Específica EFOMM + ESA",
       "numero": 3,
-      "foco": "Uma prova antiga da EFOMM por semana."
+      "foco": "Provas antigas da EFOMM e da ESA, uma por semana. Em caso de conflito de datas, a EFOMM tem prioridade."
     },
     "en": {
       "nome": "Específica Escola Naval",
       "numero": 4,
       "foco": "Provas antigas e redação no estilo da Escola Naval."
     },
-    "final": {
-      "nome": "Reta final ITA e ENEM",
+    "ita": {
+      "nome": "Reta final ITA",
       "numero": 5,
-      "foco": "Química, discursivas do ITA, redação e provas antigas do ENEM."
+      "foco": "Química, discursivas do ITA, redação e provas antigas."
+    },
+    "enem": {
+      "nome": "ENEM (provas antigas)",
+      "numero": 6,
+      "foco": "Só provas antigas do ENEM: rede de segurança para o SISU."
     }
   },
   "diagnostico": {
@@ -361,7 +411,7 @@
             "Abra o edital/programa da Escola Naval e da EFOMM e copie os tópicos de Matemática, Física, Português e Inglês.",
             "Dê uma nota de 0 a 3 para cada tópico (0 = nunca vi, 3 = domino).",
             "Os tópicos com nota 0 e 1 viram a prioridade da Fase 1.",
-            "Marque as notas também no app: Mais → Mapa de lacunas."
+            "Marque as notas também no app: QG → Trilha."
           ],
           "onde": [
             "Edital: sites da Marinha (SSPM e CIAGA, links no app).",
@@ -559,42 +609,16 @@
             "Seu mapa de conteúdos e o caderno de erros."
           ]
         }
-      ],
-      "2026-11-16": [
-        {
-          "chave": "mat",
-          "materia": "Matemática",
-          "min": 120,
-          "metodo": "recuperacao"
-        },
-        {
-          "chave": "fis",
-          "materia": "Física",
-          "min": 60,
-          "metodo": "autoexplicacao"
-        },
-        {
-          "chave": "lingua",
-          "materia": "Português/Inglês",
-          "min": 60,
-          "metodo": "intercalada"
-        },
-        {
-          "chave": "erros",
-          "materia": "Caderno de erros",
-          "titulo": "Caderno de erros",
-          "min": 10,
-          "metodo": "espacada"
-        }
       ]
     }
   },
   "materias": [
     "Matemática",
     "Física",
+    "Química",
     "Português",
     "Inglês",
-    "Química",
+    "Hist/Geo",
     "Redação"
   ],
   "tiposErro": [
@@ -717,58 +741,1273 @@
   ],
   "topicos": {
     "Matemática": [
-      "Funções",
-      "Trigonometria",
-      "Geometria plana",
-      "Geometria espacial",
-      "Geometria analítica",
-      "PA e PG",
-      "Análise combinatória",
-      "Probabilidade",
-      "Matrizes e sistemas",
-      "Logaritmos e exponenciais",
-      "Números complexos",
-      "Polinômios"
+      {
+        "nome": "Matemática básica (aritmética e álgebra)"
+      },
+      {
+        "nome": "Conjuntos, lógica e funções",
+        "antigos": [
+          "Funções",
+          "Logaritmos e exponenciais"
+        ]
+      },
+      {
+        "nome": "Trigonometria",
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "nome": "PA, PG, matrizes e sistemas",
+        "antigos": [
+          "PA e PG",
+          "Matrizes e sistemas"
+        ]
+      },
+      {
+        "nome": "Combinatória, probabilidade e estatística",
+        "antigos": [
+          "Análise combinatória",
+          "Probabilidade"
+        ]
+      },
+      {
+        "nome": "Geometria plana",
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "nome": "Geometria espacial",
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "nome": "Analítica, vetores, cônicas e quádricas",
+        "antigos": [
+          "Geometria analítica"
+        ]
+      },
+      {
+        "nome": "Números complexos e polinômios",
+        "antigos": [
+          "Números complexos",
+          "Polinômios"
+        ]
+      },
+      {
+        "nome": "Cálculo (só Escola Naval)",
+        "concursos": [
+          "en"
+        ]
+      }
     ],
     "Física": [
-      "Cinemática",
-      "Dinâmica",
-      "Trabalho e energia",
-      "Hidrostática",
-      "Termologia",
-      "Óptica",
-      "Ondulatória",
-      "Eletricidade",
-      "Magnetismo"
+      {
+        "nome": "Grandezas e vetores"
+      },
+      {
+        "nome": "Cinemática",
+        "antigos": [
+          "Cinemática"
+        ]
+      },
+      {
+        "nome": "Dinâmica, energia, impulso e colisões",
+        "antigos": [
+          "Dinâmica",
+          "Trabalho e energia"
+        ]
+      },
+      {
+        "nome": "Gravitação e estática"
+      },
+      {
+        "nome": "Fluidos",
+        "antigos": [
+          "Hidrostática"
+        ]
+      },
+      {
+        "nome": "Termologia e termodinâmica",
+        "antigos": [
+          "Termologia"
+        ]
+      },
+      {
+        "nome": "MHS, ondas, som e luz",
+        "antigos": [
+          "Ondulatória",
+          "Óptica"
+        ]
+      },
+      {
+        "nome": "Eletrostática",
+        "antigos": [
+          "Eletricidade"
+        ]
+      },
+      {
+        "nome": "Eletrodinâmica",
+        "antigos": [
+          "Eletricidade"
+        ]
+      },
+      {
+        "nome": "Magnetismo e indução",
+        "antigos": [
+          "Magnetismo"
+        ]
+      }
     ],
     "Química": [
-      "Atomística",
-      "Tabela periódica e ligações",
-      "Estequiometria",
-      "Soluções",
-      "Termoquímica",
-      "Cinética",
-      "Equilíbrio",
-      "Eletroquímica",
-      "Química orgânica"
+      {
+        "nome": "Estrutura atômica e ligações",
+        "antigos": [
+          "Atomística",
+          "Tabela periódica e ligações"
+        ]
+      },
+      {
+        "nome": "Estequiometria e soluções",
+        "antigos": [
+          "Estequiometria",
+          "Soluções"
+        ]
+      },
+      {
+        "nome": "Termoquímica",
+        "antigos": [
+          "Termoquímica"
+        ]
+      },
+      {
+        "nome": "Cinética",
+        "antigos": [
+          "Cinética"
+        ]
+      },
+      {
+        "nome": "Equilíbrio",
+        "antigos": [
+          "Equilíbrio"
+        ]
+      },
+      {
+        "nome": "Eletroquímica",
+        "antigos": [
+          "Eletroquímica"
+        ]
+      },
+      {
+        "nome": "Química orgânica",
+        "antigos": [
+          "Química orgânica"
+        ]
+      }
     ],
     "Português": [
-      "Interpretação de texto",
-      "Classes de palavras",
-      "Sintaxe",
-      "Concordância",
-      "Regência",
-      "Crase",
-      "Pontuação",
-      "Semântica"
+      {
+        "nome": "Interpretação de texto",
+        "antigos": [
+          "Interpretação de texto"
+        ]
+      },
+      {
+        "nome": "Sintaxe",
+        "antigos": [
+          "Sintaxe"
+        ]
+      },
+      {
+        "nome": "Concordância, regência, crase, colocação e pontuação",
+        "antigos": [
+          "Concordância",
+          "Regência",
+          "Crase",
+          "Pontuação"
+        ]
+      },
+      {
+        "nome": "Classes de palavras",
+        "antigos": [
+          "Classes de palavras"
+        ]
+      },
+      {
+        "nome": "Semântica",
+        "antigos": [
+          "Semântica"
+        ]
+      }
     ],
     "Inglês": [
-      "Interpretação de texto",
-      "Vocabulário",
-      "Tempos verbais",
-      "Falsos cognatos",
-      "Preposições",
-      "Conectivos"
+      {
+        "nome": "Leitura e vocabulário",
+        "antigos": [
+          "Interpretação de texto",
+          "Vocabulário",
+          "Falsos cognatos"
+        ]
+      },
+      {
+        "nome": "Tempos verbais e modais",
+        "antigos": [
+          "Tempos verbais"
+        ]
+      },
+      {
+        "nome": "Condicionais, voz passiva e discurso indireto"
+      },
+      {
+        "nome": "Phrasal verbs, tags, causativos e comparativos",
+        "antigos": [
+          "Preposições",
+          "Conectivos"
+        ]
+      }
+    ],
+    "Hist/Geo": [
+      {
+        "nome": "História: Colônia"
+      },
+      {
+        "nome": "História: Império"
+      },
+      {
+        "nome": "História: República"
+      },
+      {
+        "nome": "Geografia: relevo, clima e hidrografia"
+      },
+      {
+        "nome": "Geografia: geopolítica e meio ambiente"
+      }
     ]
-  }
+  },
+  "versaoSeed": 7,
+  "materiasInfo": {
+    "Matemática": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "esaQuestoes": 14
+    },
+    "Física": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita"
+      ]
+    },
+    "Química": {
+      "concursos": [
+        "ita"
+      ]
+    },
+    "Português": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "esaQuestoes": 14
+    },
+    "Inglês": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "esaQuestoes": 10
+    },
+    "Hist/Geo": {
+      "concursos": [
+        "esa"
+      ],
+      "esaQuestoes": 12,
+      "nome": "História e Geografia do Brasil"
+    },
+    "Redação": {
+      "concursos": [
+        "en",
+        "efomm",
+        "ita",
+        "esa"
+      ],
+      "obs": "Na ESA a redação só elimina (não soma nota)."
+    }
+  },
+  "regras": {
+    "en": {
+      "minPorMateriaPct": 50,
+      "minRedacaoDe100": 50
+    }
+  },
+  "horasFase": {
+    "base": {
+      "mat": 20,
+      "fis": 14,
+      "qui": 3,
+      "por": 4,
+      "red": 2,
+      "ing": 2,
+      "hg": 0,
+      "provas": 5
+    },
+    "desenvolvimento": {
+      "mat": 17,
+      "fis": 13,
+      "qui": 3,
+      "por": 4,
+      "red": 2,
+      "ing": 2,
+      "hg": 3,
+      "provas": 6
+    },
+    "efomm": {
+      "mat": 14,
+      "fis": 10,
+      "qui": 2,
+      "por": 5,
+      "red": 3,
+      "ing": 2,
+      "hg": 5,
+      "provas": 9
+    },
+    "en": {
+      "mat": 15,
+      "fis": 12,
+      "qui": 2,
+      "por": 5,
+      "red": 3,
+      "ing": 2,
+      "hg": 0,
+      "provas": 11
+    },
+    "ita": {
+      "mat": 15,
+      "fis": 13,
+      "qui": 10,
+      "por": 3,
+      "red": 3,
+      "ing": 2,
+      "hg": 0,
+      "provas": 4
+    },
+    "enem": {
+      "mat": 7,
+      "fis": 5,
+      "qui": 2,
+      "por": 2,
+      "red": 4,
+      "ing": 0,
+      "hg": 0,
+      "provas": 30
+    }
+  },
+  "categorias": {
+    "mat": {
+      "materia": "Matemática",
+      "metodo": "recuperacao"
+    },
+    "fis": {
+      "materia": "Física",
+      "metodo": "autoexplicacao"
+    },
+    "qui": {
+      "materia": "Química",
+      "metodo": "recuperacao"
+    },
+    "por": {
+      "materia": "Português",
+      "metodo": "recuperacao"
+    },
+    "ing": {
+      "materia": "Inglês",
+      "metodo": "intercalada"
+    },
+    "hg": {
+      "materia": "Hist/Geo",
+      "metodo": "espacada"
+    },
+    "red": {
+      "materia": "Redação",
+      "titulo": "Redação",
+      "metodo": "autoexplicacao"
+    },
+    "prova": {
+      "materia": "Prova antiga",
+      "metodo": "recuperacao"
+    },
+    "corr": {
+      "materia": "Correção",
+      "titulo": "Correção e caderno de erros",
+      "metodo": "autoexplicacao"
+    },
+    "plan": {
+      "materia": "Planejamento",
+      "titulo": "Planejar a semana",
+      "metodo": "autoexplicacao"
+    },
+    "erros": {
+      "materia": "Caderno de erros",
+      "titulo": "Caderno de erros",
+      "metodo": "espacada"
+    }
+  },
+  "ritmos": {
+    "teoria": 10,
+    "gramatica": 15,
+    "questoesNaval": 6,
+    "questoesITA": 3
+  },
+  "biblioteca": {
+    "principal": {
+      "Matemática": "iezzi",
+      "Física": "fisica-classica",
+      "Química": "feltre",
+      "Português": "cegalla",
+      "Inglês": "murphy",
+      "Hist/Geo": null
+    },
+    "recursos": [
+      {
+        "id": "iezzi-1",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 1,
+        "assunto": "Conjuntos e funções",
+        "serie": "iezzi",
+        "obs": "Conteúdo do volume conferido na busca.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-2",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 2,
+        "assunto": "Logaritmos",
+        "serie": "iezzi",
+        "obs": "Conteúdo deste volume vem da minha memória; confira.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-3",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 3,
+        "assunto": "Trigonometria",
+        "serie": "iezzi",
+        "obs": "Conteúdo do volume conferido na busca.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-4",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 4,
+        "assunto": "Sequências, matrizes, determinantes e sistemas",
+        "serie": "iezzi",
+        "obs": "Conteúdo do volume conferido na busca.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-5",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 5,
+        "assunto": "Combinatória e probabilidade",
+        "serie": "iezzi",
+        "obs": "Conteúdo deste volume vem da minha memória; confira.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-6",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 6,
+        "assunto": "Complexos, polinômios e equações",
+        "serie": "iezzi",
+        "obs": "Conteúdo deste volume vem da minha memória; confira.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-7",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 7,
+        "assunto": "Geometria analítica",
+        "serie": "iezzi",
+        "obs": "Conteúdo do volume conferido na busca.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-8",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 8,
+        "assunto": "Limites, derivadas e noções de integral",
+        "serie": "iezzi",
+        "obs": "Conteúdo do volume conferido na busca.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-9",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 9,
+        "assunto": "Geometria plana",
+        "serie": "iezzi",
+        "obs": "Conteúdo deste volume vem da minha memória; confira.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-10",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 10,
+        "assunto": "Geometria espacial",
+        "serie": "iezzi",
+        "obs": "Conteúdo deste volume vem da minha memória; confira.",
+        "editora": "Atual"
+      },
+      {
+        "id": "iezzi-11",
+        "tipo": "livro",
+        "materia": "Matemática",
+        "titulo": "Fundamentos de Matemática Elementar",
+        "autor": "Gelson Iezzi e outros",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 11,
+        "assunto": "Matemática comercial, financeira e estatística descritiva",
+        "serie": "iezzi",
+        "obs": "Conteúdo do volume conferido na busca.",
+        "editora": "Atual"
+      },
+      {
+        "id": "matzero",
+        "tipo": "video",
+        "materia": "Matemática",
+        "titulo": "Matemática Zero 2.0 (Nerckie)",
+        "autor": "Nerckie",
+        "link": "https://www.youtube.com/user/nerckie",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Curso completo de matemática básica no YouTube"
+      },
+      {
+        "id": "ferretto",
+        "tipo": "video",
+        "materia": "Matemática",
+        "titulo": "Professor Ferretto (YouTube)",
+        "autor": "Prof. Ferretto",
+        "link": "https://www.youtube.com/channel/UCW9_n8p_Byz-4k8wV1tnUBg",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Playlists de matemática básica ao ensino médio",
+        "obs": "Site: professorferretto.com.br"
+      },
+      {
+        "id": "portal-obmep",
+        "tipo": "site",
+        "materia": "Matemática",
+        "titulo": "Portal da Matemática (OBMEP/IMPA)",
+        "autor": "IMPA",
+        "link": "https://portaldaobmep.impa.br/",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Videoaulas, apostilas e exercícios resolvidos"
+      },
+      {
+        "id": "fisica-classica",
+        "tipo": "livro",
+        "materia": "Física",
+        "titulo": "Física Clássica",
+        "autor": "Caio Sérgio Calçada e José Luiz Sampaio",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": "",
+        "assunto": "Livro principal escolhido. Volumes não confirmados: cadastre os que você tem em 'Adicionar volume'.",
+        "serie": "fisica-classica",
+        "editora": "Atual"
+      },
+      {
+        "id": "topicos-fisica-1",
+        "tipo": "livro",
+        "materia": "Física",
+        "titulo": "Tópicos de Física",
+        "autor": "Gualter, Newton e Helou",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 1,
+        "assunto": "Mecânica (inclui hidrodinâmica)",
+        "serie": "topicos-fisica",
+        "obs": "Existência dos 3 volumes e o tema do volume 1 vistos em lojas; os temas dos volumes 2 e 3 são da minha memória.",
+        "editora": "Saraiva"
+      },
+      {
+        "id": "topicos-fisica-2",
+        "tipo": "livro",
+        "materia": "Física",
+        "titulo": "Tópicos de Física",
+        "autor": "Gualter, Newton e Helou",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 2,
+        "assunto": "Termologia, óptica e ondas",
+        "serie": "topicos-fisica",
+        "obs": "Tema deste volume vem da minha memória; confira.",
+        "editora": "Saraiva"
+      },
+      {
+        "id": "topicos-fisica-3",
+        "tipo": "livro",
+        "materia": "Física",
+        "titulo": "Tópicos de Física",
+        "autor": "Gualter, Newton e Helou",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 3,
+        "assunto": "Eletricidade e física moderna",
+        "serie": "topicos-fisica",
+        "obs": "Tema deste volume vem da minha memória; confira.",
+        "editora": "Saraiva"
+      },
+      {
+        "id": "fisica-total",
+        "tipo": "video",
+        "materia": "Física",
+        "titulo": "Física Total (Ivys Urquiza)",
+        "autor": "Ivys Urquiza",
+        "link": "https://www.youtube.com/user/fisicatotal",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Curso completo de física gratuito no YouTube",
+        "obs": "Site: fisicatotal.com.br"
+      },
+      {
+        "id": "fisica-em",
+        "tipo": "video",
+        "materia": "Física",
+        "titulo": "Física do Ensino Médio (IF-USP)",
+        "autor": "Gil da Costa Marques",
+        "link": "https://www.youtube.com/c/FisicadoEnsinoMedio",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Canal de física do ensino médio ligado ao IF-USP"
+      },
+      {
+        "id": "feltre-1",
+        "tipo": "livro",
+        "materia": "Química",
+        "titulo": "Química (Feltre)",
+        "autor": "Ricardo Feltre",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 1,
+        "assunto": "Química geral",
+        "serie": "feltre",
+        "obs": "Não encontrei nada sobre os volumes na busca: confira títulos e volumes.",
+        "editora": "Moderna"
+      },
+      {
+        "id": "feltre-2",
+        "tipo": "livro",
+        "materia": "Química",
+        "titulo": "Química (Feltre)",
+        "autor": "Ricardo Feltre",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 2,
+        "assunto": "Físico-química",
+        "serie": "feltre",
+        "obs": "Não encontrei nada sobre os volumes na busca: confira títulos e volumes.",
+        "editora": "Moderna"
+      },
+      {
+        "id": "feltre-3",
+        "tipo": "livro",
+        "materia": "Química",
+        "titulo": "Química (Feltre)",
+        "autor": "Ricardo Feltre",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": 3,
+        "assunto": "Química orgânica",
+        "serie": "feltre",
+        "obs": "Não encontrei nada sobre os volumes na busca: confira títulos e volumes.",
+        "editora": "Moderna"
+      },
+      {
+        "id": "cegalla",
+        "tipo": "livro",
+        "materia": "Português",
+        "titulo": "Novíssima Gramática da Língua Portuguesa",
+        "autor": "Domingos Paschoal Cegalla",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": "",
+        "serie": "cegalla",
+        "obs": "Sem link: só achei páginas de lojas."
+      },
+      {
+        "id": "obmep-port",
+        "tipo": "site",
+        "materia": "Português",
+        "titulo": "Videoaulas de Português (Portal da OBMEP/IMPA)",
+        "autor": "IMPA",
+        "link": "https://portaldaobmep.impa.br/",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Videoaulas gratuitas de português (acervo novo em 2026)"
+      },
+      {
+        "id": "murphy",
+        "tipo": "livro",
+        "materia": "Inglês",
+        "titulo": "English Grammar in Use",
+        "autor": "Raymond Murphy",
+        "link": "https://www.cambridge.org/gb/cambridgeenglish/catalog/grammar-vocabulary-and-pronunciation/english-grammar-use-5th-edition",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Edição atual: 5ª (Cambridge)",
+        "serie": "murphy",
+        "obs": "O link é a página do livro na editora (venda), não conteúdo gratuito.",
+        "editora": "Cambridge"
+      }
+    ],
+    "vinculos": [
+      {
+        "id": "iezzi-1|Conjuntos, lógica e funções",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Conjuntos, lógica e funções",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Conjuntos, lógica e funções",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Conjuntos, lógica e funções",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Trigonometria",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Trigonometria",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-4|PA, PG, matrizes e sistemas",
+        "recurso": "iezzi-4",
+        "materia": "Matemática",
+        "topico": "PA, PG, matrizes e sistemas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Combinatória, probabilidade e estatística",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "Combinatória, probabilidade e estatística",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Combinatória, probabilidade e estatística",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "Combinatória, probabilidade e estatística",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Geometria plana",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Geometria plana",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Geometria espacial",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Geometria espacial",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-7|Analítica, vetores, cônicas e quádricas",
+        "recurso": "iezzi-7",
+        "materia": "Matemática",
+        "topico": "Analítica, vetores, cônicas e quádricas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Números complexos e polinômios",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Números complexos e polinômios",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-8|Cálculo (só Escola Naval)",
+        "recurso": "iezzi-8",
+        "materia": "Matemática",
+        "topico": "Cálculo (só Escola Naval)",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "matzero|Matemática básica (aritmética e álgebra)",
+        "recurso": "matzero",
+        "materia": "Matemática",
+        "topico": "Matemática básica (aritmética e álgebra)",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Grandezas e vetores",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Grandezas e vetores",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Cinemática",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Cinemática",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Dinâmica, energia, impulso e colisões",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Dinâmica, energia, impulso e colisões",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Gravitação e estática",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Gravitação e estática",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Fluidos",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Fluidos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Termologia e termodinâmica",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Termologia e termodinâmica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|MHS, ondas, som e luz",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "MHS, ondas, som e luz",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Eletrostática",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Eletrostática",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Eletrodinâmica",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Eletrodinâmica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Magnetismo e indução",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Magnetismo e indução",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Estrutura atômica e ligações",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Estrutura atômica e ligações",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Estequiometria e soluções",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Estequiometria e soluções",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-2|Termoquímica",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Termoquímica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-2|Cinética",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Cinética",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-2|Equilíbrio",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Equilíbrio",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-2|Eletroquímica",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Eletroquímica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Química orgânica",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Química orgânica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "cegalla|Sintaxe",
+        "recurso": "cegalla",
+        "materia": "Português",
+        "topico": "Sintaxe",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "cegalla|Concordância, regência, crase, colocação e pontuação",
+        "recurso": "cegalla",
+        "materia": "Português",
+        "topico": "Concordância, regência, crase, colocação e pontuação",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "cegalla|Classes de palavras",
+        "recurso": "cegalla",
+        "materia": "Português",
+        "topico": "Classes de palavras",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "cegalla|Semântica",
+        "recurso": "cegalla",
+        "materia": "Português",
+        "topico": "Semântica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "murphy|Tempos verbais e modais",
+        "recurso": "murphy",
+        "materia": "Inglês",
+        "topico": "Tempos verbais e modais",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "murphy|Condicionais, voz passiva e discurso indireto",
+        "recurso": "murphy",
+        "materia": "Inglês",
+        "topico": "Condicionais, voz passiva e discurso indireto",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "murphy|Phrasal verbs, tags, causativos e comparativos",
+        "recurso": "murphy",
+        "materia": "Inglês",
+        "topico": "Phrasal verbs, tags, causativos e comparativos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      }
+    ],
+    "removidos": []
+  },
+  "temasRedacao": [
+    {
+      "ano": 2025,
+      "tema": "Mentalidade marítima"
+    },
+    {
+      "ano": 2024,
+      "tema": "Ações humanitárias da Marinha"
+    },
+    {
+      "ano": 2021,
+      "tema": "A Marinha nos cenários nacional e internacional"
+    },
+    {
+      "ano": 2020,
+      "tema": "Carreira naval"
+    },
+    {
+      "ano": 2012,
+      "tema": "Amazônia Azul"
+    }
+  ],
+  "cotasGratis": {
+    "qconcursos": 10,
+    "estuda": 5
+  },
+  "questoesLinks": {},
+  "divisaoBloco": {
+    "video": 25,
+    "teoria": 45,
+    "questoes": 30
+  },
+  "sitesQuestoes": [
+    {
+      "id": "qconcursos",
+      "nome": "QConcursos"
+    },
+    {
+      "id": "estuda",
+      "nome": "Estuda.com"
+    },
+    {
+      "id": "pdf",
+      "nome": "Prova em PDF"
+    },
+    {
+      "id": "outro",
+      "nome": "Outro"
+    }
+  ]
 }

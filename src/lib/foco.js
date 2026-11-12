@@ -10,12 +10,19 @@ export function planoSessoes(min, foco = FOCO_PADRAO) {
   return { sessoes: n, len: n === 1 ? Math.min(s, min) : len, pausa: p };
 }
 
+/** Plano de sessões de um bloco: bloco contínuo (prova, correção, redação) é uma sessão só; os demais usam o tempo bruto (com as pausas). */
+export function planoDoBloco(b, foco = FOCO_PADRAO) {
+  if (b.sessoes === 0) return { sessoes: 1, len: b.min, pausa: foco.pausaMin };
+  return planoSessoes(b.bruto ?? b.min, foco);
+}
+
 export function iniciar(b, foco, agora) {
-  const { sessoes, len, pausa } = planoSessoes(b.min, foco);
+  const { sessoes, len, pausa } = planoDoBloco(b, foco);
   return {
     id: b.id, titulo: b.titulo, materia: b.materia, chave: b.chave, comAssunto: !!b.comAssunto,
     sessoes, len, pausa, sessao: 1, fase: 'foco', inicio: agora, focoMs: 0, avisado: false,
-    registro: { feitas: 0, acertos: 0, sozinho: null, assunto: '' },
+    tarefa: b.tarefa ?? null, // a tarefa exata do bloco (vídeo, páginas, exercícios, questões), para mostrar no modo foco
+    registro: { feitas: 0, acertos: 0, sozinho: null, assunto: b.tarefa?.topico ?? '', site: null, paginas: b.tarefa?.paginas?.n ?? 0, vinculoId: b.tarefa?.vinculoId ?? null },
   };
 }
 

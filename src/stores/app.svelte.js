@@ -10,25 +10,31 @@ import { conquistas } from '../lib/conquistas.js';
 import * as foco from '../lib/foco.js';
 import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
+import { migrarCfg } from '../lib/migracao.js';
+import { migrarLacunas } from '../lib/trilha.js';
+import { ajustarLeitura } from '../lib/livros.js';
+import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
   ...structuredClone(EXTRAS), timer: null, dia: today(), toast: null, insignia: null,
-  ultimoBackup: null, lembreteAdiado: null, persistente: null,
+  ultimoBackup: null, lembreteAdiado: null, persistente: null, registroAberto: null,
 });
 export const fases = () => gerarFases(app.cfg);
-export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis });
+export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis, exams: app.exams });
 export const pf = () => prefs(app.cfg);
 const snap = (v) => $state.snapshot(v);
 
 export async function iniciar() {
   const salvo = await db.get('kv', 'config');
+  let antes = seed.versaoSeed ?? 1;
   if (salvo) {
-    for (const k of Object.keys(seed)) if (!(k in salvo)) salvo[k] = structuredClone(seed[k]); // campos novos do seed
-    app.cfg = salvo;
+    antes = salvo.versaoSeed ?? 1;
+    app.cfg = migrarCfg(salvo, seed); // traz conteúdo novo do seed sem perder o que você editou
+    if ((app.cfg.versaoSeed ?? 1) !== antes) await db.put('kv', 'config', snap(app.cfg));
   }
   aplicarPrefs(pf());
   app.done = await db.all('done');
@@ -36,6 +42,7 @@ export async function iniciar() {
   app.errors = await db.all('errors');
   app.exams = await db.all('exams');
   for (const k of Object.keys(EXTRAS)) app[k] = (await db.get('kv', k)) ?? structuredClone(EXTRAS[k]);
+  if (antes < 3) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); } // notas do mapa de lacunas antigo
   app.timer = (await db.get('kv', 'timer')) ?? null;
   app.ultimoBackup = (await db.get('kv', 'ultimoBackup')) ?? null;
   app.lembreteAdiado = (await db.get('kv', 'lembreteAdiado')) ?? null;
@@ -53,9 +60,9 @@ export const salvarKV = (k) => db.put('kv', k, snap(app[k]));
 
 let timerToast;
 const ELOGIOS = ['Mais um morcego no céu.', 'A cidade está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.', 'Uma janela a mais acesa na cidade.'];
-export function avisar(msg, desfazer, sub) {
+export function avisar(msg, desfazer, sub, acao = null) {
   clearTimeout(timerToast);
-  app.toast = { msg, desfazer, sub: sub ?? ELOGIOS[Math.floor(Math.random() * ELOGIOS.length)] };
+  app.toast = { msg, desfazer, acao, sub: sub ?? ELOGIOS[Math.floor(Math.random() * ELOGIOS.length)] };
   timerToast = setTimeout(() => (app.toast = null), 5000);
 }
 function comemorar() { vibrar(pf(), 'ok'); if (pf().sons) sino(); }
@@ -69,14 +76,16 @@ async function registrar(b, extra = {}) {
     app.reviews[r.id] = r; await db.put('reviews', r.id, r);
   }
   comemorar();
-  avisar(`${b.titulo} concluído`, () => desmarcar(b.id));
+  avisar(`${b.titulo} concluído`, () => desmarcar(b.id), undefined, REGISTRAVEL.includes(b.cat) ? { rotulo: 'Registrar', fn: () => { app.toast = null; app.registroAberto = { id: b.id }; } } : null);
   checarConquistas();
 }
 
 /** Marca/desmarca um bloco. Se tiver assunto, agenda revisões em 1, 7 e 30 dias. */
-export async function alternarBloco(b, assunto = '') {
+export async function alternarBloco(b, assunto = '', tarefa = null) {
   if (app.done[b.id]) return desmarcar(b.id);
-  await registrar(b, { assunto });
+  // o assunto estudado é o tópico da tarefa (agenda as revisões de 1, 7 e 30 dias com o nome certo)
+  await registrar(b, { assunto: assunto || tarefa?.topico || '', topico: tarefa?.topico, vinculoId: tarefa?.vinculoId ?? null, paginasPlan: tarefa?.paginas?.n ?? 0, minLeitura: tarefa?.paginas?.min ?? 0,
+    questoesPlan: tarefa?.questoes?.n ?? 0, fontePlan: tarefa?.questoes?.fontes?.find((f) => !f.esgotada)?.site ?? null });
 }
 
 export async function desmarcar(id) {
@@ -101,6 +110,16 @@ export async function diaDificil(dia, ligar) {
   await salvarKV('dificeis');
   vibrar(pf(), 'toque');
 }
+
+/** Guarda a revisão de domingo (3 respostas + o resumo daquele momento). `seg` = segunda-feira da semana revisada. */
+export async function salvarRevisao(seg, dados) {
+  app.revisoes[seg] = { seg, feita: app.dia, ...dados };
+  await salvarKV('revisoes');
+  vibrar(pf(), 'ok');
+  avisar('Revisão da semana salva', null, dados.foco?.trim() ? `Foco da próxima semana: ${dados.foco.trim()}` : 'Boa semana de estudo.');
+  checarConquistas();
+}
+export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
 
 export async function marcarCumprido(dia) {
   if (app.cumpridos[dia]) return;
@@ -208,15 +227,53 @@ export async function atualizarTimer(mudar) { app.timer = mudar(snap(app.timer))
 export const encerrarSessao = () => atualizarTimer((t) => foco.encerrarSessao(t, Date.now()));
 export const proximaSessao = () => atualizarTimer((t) => foco.proximaSessao(t, Date.now()));
 export async function cancelarFoco() { app.timer = null; await salvarTimer(); }
+// ---------- resultado de um bloco de estudo ----------
+/** Guarda o resultado (questões, páginas, site, erros) sem duplicar nada se você corrigir depois. */
+async function aplicarResultado(b, d) {
+  const antigo = app.done[b.id]?.resultado ?? null;
+  const delta = deltaResultado(antigo, d);
+  if (d.vinculoId && delta.paginas) {
+    const v = app.cfg.biblioteca?.vinculos?.find((x) => x.id === d.vinculoId);
+    if (v) { app.leitura[v.id] = ajustarLeitura(app.leitura[v.id], v, delta.paginas, d.minutosLeitura ?? 0, app.dia); await salvarKV('leitura'); }
+  }
+  if (Object.keys(delta.cotas).length) { app.cotas[app.dia] = aplicarCota(app.cotas[app.dia], delta.cotas); await salvarKV('cotas'); }
+  const atual = snap(app.done[b.id]) ?? {};
+  const novoReg = { ...atual, topico: d.topico ?? atual.topico, vinculoId: d.vinculoId ?? atual.vinculoId ?? null,
+    questoes: d.feitas ? { feitas: d.feitas, acertos: Math.min(d.acertos ?? 0, d.feitas) } : atual.questoes,
+    resultado: { feitas: d.feitas ?? 0, acertos: Math.min(d.acertos ?? 0, d.feitas ?? 0), paginas: d.paginas ?? 0, site: d.site ?? null, errosRegistrados: antigo?.errosRegistrados ?? 0 } };
+  app.done[b.id] = novoReg; await db.put('done', b.id, snap(novoReg));
+  return delta;
+}
+/** Registro em uma tela: fiz X, acertei Y, onde fiz, páginas lidas e os erros (assunto + tipo) que vão para o caderno. */
+export async function registrarResultado(b, d) {
+  if (!app.done[b.id]) await registrar(b, { assunto: d.topico ?? '', topico: d.topico, vinculoId: d.vinculoId ?? null });
+  await aplicarResultado(b, d);
+  let n = 0;
+  for (const e of d.erros ?? []) { await addErro({ materia: b.materia, assunto: e.assunto || d.topico || b.materia, tipo: e.tipo, licao: '' }); n++; }
+  if (n) {
+    const r = snap(app.done[b.id]); r.resultado.errosRegistrados = (r.resultado.errosRegistrados ?? 0) + n;
+    app.done[b.id] = r; await db.put('done', b.id, r);
+  }
+  app.registroAberto = null;
+  avisar('Resultado registrado', null, d.feitas ? `${d.acertos ?? 0} de ${d.feitas} questões${n ? ` · ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno` : ''}` : 'Páginas e tempo salvos.');
+  checarConquistas();
+}
+export const fecharRegistro = () => { app.registroAberto = null; };
+
 /** Conclui o bloco com os minutos reais, as questões e o assunto registrados. */
 export async function concluirFoco(b) {
   const t = snap(app.timer); if (!t) return;
   const r = t.registro;
   app.timer = null; await salvarTimer();
-  await registrar(b ?? t, {
+  const alvo = b ?? t;
+  await registrar(alvo, {
     min: Math.max(1, foco.minutosFoco(t, Date.now())), sessoes: t.sessoes, assunto: r.assunto,
     questoes: r.feitas ? { feitas: r.feitas, acertos: Math.min(r.acertos, r.feitas) } : undefined, sozinho: r.sozinho,
+    topico: t.tarefa?.topico ?? r.assunto ?? undefined, vinculoId: r.vinculoId ?? null,
   });
+  if (r.feitas || r.paginas) await aplicarResultado(alvo, { feitas: r.feitas, acertos: r.acertos, site: r.site, paginas: r.paginas ?? 0, vinculoId: r.vinculoId, topico: t.tarefa?.topico, minutosLeitura: t.tarefa?.paginas?.min ?? 0 });
+  // se ficaram erros por registrar, a tela Hoje abre o registro só dos erros
+  if ((r.feitas ?? 0) - (r.acertos ?? 0) > 0 && REGISTRAVEL.includes(t.chave?.replace(/\d+$/, ''))) app.registroAberto = { id: alvo.id, soErros: true };
 }
 
 // ---------- insígnias e capítulos ----------
@@ -239,9 +296,12 @@ export async function verCapitulo(id) { app.vistos.capitulos[id] = true; await s
 export async function importar(d) {
   for (const s of ['done', 'reviews', 'errors', 'exams']) { for (const k of Object.keys(await db.all(s))) await db.del(s, k); for (const [k, v] of Object.entries(d[s])) await db.put(s, k, v); app[s] = d[s]; }
   for (const k of Object.keys(EXTRAS)) { app[k] = d.extras?.[k] ?? structuredClone(EXTRAS[k]); await salvarKV(k); }
-  app.cfg = d.cfg; await salvarCfg();
+  const antes = d.cfg.versaoSeed ?? 1;
+  app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
+  if (antes < 3) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); }
 }
 export async function restaurarSeed() {
-  const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema };
+  const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema,
+    questoesLinks: app.cfg.questoesLinks, biblioteca: app.cfg.biblioteca, cotasGratis: app.cfg.cotasGratis };
   app.cfg = { ...structuredClone(seed), ...manter }; await salvarCfg();
 }
