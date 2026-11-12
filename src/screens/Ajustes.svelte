@@ -117,6 +117,13 @@
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>
 
+<h2>Questões grátis por dia</h2>
+<section class="card bloco duas">
+  <label>QConcursos<input type="number" min="0" max="200" bind:value={app.cfg.cotasGratis.qconcursos} onchange={salvar} /></label>
+  <label>Estuda.com<input type="number" min="0" max="200" bind:value={app.cfg.cotasGratis.estuda} onchange={salvar} /></label>
+  <p class="muted cheia">Quando a cota do dia acaba, o bloco avisa e sugere a prova em PDF ou os exercícios do livro. Cole os links das listas em cada tópico, na Trilha.</p>
+</section>
+
 <h2>Janelas de estudo</h2>
 <p class="muted">Os blocos do dia são encaixados nestas janelas, com 50 min de foco e 10 de pausa. Sábado e domingo têm janela própria: prova antiga e correção no sábado, redação e planejamento no domingo.</p>
 {#each ordem as d}
@@ -168,7 +175,7 @@
   .temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .temas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; } .temas .on { background: var(--ac); color: var(--ac-tx); border-color: var(--ac); }
   .msg { min-height: 1.5em; }
   .rot { font-weight: 600; }
-  .duas { grid-template-columns: 1fr 1fr; }
+  .duas { grid-template-columns: 1fr 1fr; } .cheia { grid-column: 1 / -1; }
   textarea { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); resize: vertical; }
   .tg { display: flex; align-items: center; gap: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
   .tg > span { flex: 1; display: grid; }

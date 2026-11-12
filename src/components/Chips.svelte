@@ -1,10 +1,10 @@
 <script>
-  let { opcoes, valor = $bindable(), rotulo } = $props();
+  let { opcoes, valor = $bindable(), rotulo, aoMudar = null } = $props();
 </script>
 <div class="chips" role="radiogroup" aria-label={rotulo}>
   {#each opcoes as o}
     {@const id = o.id ?? o}
-    <button type="button" role="radio" aria-checked={valor === id} class:on={valor === id} onclick={() => (valor = id)}>{o.nome ?? o}</button>
+    <button type="button" role="radio" aria-checked={valor === id} class:on={valor === id} onclick={() => { valor = id; aoMudar?.(id); }}>{o.nome ?? o}</button>
   {/each}
 </div>
 <style>

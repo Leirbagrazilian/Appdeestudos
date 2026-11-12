@@ -88,6 +88,7 @@
 {#if app.toast}
   <div class="toast" role="status">
     <span class="tx"><strong>{app.toast.msg}</strong><em>{app.toast.sub}</em></span>
+    {#if app.toast.acao}<button onclick={app.toast.acao.fn}>{app.toast.acao.rotulo}</button>{/if}
     {#if app.toast.desfazer}<button onclick={app.toast.desfazer}>Desfazer</button>{/if}
   </div>
 {/if}

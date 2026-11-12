@@ -259,7 +259,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(6);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(5);
+    expect(novo.versaoSeed).toBe(6);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
@@ -622,6 +622,129 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(5); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(6); expect(novo.ritmos.teoria).toBe(10);
+  });
+});
+
+import { tarefasDoDia, divisaoBloco, fontesQuestoes, aplicarCota, acertoPorTopico, deltaResultado, linksDe, videoDe, limitesCota } from '../src/lib/tarefas.js';
+import { ajustarLeitura } from '../src/lib/livros.js';
+describe('bloco = tarefa exata', () => {
+  const novo = () => {
+    const c = cfg();
+    const v = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-3|Trigonometria');
+    Object.assign(v, { pagIni: 1, pagFim: 100, exIni: 1, exFim: 50 });
+    return c;
+  };
+  const lac = { Matemática: { 'Matemática básica (aritmética e álgebra)': 3, 'Conjuntos, lógica e funções': 3 } }; // próximo tópico: Trigonometria
+  const bl = (id, min = 100, materia = 'Matemática', cat = 'mat') => ({ id: `2026-11-23:${id}`, cat, materia, min });
+
+  it('divisão do bloco: vídeo 25, teoria 45, questões 30; sem vídeo ou sem páginas, redistribui', () => {
+    const c = cfg();
+    expect(divisaoBloco(c, 100, { video: true, paginas: true })).toEqual({ video: 25, teoria: 45, questoes: 30 });
+    expect(divisaoBloco(c, 100, { video: false, paginas: true })).toEqual({ video: 0, teoria: 60, questoes: 40 });
+    expect(divisaoBloco(c, 100, { video: true, paginas: false })).toEqual({ video: 45, teoria: 0, questoes: 55 });
+    expect(divisaoBloco(c, 100, { video: false, paginas: false })).toEqual({ video: 0, teoria: 0, questoes: 100 });
+    const d = divisaoBloco(c, 110, { video: true, paginas: true });
+    expect(d.video + d.teoria + d.questoes).toBe(110);
+  });
+  it('tarefa completa: tópico da Trilha, vídeo, páginas, exercícios e questões', () => {
+    const c = novo();
+    const t = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base' })['2026-11-23:mat@0600'];
+    expect(t.topico).toBe('Trigonometria');
+    expect(t.video).toMatchObject({ min: 25 }); expect(t.video.url).toMatch(/^https:/);
+    expect(t.paginas).toMatchObject({ de: 1, ate: 8, n: 8, min: 45, vinculoId: 'iezzi-3|Trigonometria' });
+    expect(t.paginas.livro).toBe('Fundamentos de Matemática Elementar v.3');
+    expect(t.exercicios).toEqual({ de: 1, ate: 4 });
+    expect(t.questoes.n).toBe(3); // 30 min a 6 questões/h
+    expect(t.semPaginas).toBe(false);
+  });
+  it('sem páginas cadastradas: mostra vídeo e questões e pede para cadastrar as páginas', () => {
+    const t = tarefasDoDia(cfg(), [bl('mat@0600')], { lacunas: lac, faseId: 'base' })['2026-11-23:mat@0600'];
+    expect(t.paginas).toBeNull(); expect(t.semPaginas).toBe(true); expect(t.temLivro).toBe(true);
+    expect(t.video.min).toBe(45); expect(t.partes.questoes).toBe(55);
+  });
+  it('vários blocos da mesma matéria no dia continuam de onde o anterior parou; blocos feitos ficam de fora', () => {
+    const c = novo();
+    const blocos = [bl('mat@0600'), bl('mat@1230'), bl('mat@1630')];
+    const t = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'base' });
+    expect(t[blocos[0].id].paginas).toMatchObject({ de: 1, ate: 8 });
+    expect(t[blocos[1].id].paginas).toMatchObject({ de: 9, ate: 16 });
+    expect(t[blocos[2].id].paginas).toMatchObject({ de: 17, ate: 24 });
+    // o primeiro já foi feito e a leitura andou: o segundo começa na 9
+    const feito = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'base', done: { [blocos[0].id]: {} }, leitura: { 'iezzi-3|Trigonometria': { proxima: 9, registros: [] } } });
+    expect(feito[blocos[0].id]).toBeUndefined();
+    expect(feito[blocos[1].id].paginas.de).toBe(9);
+  });
+  it('quando o tópico acaba o livro no dia, o bloco seguinte passa ao próximo tópico', () => {
+    const c = novo(); c.biblioteca.vinculos.find((x) => x.id === 'iezzi-3|Trigonometria').pagFim = 10;
+    const blocos = [bl('mat@0600'), bl('mat@1230'), bl('mat@1630')];
+    const t = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'base' });
+    expect(t[blocos[0].id].topico).toBe('Trigonometria');
+    expect(t[blocos[1].id]).toMatchObject({ topico: 'Trigonometria', paginas: { de: 9, ate: 10, restante: 0 } });
+    expect(t[blocos[2].id].topico).toBe('PA, PG, matrizes e sistemas');
+  });
+  it('questões: links colados por tópico e cota grátis do dia (10 QConcursos + 5 Estuda.com)', () => {
+    const c = novo();
+    c.questoesLinks = { Matemática: { Trigonometria: { qconcursos: 'https://qc/x', estuda: 'https://es/x', pdf: 'https://pdf/x', video: 'https://v/x' } } };
+    expect(linksDe(c, 'Matemática', 'Trigonometria').outro).toBe('');
+    expect(limitesCota(c)).toEqual({ qconcursos: 10, estuda: 5 });
+    expect(fontesQuestoes(c, 'Matemática', 'Trigonometria', {}).map((f) => [f.site, f.restante, f.esgotada])).toEqual([['qconcursos', 10, false], ['estuda', 5, false], ['pdf', null, false]]);
+    const meio = fontesQuestoes(c, 'Matemática', 'Trigonometria', { qconcursos: 10, estuda: 2 });
+    expect(meio[0].esgotada).toBe(true); expect(meio[1]).toMatchObject({ esgotada: false, restante: 3 });
+    expect(videoDe(c, 'Matemática', 'Trigonometria')).toEqual({ url: 'https://v/x', origem: 'topico' });
+    // cota acabou: sugere PDF/prova (sem páginas) ou exercícios do livro (com páginas)
+    const cotas = { qconcursos: 10, estuda: 5 };
+    const t = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base', cotasDia: cotas })['2026-11-23:mat@0600'];
+    expect(t.questoes).toMatchObject({ cotaEsgotada: true, alternativa: 'pdf' }); // tem link de PDF: sugere a prova em PDF
+    delete c.questoesLinks.Matemática.Trigonometria.pdf;
+    const semPdf = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base', cotasDia: cotas })['2026-11-23:mat@0600'];
+    expect(semPdf.questoes).toMatchObject({ cotaEsgotada: true, alternativa: 'livro' }); // senão, os exercícios do livro
+    const aindaTem = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base', cotasDia: { qconcursos: 10, estuda: 4 } })['2026-11-23:mat@0600'];
+    expect(aindaTem.questoes).toMatchObject({ cotaEsgotada: false, alternativa: null });
+    const sem = tarefasDoDia(cfg(), [bl('mat@0600')], { lacunas: lac, faseId: 'base' })['2026-11-23:mat@0600'];
+    expect(sem.questoes).toMatchObject({ semLinks: true, cotaEsgotada: false, alternativa: null });
+    expect(aplicarCota({ qconcursos: 4 }, { qconcursos: 3, estuda: 2, pdf: 9 })).toEqual({ qconcursos: 7, estuda: 2 }); // PDF não tem cota
+    expect(aplicarCota({ estuda: 1 }, { estuda: -5 })).toEqual({ estuda: 0 });
+  });
+  it('questões por hora: 6 no EN/EFOMM e 3 no ITA mudam o número de questões do bloco', () => {
+    const c = novo();
+    const n = (faseId) => tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId })['2026-11-23:mat@0600'].questoes.n;
+    expect(n('en')).toBe(3); expect(n('ita')).toBe(2); // 30 min: 6/h = 3 ; 3/h = 1,5 -> 2
+  });
+  it('registro de resultado: acerto por tópico e deltas de páginas, cota e erros', () => {
+    const done = {
+      a: { materia: 'Matemática', topico: 'Trigonometria', questoes: { feitas: 10, acertos: 7 } },
+      b: { materia: 'Matemática', topico: 'Trigonometria', questoes: { feitas: 5, acertos: 2 } },
+      c: { materia: 'Física', topico: 'Cinemática', questoes: { feitas: 4, acertos: 4 } },
+      d: { materia: 'Física', questoes: { feitas: 9, acertos: 1 } }, // sem tópico: não entra
+    };
+    expect(acertoPorTopico(done)).toEqual({ 'Matemática|Trigonometria': { feitas: 15, acertos: 9 }, 'Física|Cinemática': { feitas: 4, acertos: 4 } });
+    // primeiro registro
+    expect(deltaResultado(null, { feitas: 5, acertos: 3, site: 'qconcursos', paginas: 8 })).toEqual({ paginas: 8, cotas: { qconcursos: 5 }, errosFaltando: 2 });
+    // correção: leu 10 em vez de 8, fez 6 no Estuda e já tinha registrado 2 erros
+    expect(deltaResultado({ feitas: 5, acertos: 3, site: 'qconcursos', paginas: 8, errosRegistrados: 2 }, { feitas: 6, acertos: 3, site: 'estuda', paginas: 10 }))
+      .toEqual({ paginas: 2, cotas: { qconcursos: -5, estuda: 6 }, errosFaltando: 1 });
+  });
+  it('corrigir o registro de páginas move o ponteiro de leitura', () => {
+    const v = { pagIni: 1, pagFim: 100 };
+    const l1 = ajustarLeitura(null, v, 8, 45, 'd'); expect(l1.proxima).toBe(9);
+    const l2 = ajustarLeitura(l1, v, -3, 0, 'd'); expect(l2.proxima).toBe(6);
+    expect(ajustarLeitura(l2, v, 0, 0, 'd')).toBe(l2);
+    expect(ajustarLeitura({ proxima: 2, registros: [] }, v, -50, 0, 'd').proxima).toBe(1); // não passa do início
+  });
+});
+
+describe('etapa 5: migração dos campos novos', () => {
+  it('configuração antiga ganha cota grátis, divisão do bloco e sites; os links colados por você sobrevivem', () => {
+    const velho = cfg(); delete velho.cotasGratis; delete velho.divisaoBloco; delete velho.sitesQuestoes; delete velho.questoesLinks; velho.versaoSeed = 5;
+    const novo = migrarCfg(velho, cfg());
+    expect(novo.cotasGratis).toEqual({ qconcursos: 10, estuda: 5 });
+    expect(novo.divisaoBloco).toEqual({ video: 25, teoria: 45, questoes: 30 });
+    expect(novo.sitesQuestoes.map((s) => s.id)).toEqual(['qconcursos', 'estuda', 'pdf', 'outro']);
+    expect(novo.questoesLinks).toEqual({});
+    const comLinks = cfg(); comLinks.versaoSeed = 5; comLinks.questoesLinks = { Matemática: { Trigonometria: { qconcursos: 'https://qc/x' } } }; comLinks.cotasGratis = { qconcursos: 7, estuda: 3 };
+    const n2 = migrarCfg(comLinks, cfg());
+    expect(n2.questoesLinks.Matemática.Trigonometria.qconcursos).toBe('https://qc/x');
+    expect(n2.cotasGratis).toEqual({ qconcursos: 7, estuda: 3 }); // editou: fica
   });
 });

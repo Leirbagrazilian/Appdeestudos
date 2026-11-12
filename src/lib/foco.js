@@ -21,7 +21,8 @@ export function iniciar(b, foco, agora) {
   return {
     id: b.id, titulo: b.titulo, materia: b.materia, chave: b.chave, comAssunto: !!b.comAssunto,
     sessoes, len, pausa, sessao: 1, fase: 'foco', inicio: agora, focoMs: 0, avisado: false,
-    registro: { feitas: 0, acertos: 0, sozinho: null, assunto: '' },
+    tarefa: b.tarefa ?? null, // a tarefa exata do bloco (vídeo, páginas, exercícios, questões), para mostrar no modo foco
+    registro: { feitas: 0, acertos: 0, sozinho: null, assunto: b.tarefa?.topico ?? '', site: null, paginas: b.tarefa?.paginas?.n ?? 0, vinculoId: b.tarefa?.vinculoId ?? null },
   };
 }
 

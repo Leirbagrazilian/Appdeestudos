@@ -7,6 +7,9 @@
   import { diaNome, fmtCurta, fmtBR, fmtMin, weekday, addDays, startOfWeek, diffDays } from '../lib/dates.js';
   import { alertasInscricao, conflitosProvas } from '../lib/alerts.js';
   import { planoDoBloco } from '../lib/foco.js';
+  import { tarefasDoDia } from '../lib/tarefas.js';
+  import Registro from '../components/Registro.svelte';
+  import Tarefa from '../components/Tarefa.svelte';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
   import Check from '../components/Check.svelte';
@@ -23,6 +26,13 @@
   const fs = $derived(fases());
   const fase = $derived(faseDoDia(fs, app.dia));
   const blocos = $derived(blocosAjustados(app.cfg, fs, app.dia, ajustes()));
+  // tarefa exata de cada bloco de estudo: tópico da Trilha, vídeo, páginas, exercícios e questões
+  const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id }));
+  const bRegistro = $derived(app.registroAberto ? blocos.find((x) => x.id === app.registroAberto.id) : null);
+  const tituloDe = (b) => {
+    const topico = tarefas[b.id]?.topico ?? app.done[b.id]?.topico;
+    return topico ? `${b.materia} · ${topico}` : b.titulo;
+  };
   const revs = $derived(revisoesDoDia(Object.values(app.reviews), app.dia));
   const prox = $derived(proximaProva(app.cfg, app.dia));
   const leve = $derived(revisaoLeve(app.cfg, app.dia));
@@ -73,7 +83,7 @@
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
-    if (!app.timer || app.timer.id !== b.id) iniciarFoco(b);
+    if (!app.timer || app.timer.id !== b.id) iniciarFoco({ ...b, tarefa: tarefas[b.id] ?? null });
     location.hash = '#/foco';
   }
   const fotoDe = (r) => (r.origem?.startsWith('erro:') ? app.errors[r.origem.slice(5)]?.foto : null);
@@ -153,11 +163,12 @@
   {#each blocos as b (b.id)}
     {@const feito = !!app.done[b.id]}
     {@const rodando = app.timer?.id === b.id}
+    {@const tarefa = tarefas[b.id]}
     <li class:feito>
       <div class="linha">
-        <Check {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onclick={() => alternarBloco(b, assuntos[b.id] ?? '')} />
+        <Check {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onclick={() => alternarBloco(b, assuntos[b.id] ?? '', tarefas[b.id])} />
         <button class="txt" aria-expanded={aberto === b.id} onclick={() => (aberto = aberto === b.id ? null : b.id)}>
-          <span class="tit">{b.titulo}</span>
+          <span class="tit">{tituloDe(b)}</span>
           <span class="sub">{b.ini ? `${b.ini}–${b.fim} · ` : ''}{feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}{app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}{app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}{b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}</span>
         </button>
         {#if !feito}
@@ -169,6 +180,10 @@
       </div>
       {#if aberto === b.id}
         <div class="det" transition:slide={{ duration: dur(220) }}>
+          <Tarefa {tarefa} materia={b.materia} />
+          {#if feito && b.comAssunto}
+            <button class="sec" onclick={() => (app.registroAberto = { id: b.id })}>{app.done[b.id].resultado ? 'Corrigir o resultado' : 'Registrar resultado (questões, páginas, erros)'}</button>
+          {/if}
           <p class="dica"><Icon nome="bulb" />{b.dica}</p>
           {#if b.como}<strong>Como fazer</strong><ul>{#each b.como as c}<li>{c}</li>{/each}</ul>{/if}
           {#if b.onde}<strong>Onde achar</strong><ul>{#each b.onde as c}<li>{c}</li>{/each}</ul>{/if}
@@ -218,6 +233,8 @@
     {/each}
   </ul>
 {/if}
+
+{#if bRegistro}<Registro b={bRegistro} tarefa={tarefas[bRegistro.id] ?? null} soErros={!!app.registroAberto?.soErros} />{/if}
 
 <p class="lembrete"><Icon nome={weekday(app.dia) === 0 || weekday(app.dia) === 3 ? 'run' : 'moon'} size={16} />{lembrete}</p>
 <p class="lembrete">

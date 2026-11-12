@@ -988,7 +988,7 @@
       }
     ]
   },
-  "versaoSeed": 5,
+  "versaoSeed": 6,
   "materiasInfo": {
     "Matemática": {
       "concursos": [
@@ -1982,6 +1982,34 @@
     {
       "ano": 2012,
       "tema": "Amazônia Azul"
+    }
+  ],
+  "cotasGratis": {
+    "qconcursos": 10,
+    "estuda": 5
+  },
+  "questoesLinks": {},
+  "divisaoBloco": {
+    "video": 25,
+    "teoria": 45,
+    "questoes": 30
+  },
+  "sitesQuestoes": [
+    {
+      "id": "qconcursos",
+      "nome": "QConcursos"
+    },
+    {
+      "id": "estuda",
+      "nome": "Estuda.com"
+    },
+    {
+      "id": "pdf",
+      "nome": "Prova em PDF"
+    },
+    {
+      "id": "outro",
+      "nome": "Outro"
     }
   ]
 }

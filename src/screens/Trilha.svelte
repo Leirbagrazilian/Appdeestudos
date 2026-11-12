@@ -1,5 +1,8 @@
 <script>
-  import { app, setLacuna } from '../stores/app.svelte.js';
+  import { slide } from 'svelte/transition';
+  import { app, setLacuna, salvarCfg } from '../stores/app.svelte.js';
+  import { dur } from '../lib/prefs.js';
+  import { linksDe, acertoPorTopico } from '../lib/tarefas.js';
   import Chips from '../components/Chips.svelte';
   import Ring from '../components/Ring.svelte';
   import { NIVEIS, MATERIAS_TRILHA, topicosDe, dominio, status, proximoTopico, cobertura } from '../lib/trilha.js';
@@ -15,6 +18,15 @@
   const sigla = (id) => app.cfg.concursos.find((c) => c.id === id)?.sigla ?? id;
   const cor = (id) => app.cfg.concursos.find((c) => c.id === id)?.cor ?? 'var(--ac)';
   const en = $derived(app.cfg.regras?.en);
+  let painel = $state(null);
+  const acerto = $derived(acertoPorTopico(app.done));
+  const ROTULOS = [['video', 'Vídeo ou aula do tópico'], ['qconcursos', 'QConcursos (lista filtrada)'], ['estuda', 'Estuda.com (lista)'], ['pdf', 'Prova em PDF'], ['outro', 'Outro (ex.: ENEM, enem.dev)']];
+  const nLinks = (t) => Object.values(linksDe(app.cfg, materia, t.nome)).filter(Boolean).length;
+  function colar(t, campo, valor) {
+    app.cfg.questoesLinks ??= {};
+    ((app.cfg.questoesLinks[materia] ??= {})[t.nome] ??= {})[campo] = valor.trim();
+    salvarCfg();
+  }
   const nomeCompleto = (m) => app.cfg.materiasInfo?.[m]?.nome ?? m;
 </script>
 
@@ -60,11 +72,24 @@
           <span class="sub"><span class="cs">{#each t.concursos as id}<i style="--c:{cor(id)}" aria-hidden="true"></i>{/each}</span>{t.concursos.map(sigla).join(' · ')} · {status(n)}{proximo?.nome === t.nome ? ' · próximo' : ''}</span>
         </span>
       </div>
+      {#if acerto[`${materia}|${t.nome}`]}
+        {@const a = acerto[`${materia}|${t.nome}`]}
+        <p class="sub ac">Acerto neste tópico: <strong>{Math.round((a.acertos / a.feitas) * 100)}%</strong> · {a.acertos} de {a.feitas} questões</p>
+      {/if}
       <div class="seg" role="radiogroup" aria-label="Domínio de {t.nome}">
         {#each NIVEIS as [v, desc]}
           <button role="radio" aria-checked={n === +v && app.lacunas[materia]?.[t.nome] != null} aria-label="{v}: {desc}" class="b{v}" class:on={app.lacunas[materia]?.[t.nome] === +v} onclick={() => setLacuna(materia, t.nome, +v)}>{v}</button>
         {/each}
       </div>
+      <button class="lbtn" aria-expanded={painel === t.nome} onclick={() => (painel = painel === t.nome ? null : t.nome)}>Links de questões e vídeo{nLinks(t) ? ` · ${nLinks(t)} colados` : ''}</button>
+      {#if painel === t.nome}
+        <div class="links" transition:slide={{ duration: dur(220) }}>
+          {#each ROTULOS as [campo, rot]}
+            <label>{rot}<input type="url" inputmode="url" placeholder="cole o link" value={linksDe(app.cfg, materia, t.nome)[campo]} onchange={(e) => colar(t, campo, e.currentTarget.value)} /></label>
+          {/each}
+          <p class="sub">O app não guarda questões: cole aqui o link de uma lista já filtrada por este tópico. Ela aparece no bloco do dia.</p>
+        </div>
+      {/if}
     </li>
   {/each}
 </ul>
@@ -93,6 +118,11 @@
   .num.ok { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
   .nm { display: grid; gap: 2px; }
   .nm .sub { display: flex; flex-wrap: wrap; align-items: center; }
+  .ac strong { color: var(--ac); }
+  .lbtn { min-height: 44px; text-align: left; color: var(--ac); font-weight: 600; font-size: .85rem; }
+  .links { display: grid; gap: 8px; }
+  .links label { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }
+  .links input { width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
   .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .seg button { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); font-weight: 700; color: var(--tx2); }
   .seg .on.b0 { background: #ff6b6b; color: #1a0606; border-color: #ff6b6b; }

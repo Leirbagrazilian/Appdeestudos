@@ -67,6 +67,12 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - A biblioteca do SPEC vem cadastrada **sem páginas**. Links: só entram os que apareceram na busca ("link visto na busca"); os demais ficam "a confirmar" e você cola o seu. Questões por hora: 6 (EN/EFOMM) e 3 (ITA).
 - Os temas de redação já cobrados na Escola Naval aparecem na tela Redação (lista do SPEC, não verificada).
 
+## Bloco = tarefa exata (SPEC v2, etapa 5)
+- Cada bloco de estudo vira uma tarefa: **vídeo → páginas do livro → exercícios → questões do tópico**. O tópico vem da Trilha (o próximo, pela regra dos concursos), as páginas da biblioteca (Meus livros) e os minutos são divididos 25% vídeo, 45% páginas/exercícios e 30% questões, só entre o que existe. Vários blocos da mesma matéria no dia continuam de onde o anterior parou.
+- **Questões: o app não guarda nem gera questões.** Em cada tópico (Trilha → "Links de questões e vídeo") você cola o link de uma lista já filtrada: QConcursos, Estuda.com, prova em PDF ou outro. O bloco mostra os links com a cota grátis do dia (padrão 10 + 5, editável em Ajustes) e, quando acaba, sugere a prova em PDF ou os exercícios do livro.
+- **Registro em uma tela:** marcar o bloco é 1 toque; "Registrar" (no aviso ou no bloco) abre: questões feitas e acertadas, onde fez, páginas lidas e os erros (assunto + tipo) que vão para o caderno. Corrigir depois não duplica páginas, cota nem erros. Daí saem o **acerto por tópico** (na Trilha) e a leitura "de onde parei".
+- Sem páginas cadastradas, o bloco mostra vídeo e questões e um botão "Cadastrar páginas". O cronômetro mostra a mesma tarefa e, ao concluir, abre o registro só dos erros.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

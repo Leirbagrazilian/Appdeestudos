@@ -2,7 +2,7 @@ import { mesclarBiblioteca } from './livros.js';
 // Atualiza a configuração salva no aparelho quando o seed ganha conteúdo novo,
 // sem perder o que você editou (datas, status, metas, carta, links, preferências...).
 // Conteúdo que você não edita no app (fases, tópicos, textos) é sempre trazido do seed.
-const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'pausasAtivas', 'questoes', 'materias', 'tiposErro', 'materiasInfo', 'regras', 'horasFase', 'categorias', 'ritmos', 'temasRedacao'];
+const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'pausasAtivas', 'questoes', 'materias', 'tiposErro', 'materiasInfo', 'regras', 'horasFase', 'categorias', 'ritmos', 'temasRedacao', 'divisaoBloco', 'sitesQuestoes'];
 const CAMPOS_CONCURSO = ['nome', 'sigla', 'cor', 'prioridade', 'idade', 'link', 'plano'];
 const mesmoEvento = (a, b) => a.tipo === b.tipo && (a.nome ?? '') === (b.nome ?? '');
 

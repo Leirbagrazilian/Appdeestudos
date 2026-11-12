@@ -75,6 +75,12 @@ export function registrarLeitura(leit, v, pags, min, dia) {
   const prox = Math.min(+v.pagFim + 1, proximaPagina(v, atual) + Math.max(0, Math.round(pags)));
   return { proxima: prox, registros: [...(atual.registros ?? []), { dia, pags: Math.round(pags), min: Math.round(min) }] };
 }
+/** Corrige o ponteiro ao mudar um registro: delta positivo conta como leitura, negativo volta o ponteiro. */
+export function ajustarLeitura(leit, v, delta, min, dia) {
+  if (delta > 0) return registrarLeitura(leit, v, delta, min, dia);
+  if (delta < 0) return { ...(leit ?? { registros: [] }), proxima: Math.max(+v.pagIni, proximaPagina(v, leit) + delta) };
+  return leit;
+}
 /** "Parei na página X": a próxima é a X + 1. */
 export const pararNaPagina = (leit, v, pagina) => ({ ...(leit ?? { registros: [] }), proxima: Math.min(+v.pagFim + 1, Math.max(+v.pagIni, Math.round(pagina) + 1)) });
 

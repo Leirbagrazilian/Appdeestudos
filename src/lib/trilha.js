@@ -21,11 +21,12 @@ export const status = (n) => (n >= 3 ? 'dominado' : n === 0 ? 'a fazer' : 'em an
  * e escolhe o que serve a mais concursos (empate: o primeiro da trilha). Assim a ordem de estudo é
  * respeitada, mas um tópico que vale para vários concursos passa na frente de vizinhos que valem para um só.
  */
-export function proximoTopico(cfg, lacunas, materia, janela = 3) {
+export function proximoTopico(cfg, lacunas, materia, janela = 3, excluir = new Set()) {
   const lista = topicosDe(cfg, materia);
-  const primeiro = lista.findIndex((t) => dominio(lacunas, materia, t.nome) < 3);
+  const livre = (t) => dominio(lacunas, materia, t.nome) < 3 && !excluir.has(t.nome); // `excluir`: tópicos que já usaram todo o livro no dia
+  const primeiro = lista.findIndex(livre);
   if (primeiro < 0) return null;
-  const cand = lista.slice(primeiro, primeiro + janela).filter((t) => dominio(lacunas, materia, t.nome) < 3);
+  const cand = lista.slice(primeiro, primeiro + janela).filter(livre);
   return cand.reduce((melhor, t) => (t.concursos.length > melhor.concursos.length ? t : melhor), cand[0]);
 }
 

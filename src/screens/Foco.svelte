@@ -5,6 +5,9 @@
   import { sino, ambiente, ambienteLigado } from '../lib/audio.js';
   import Icon from '../components/Icon.svelte';
   import Bat from '../components/Bat.svelte';
+  import Tarefa from '../components/Tarefa.svelte';
+  import Chips from '../components/Chips.svelte';
+  import { limitesCota } from '../lib/tarefas.js';
 
   let agora = $state(Date.now());
   $effect(() => {
@@ -38,6 +41,11 @@
   const desfazerQ = () => reg((r) => (r.feitas ? { ...r, feitas: r.feitas - 1, acertos: Math.min(r.acertos, r.feitas - 1) } : r));
   const erros = $derived(t ? t.registro.feitas - t.registro.acertos : 0);
 
+  const opcoesSite = $derived([...(app.cfg.sitesQuestoes ?? []).map((s) => ({ id: s.id, nome: s.nome })), { id: 'livro', nome: 'Livro' }]);
+  const cotaFim = $derived.by(() => {
+    const s = t?.registro?.site, lim = limitesCota(app.cfg);
+    return (s === 'qconcursos' || s === 'estuda') && (app.cotas[app.dia]?.[s] ?? 0) + (t.registro.feitas ?? 0) >= lim[s];
+  });
   const pausas = $derived(app.cfg.pausasAtivas ?? []);
   const exercicio = $derived(t && pausas.length ? pausas[(t.sessao + new Date().getDate()) % pausas.length] : '');
   const android = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
@@ -58,6 +66,8 @@
     <h1>{t.titulo}</h1>
     <p class="sub">{minutosFoco(t, agora)} min de foco até agora{t.registro.feitas ? ` · ${t.registro.acertos}/${t.registro.feitas} questões` : ''}</p>
   </header>
+
+  {#if t.tarefa && t.fase !== 'fim'}<div class="tarefa"><Tarefa tarefa={t.tarefa} materia={t.materia} /></div>{/if}
 
   {#if t.fase !== 'fim'}
     <div class="relogio" class:pausa={t.fase === 'pausa'} class:acabou={est.acabou}>
@@ -90,7 +100,16 @@
       </div>
       <p class="placar" aria-live="polite"><strong>{t.registro.feitas}</strong> feitas · <strong>{t.registro.acertos}</strong> certas{t.registro.feitas ? ` · ${Math.round((t.registro.acertos / t.registro.feitas) * 100)}%` : ''}
         {#if t.registro.feitas}<button class="lk" onclick={desfazerQ}>desfazer a última</button>{/if}</p>
-      {#if erros > 0}<a class="sec bloco" href="#/erros?novo=1&materia={encodeURIComponent(t.materia)}">Fotografar uma questão errada</a>{/if}
+      {#if t.registro.feitas}
+        <p class="sub">Onde você fez</p>
+        <Chips opcoes={opcoesSite} valor={t.registro.site} rotulo="Onde você fez as questões" aoMudar={(v) => reg((r) => ({ ...r, site: v }))} />
+        {#if cotaFim}<p class="sub fimcota">A cota grátis de hoje acabou: use a prova em PDF ou os exercícios do livro.</p>{/if}
+      {/if}
+      {#if t.registro.vinculoId}
+        <label class="pagl" for="pags">Páginas lidas</label>
+        <input id="pags" type="number" inputmode="numeric" min="0" value={t.registro.paginas ?? 0} onchange={(e) => reg((r) => ({ ...r, paginas: Math.max(0, +e.currentTarget.value || 0) }))} />
+      {/if}
+      {#if erros > 0}<p class="sub">Ao concluir, o app abre os {erros} {erros === 1 ? 'erro' : 'erros'} para você registrar o assunto e o tipo (vão para o caderno de erros).</p>{/if}
 
       <p class="sub">Refez alguma questão sem olhar a resolução do vídeo?</p>
       <div class="sn" role="radiogroup" aria-label="Refez sem olhar">
@@ -164,6 +183,9 @@
   input { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
   .ativa { padding: 16px; margin-top: 12px; border-color: var(--ac2); display: grid; gap: 6px; }
   .ex { font-size: 1.05rem; font-weight: 600; }
+  .tarefa { margin-bottom: 12px; }
+  .pagl { color: var(--tx2); font-size: .85rem; }
+  .fimcota { color: var(--warn); font-weight: 600; }
   .extras { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
   .extras .sec { min-height: 44px; font-size: .9rem; font-weight: 600; }
   .cancelar { text-align: center; margin-top: 8px; }
