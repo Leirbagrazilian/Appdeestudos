@@ -16,6 +16,7 @@
   import Foco from './screens/Foco.svelte';
   import Trilha from './screens/Trilha.svelte';
   import Livros from './screens/Livros.svelte';
+  import Revisao from './screens/Revisao.svelte';
   import Conquistas from './screens/Conquistas.svelte';
   import Redacao from './screens/Redacao.svelte';
 
@@ -27,8 +28,8 @@
     { id: 'mais', nome: 'QG', d: 'M4 20V10l8-6 8 6v10h-5v-6H9v6z' },
   ];
   // Ordem das telas: define se a transição desliza para a esquerda ou para a direita.
-  const ORDEM = ['hoje', 'foco', 'semana', 'calendario', 'erros', 'mais', 'simulados', 'redacao', 'trilha', 'livros', 'conquistas', 'questoes', 'ajustes'];
-  const SUB_MAIS = ['simulados', 'ajustes', 'questoes', 'trilha', 'livros', 'conquistas', 'redacao'];
+  const ORDEM = ['hoje', 'foco', 'semana', 'calendario', 'erros', 'mais', 'simulados', 'redacao', 'trilha', 'livros', 'revisao', 'conquistas', 'questoes', 'ajustes'];
+  const SUB_MAIS = ['simulados', 'ajustes', 'questoes', 'trilha', 'livros', 'revisao', 'conquistas', 'redacao'];
   const ler = () => { const r = location.hash.replace('#/', '').split('?')[0] || 'hoje'; return r === 'lacunas' ? 'trilha' : r; }; // links antigos do mapa de lacunas
   let rota = $state(ler());
 
@@ -65,6 +66,7 @@
   {:else if rota === 'questoes'}<Questoes />
   {:else if rota === 'trilha'}<Trilha />
   {:else if rota === 'livros'}<Livros />
+  {:else if rota === 'revisao'}<Revisao />
   {:else if rota === 'conquistas'}<Conquistas />
   {:else if rota === 'redacao'}<Redacao />
   {:else}<Mais />{/if}

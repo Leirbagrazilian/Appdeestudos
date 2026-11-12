@@ -73,6 +73,13 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - **Registro em uma tela:** marcar o bloco é 1 toque; "Registrar" (no aviso ou no bloco) abre: questões feitas e acertadas, onde fez, páginas lidas e os erros (assunto + tipo) que vão para o caderno. Corrigir depois não duplica páginas, cota nem erros. Daí saem o **acerto por tópico** (na Trilha) e a leitura "de onde parei".
 - Sem páginas cadastradas, o bloco mostra vídeo e questões e um botão "Cadastrar páginas". O cronômetro mostra a mesma tarefa e, ao concluir, abre o registro só dos erros.
 
+## Extras e telas (SPEC v2, etapa 6)
+- **Dia mínimo** (substitui o "dia difícil"): um único bloco de 45 min com 20 questões da matéria mais fraca + revisões vencidas. Conta como dia cumprido. Botão na tela Hoje.
+- **Revisão de domingo** (QG → Revisão da semana): 3 perguntas (o que foi bem, o que faltou, foco da próxima), resumo automático (horas, questões, erros, dias cumpridos) e histórico. O foco aparece na Hoje durante a semana seguinte.
+- **Cobertura do conteúdo** (Trilha): % de tópicos dominados e % de páginas lidas por matéria.
+- **Ajustes**: janelas de estudo, meta, rampa e livro principal de cada matéria.
+- O lembrete de sono/exercício foi removido.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

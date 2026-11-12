@@ -7,6 +7,7 @@
   import { pedir, suportado } from '../lib/notify.js';
   import { fmtBR } from '../lib/dates.js';
   import { slotsDaJanela, janelasValidas, toHHMM } from '../lib/semana.js';
+  import { series, principalDe } from '../lib/livros.js';
 
   const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
   const ordem = [1, 2, 3, 4, 5, 6, 0];
@@ -30,6 +31,7 @@
     animacoes: [['completas', 'Completas'], ['discretas', 'Discretas'], ['nenhuma', 'Nenhuma']],
     texto: [['normal', 'Normal'], ['grande', 'Grande'], ['muito', 'Muito grande']],
   };
+  const materiasLivro = $derived(app.cfg.materias.map((nome) => ({ nome, series: series(app.cfg, nome) })).filter((m) => m.series.length));
   const capacidade = (d) => {
     const bruto = app.cfg.rotina.janelas[d] ?? [];
     const js = janelasValidas(bruto);
@@ -76,7 +78,7 @@
 <section class="card bloco">
   <label for="carta">Por que você quer a Escola Naval? Escreva para o você dos dias difíceis.</label>
   <textarea id="carta" rows="5" placeholder="Eu quero isso porque…" bind:value={app.cfg.carta} onchange={salvar}></textarea>
-  <p class="muted">Ela aparece na tela Hoje quando você ativa o "dia difícil" ou quando o dia está pesado.</p>
+  <p class="muted">Ela aparece na tela Hoje quando você ativa o "dia mínimo" ou quando o dia está pesado.</p>
 </section>
 
 <h2>Tema</h2>
@@ -115,6 +117,18 @@
   <p class="muted">As horas de cada matéria vêm da tabela da fase (base de 50 h), escalada para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}.</p>
   <div class="tg"><span><strong>Rampa de 75%</strong><span class="muted">Nas {app.cfg.rotina.rampa.semanas} primeiras semanas do plano, 75% das horas.</span></span>
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
+</section>
+
+<h2>Livros principais</h2>
+<section class="card bloco">
+  <p class="muted">Cada matéria usa os volumes do livro principal nos blocos. Cadastre páginas e outros livros em QG → Meus livros.</p>
+  {#each materiasLivro as m}
+    <label>{m.nome}
+      <select value={principalDe(app.cfg, m.nome) ?? ''} onchange={(e) => { app.cfg.biblioteca.principal[m.nome] = e.currentTarget.value || null; salvar(); }}>
+        <option value="">Nenhum</option>
+        {#each m.series as s}<option value={s.id}>{s.titulo}{s.autor ? ` (${s.autor})` : ''}</option>{/each}
+      </select></label>
+  {/each}
 </section>
 
 <h2>Questões grátis por dia</h2>

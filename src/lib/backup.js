@@ -1,5 +1,5 @@
 export const VERSAO = 1;
-const EXTRAS = ['adiados', 'dificeis', 'lacunas', 'leitura', 'cotas', 'cumpridos', 'vistos', 'redacoes'];
+const EXTRAS = ['adiados', 'dificeis', 'lacunas', 'leitura', 'cotas', 'revisoes', 'cumpridos', 'vistos', 'redacoes'];
 export function baixar(nome, texto, tipo) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([texto], { type: tipo }));

@@ -65,6 +65,7 @@
 <h2>Desempenho</h2>
 <ul class="grupo card">
   <li><a href="#/simulados"><span class="t"><strong>Simulados</strong><span class="sub">Notas por matéria, nota de corte e evolução</span></span><Icon nome="ext" size={18} /></a></li>
+  <li><a href="#/revisao"><span class="t"><strong>Revisão da semana</strong><span class="sub">3 perguntas de domingo, resumo e o foco da próxima semana</span></span><Icon nome="clock" size={18} /></a></li>
   <li><a href="#/redacao"><span class="t"><strong>Redação</strong><span class="sub">Nota por competência, checklist e evolução</span></span><Icon nome="ext" size={18} /></a></li>
   <li><a href="#/trilha"><span class="t"><strong>Trilha</strong><span class="sub">Tópicos de cada matéria, seu domínio e o que estudar a seguir</span></span><Icon nome="mapa" size={18} /></a></li>
   <li><a href="#/conquistas"><span class="t"><strong>Insígnias e capítulos</strong><span class="sub">Suas conquistas e as fases concluídas</span></span><Icon nome="trofeu" size={18} /></a></li>

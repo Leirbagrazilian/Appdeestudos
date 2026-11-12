@@ -13,10 +13,10 @@ import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas } from '../lib/trilha.js';
 import { ajustarLeitura } from '../lib/livros.js';
-import { aplicarCota, deltaResultado, ESTUDO } from '../lib/tarefas.js';
+import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -76,7 +76,7 @@ async function registrar(b, extra = {}) {
     app.reviews[r.id] = r; await db.put('reviews', r.id, r);
   }
   comemorar();
-  avisar(`${b.titulo} concluído`, () => desmarcar(b.id), undefined, ESTUDO.includes(b.cat) ? { rotulo: 'Registrar', fn: () => { app.toast = null; app.registroAberto = { id: b.id }; } } : null);
+  avisar(`${b.titulo} concluído`, () => desmarcar(b.id), undefined, REGISTRAVEL.includes(b.cat) ? { rotulo: 'Registrar', fn: () => { app.toast = null; app.registroAberto = { id: b.id }; } } : null);
   checarConquistas();
 }
 
@@ -110,6 +110,16 @@ export async function diaDificil(dia, ligar) {
   await salvarKV('dificeis');
   vibrar(pf(), 'toque');
 }
+
+/** Guarda a revisão de domingo (3 respostas + o resumo daquele momento). `seg` = segunda-feira da semana revisada. */
+export async function salvarRevisao(seg, dados) {
+  app.revisoes[seg] = { seg, feita: app.dia, ...dados };
+  await salvarKV('revisoes');
+  vibrar(pf(), 'ok');
+  avisar('Revisão da semana salva', null, dados.foco?.trim() ? `Foco da próxima semana: ${dados.foco.trim()}` : 'Boa semana de estudo.');
+  checarConquistas();
+}
+export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
 
 export async function marcarCumprido(dia) {
   if (app.cumpridos[dia]) return;
@@ -263,7 +273,7 @@ export async function concluirFoco(b) {
   });
   if (r.feitas || r.paginas) await aplicarResultado(alvo, { feitas: r.feitas, acertos: r.acertos, site: r.site, paginas: r.paginas ?? 0, vinculoId: r.vinculoId, topico: t.tarefa?.topico, minutosLeitura: t.tarefa?.paginas?.min ?? 0 });
   // se ficaram erros por registrar, a tela Hoje abre o registro só dos erros
-  if ((r.feitas ?? 0) - (r.acertos ?? 0) > 0 && ESTUDO.includes(t.chave?.replace(/\d+$/, ''))) app.registroAberto = { id: alvo.id, soErros: true };
+  if ((r.feitas ?? 0) - (r.acertos ?? 0) > 0 && REGISTRAVEL.includes(t.chave?.replace(/\d+$/, ''))) app.registroAberto = { id: alvo.id, soErros: true };
 }
 
 // ---------- insígnias e capítulos ----------

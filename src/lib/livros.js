@@ -114,3 +114,15 @@ export function mesclarBiblioteca(salva, seed) {
 
 /** Para a tela: tópicos da matéria com os vínculos de cada um. */
 export const topicosComVinculos = (cfg, materia) => topicosDe(cfg, materia).map((t) => ({ ...t, vinculos: vinculosDoTopico(cfg, materia, t.nome) }));
+
+/** Páginas lidas / total dos vínculos com páginas cadastradas dos livros ativos da matéria. */
+export function coberturaPaginas(cfg, leitura, materia) {
+  const ativos = new Set(recursosAtivos(cfg, materia).map((r) => r.id));
+  let lidas = 0, total = 0;
+  for (const v of bib(cfg).vinculos) {
+    if (v.materia !== materia || !ativos.has(v.recurso) || !temPaginas(v)) continue;
+    const t = +v.pagFim - +v.pagIni + 1;
+    total += t; lidas += Math.round(progresso(v, leitura?.[v.id]) * t);
+  }
+  return { lidas, total, pct: total ? lidas / total : null };
+}

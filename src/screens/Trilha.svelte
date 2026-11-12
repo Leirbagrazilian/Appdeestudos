@@ -3,6 +3,7 @@
   import { app, setLacuna, salvarCfg } from '../stores/app.svelte.js';
   import { dur } from '../lib/prefs.js';
   import { linksDe, acertoPorTopico } from '../lib/tarefas.js';
+  import { coberturaPaginas } from '../lib/livros.js';
   import Chips from '../components/Chips.svelte';
   import Ring from '../components/Ring.svelte';
   import { NIVEIS, MATERIAS_TRILHA, topicosDe, dominio, status, proximoTopico, cobertura } from '../lib/trilha.js';
@@ -19,6 +20,11 @@
   const cor = (id) => app.cfg.concursos.find((c) => c.id === id)?.cor ?? 'var(--ac)';
   const en = $derived(app.cfg.regras?.en);
   let painel = $state(null);
+  // cobertura do conteúdo: tópicos dominados e páginas lidas dos livros, por matéria
+  const cobertas = $derived(materias.map((m) => {
+    const l = topicosDe(app.cfg, m);
+    return { m, total: l.length, dom: l.filter((t) => dominio(app.lacunas, m, t.nome) >= 3).length, pct: cobertura(app.cfg, app.lacunas, m), pag: coberturaPaginas(app.cfg, app.leitura, m) };
+  }));
   const acerto = $derived(acertoPorTopico(app.done));
   const ROTULOS = [['video', 'Vídeo ou aula do tópico'], ['qconcursos', 'QConcursos (lista filtrada)'], ['estuda', 'Estuda.com (lista)'], ['pdf', 'Prova em PDF'], ['outro', 'Outro (ex.: ENEM, enem.dev)']];
   const nLinks = (t) => Object.values(linksDe(app.cfg, materia, t.nome)).filter(Boolean).length;
@@ -36,6 +42,20 @@
 {#if en}
   <p class="nota"><strong>Escola Naval elimina:</strong> menos de {en.minPorMateriaPct}% em qualquer matéria, ou redação abaixo de {en.minRedacaoDe100}/100.</p>
 {/if}
+
+<h2>Cobertura do conteúdo</h2>
+<ul class="grupo card cob">
+  {#each cobertas as c (c.m)}
+    <li><button class="cl" onclick={() => (materia = c.m)}>
+      <span class="cn">{c.m}</span>
+      <span class="cb" role="img" aria-label="{c.m}: {Math.round(c.pct * 100)}% dos tópicos dominados{c.pag.pct != null ? `, ${Math.round(c.pag.pct * 100)}% das páginas lidas` : ''}">
+        <i class="t" style="--w:{c.pct * 100}%"></i>{#if c.pag.pct != null}<i class="p" style="--w:{c.pag.pct * 100}%"></i>{/if}
+      </span>
+      <span class="ct">{c.dom} de {c.total} tópicos{c.pag.pct != null ? ` · ${Math.round(c.pag.pct * 100)}% das págs` : ''}</span>
+    </button></li>
+  {/each}
+</ul>
+<p class="sub leg">Barra dourada: tópicos dominados. Barra azul: páginas lidas dos livros (só onde você cadastrou as páginas).</p>
 
 <h2>O que estudar a seguir</h2>
 <ul class="grupo card prox">
@@ -118,6 +138,11 @@
   .num.ok { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
   .nm { display: grid; gap: 2px; }
   .nm .sub { display: flex; flex-wrap: wrap; align-items: center; }
+  .cl { width: 100%; display: grid; grid-template-columns: 6.2rem 1fr; gap: 4px 12px; padding: 10px 14px; min-height: 56px; text-align: left; align-items: center; }
+  .cn { font-weight: 600; font-size: .92rem; }
+  .cb { display: grid; gap: 3px; } .cb i { display: block; height: 5px; border-radius: 99px; }
+  .cb .t { background: linear-gradient(to right, var(--ac) var(--w), var(--line) var(--w)); } .cb .p { background: linear-gradient(to right, var(--ac2) var(--w), var(--line) var(--w)); }
+  .cb { background: none; } .ct { grid-column: 2; color: var(--tx2); font-size: .8125rem; }
   .ac strong { color: var(--ac); }
   .lbtn { min-height: 44px; text-align: left; color: var(--ac); font-weight: 600; font-size: .85rem; }
   .links { display: grid; gap: 8px; }

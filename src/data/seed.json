@@ -295,9 +295,7 @@
     "espacada": "Revisão espaçada: rever em 1, 7 e 30 dias faz o assunto durar de verdade.",
     "intercalada": "Prática intercalada: misture tipos de exercício. Parece mais difícil, e é por isso que funciona.",
     "autoexplicacao": "Autoexplicação: explique com suas palavras, em voz alta ou no papel, por que cada passo funciona.",
-    "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil.",
-    "sono": "Sono de 7 a 9h consolida o que você estudou hoje.",
-    "exercicio": "Se mexer 30 minutos hoje melhora foco e memória (e você é de Educação Física)."
+    "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil."
   },
   "provaSabado": {
     "base": "Prova antiga de qualquer concurso naval (a mais recente que você ainda não fez)",
@@ -988,7 +986,7 @@
       }
     ]
   },
-  "versaoSeed": 6,
+  "versaoSeed": 7,
   "materiasInfo": {
     "Matemática": {
       "concursos": [

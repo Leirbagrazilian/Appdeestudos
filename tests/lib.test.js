@@ -160,12 +160,17 @@ describe('ajustes do dia', () => {
     const amanha = blocosAjustados(c, f, '2026-11-24', { adiados });
     expect(amanha.find((b) => b.id === alvo.id)?.adiadoDe).toBe('2026-11-23');
   });
-  it('dia difícil deixa só o essencial: o primeiro bloco (até 50 min) e o caderno de erros', () => {
+  it('dia mínimo: o dia vira um bloco de 45 min com 20 questões, da matéria do primeiro bloco de estudo', () => {
     const f = gerarFases(cfg()); const c = cfg();
+    const normal = blocosDoDia(c, f, '2026-11-23');
     const l = blocosAjustados(c, f, '2026-11-23', { dificeis: { '2026-11-23': true } });
-    expect(l).toHaveLength(2);
-    expect(l[0]).toMatchObject({ essencial: true, min: 50 });
-    expect(l[1].cat).toBe('erros');
+    expect(l).toHaveLength(1);
+    expect(l[0]).toMatchObject({ id: '2026-11-23:minimo', cat: 'minimo', min: 45, questoes: 20, essencial: true, materia: normal[0].materia });
+    expect(l[0].titulo).toBe(`Dia mínimo · ${normal[0].materia}`);
+    // domingo (só redação e planejamento): cai em Matemática
+    expect(blocosAjustados(c, f, '2026-11-29', { dificeis: { '2026-11-29': true } })[0].materia).toBe('Matemática');
+    // em outro dia nada muda
+    expect(blocosAjustados(c, f, '2026-11-24', { dificeis: { '2026-11-23': true } }).length).toBeGreaterThan(2);
   });
 });
 
@@ -259,7 +264,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(6);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(6);
+    expect(novo.versaoSeed).toBe(7);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
@@ -622,7 +627,7 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(6); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(7); expect(novo.ritmos.teoria).toBe(10);
   });
 });
 
@@ -746,5 +751,61 @@ describe('etapa 5: migração dos campos novos', () => {
     const n2 = migrarCfg(comLinks, cfg());
     expect(n2.questoesLinks.Matemática.Trigonometria.qconcursos).toBe('https://qc/x');
     expect(n2.cotasGratis).toEqual({ qconcursos: 7, estuda: 3 }); // editou: fica
+  });
+});
+
+import { resumoSemana, focoDaSemana, historico, PERGUNTAS } from '../src/lib/revisao.js';
+import { coberturaPaginas } from '../src/lib/livros.js';
+import { REGISTRAVEL, QUESTOES_DIA_MINIMO } from '../src/lib/tarefas.js';
+describe('etapa 6: dia mínimo, revisão de domingo e cobertura', () => {
+  const f = gerarFases(cfg());
+  it('tarefa do dia mínimo: só questões (20 em 45 min) do próximo tópico, com os links e a cota', () => {
+    const c = cfg();
+    c.questoesLinks = { Matemática: { 'Matemática básica (aritmética e álgebra)': { qconcursos: 'https://qc/x' } } };
+    const bl = blocosAjustados(c, f, '2026-11-23', { dificeis: { '2026-11-23': true } });
+    const t = tarefasDoDia(c, bl, { lacunas: {}, faseId: 'base', cotasDia: { qconcursos: 10 } })[bl[0].id];
+    expect(t.questoes.n).toBe(QUESTOES_DIA_MINIMO); expect(t.questoes.min).toBe(45);
+    expect(t.video).toBeNull(); expect(t.paginas).toBeNull();
+    expect(t.topico).toMatch(/básica/); expect(t.questoes.cotaEsgotada).toBe(true);
+    expect(REGISTRAVEL).toContain('minimo');
+  });
+  it('resumo da semana: horas, questões, erros, dias cumpridos, revisões e adiados', () => {
+    const c = cfg(), seg = '2026-11-23';
+    const ctx = {
+      done: { '2026-11-23:mat@0600': { dia: '2026-11-23', materia: 'Matemática', min: 50, questoes: { feitas: 10, acertos: 7 } },
+              '2026-11-25:fis@1200': { dia: '2026-11-25', materia: 'Física', min: 100, questoes: { feitas: 5, acertos: 2 } },
+              '2026-11-20:mat@0600': { dia: '2026-11-20', materia: 'Matemática', min: 999 } }, // semana anterior: não conta
+      errors: { a: { dia: '2026-11-24' }, b: { dia: '2026-11-30' } },
+      cumpridos: { '2026-11-23': true, '2026-11-22': true },
+      reviews: { x: { feita: true, feitaEm: '2026-11-26' }, y: { feita: true, feitaEm: '2026-12-01' }, z: { feita: false } },
+      adiados: { '2026-11-24:mat@0900': '2026-11-25', '2026-11-30:mat@0600': '2026-12-01' },
+    };
+    const r = resumoSemana(c, f, ctx, seg);
+    expect(r.feitoMin).toBe(150); expect(r.questoes).toEqual({ feitas: 15, acertos: 9, pct: 0.6 });
+    expect(r.erros).toBe(1); expect(r.diasCumpridos).toBe(1); expect(r.revisoesFeitas).toBe(1); expect(r.adiados).toBe(1);
+    expect(r.porMateria).toEqual([['Física', 100], ['Matemática', 50]]);
+    expect(r.planMin).toBeGreaterThan(2400); expect(r.pct).toBeCloseTo(150 / r.planMin);
+    expect(resumoSemana(c, f, {}, seg).questoes.pct).toBeNull();
+  });
+  it('o foco da revisão vale para a semana seguinte, não para a própria semana', () => {
+    const rev = { '2026-11-23': { seg: '2026-11-23', foco: '  fechar Trigonometria ', bem: 'a', faltou: 'b' }, '2026-11-30': { seg: '2026-11-30', foco: '' } };
+    expect(focoDaSemana(rev, '2026-11-23')).toBeNull();            // semana revisada
+    expect(focoDaSemana(rev, '2026-11-29')).toBeNull();            // domingo da mesma semana
+    expect(focoDaSemana(rev, '2026-11-30')).toEqual({ foco: 'fechar Trigonometria', semana: '2026-11-23' });
+    expect(focoDaSemana(rev, '2026-12-06')).toMatchObject({ foco: 'fechar Trigonometria' });
+    expect(focoDaSemana(rev, '2026-12-07')).toBeNull();            // a revisão de 30/11 não tem foco
+    expect(historico(rev).map((x) => x.seg)).toEqual(['2026-11-30', '2026-11-23']);
+    expect(PERGUNTAS.map((p) => p[0])).toEqual(['bem', 'faltou', 'foco']);
+  });
+  it('cobertura de páginas por matéria: só vínculos ativos com páginas cadastradas', () => {
+    const c = cfg();
+    expect(coberturaPaginas(c, {}, 'Matemática')).toEqual({ lidas: 0, total: 0, pct: null });
+    const v = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-3|Trigonometria'); Object.assign(v, { pagIni: 1, pagFim: 100 });
+    const w = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-9|Geometria plana'); Object.assign(w, { pagIni: 1, pagFim: 100 });
+    const leit = { 'iezzi-3|Trigonometria': { proxima: 51, registros: [] } }; // 50 de 100
+    expect(coberturaPaginas(c, leit, 'Matemática')).toEqual({ lidas: 50, total: 200, pct: 0.25 });
+    // vínculo de livro que não é o principal não conta
+    const t = c.biblioteca.vinculos.find((x) => x.recurso === 'topicos-fisica-1'); Object.assign(t, { pagIni: 1, pagFim: 10 });
+    expect(coberturaPaginas(c, {}, 'Física').total).toBe(0);
   });
 });

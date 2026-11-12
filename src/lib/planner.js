@@ -1,7 +1,9 @@
 import { diaNome, startOfWeek } from './dates.js';
 import { faseDoDia, revisaoLeve } from './phases.js';
 import { planoSemana, toHHMM } from './semana.js';
+import { ESTUDO, QUESTOES_DIA_MINIMO } from './tarefas.js';
 
+const ESTUDO_MATERIAS = new Set(['Matemática', 'Física', 'Química', 'Português', 'Inglês', 'Hist/Geo']);
 const COM_ASSUNTO = ['mat', 'fis', 'qui', 'por', 'ing', 'hg', 'red'];
 
 /** Monta o checklist de um dia (não é salvo: só o que você marca é salvo).
@@ -56,7 +58,7 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
 }
 
 /** Blocos que realmente valem para o dia: o que foi passado para outro dia sai,
- *  o que veio de outro dia entra, e no "dia difícil" fica só o essencial. */
+ *  o que veio de outro dia entra, e no "dia mínimo" o dia inteiro vira 45 min de questões (20 do próximo tópico), mais as revisões vencidas. */
 export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, exams = {} } = {}) {
   const ctx = { exams };
   let lista = blocosDoDia(cfg, fases, dia, ctx).filter((b) => !adiados[b.id] || adiados[b.id] === dia);
@@ -67,9 +69,11 @@ export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, 
     if (b) lista.push({ ...b, adiadoDe: orig });
   }
   if (dificeis[dia] && lista.length) {
-    const principal = lista.find((b) => b.cat !== 'erros') ?? lista[0];
-    lista = lista.filter((b) => b === principal || b.cat === 'erros')
-      .map((b) => (b === principal ? { ...b, min: Math.min(b.min, 50), bruto: Math.min(b.bruto ?? 50, 50), essencial: true } : b));
+    const principal = lista.find((b) => ESTUDO.includes(b.cat));
+    const materia = principal?.materia ?? lista.find((b) => b.cat !== 'erros' && b.cat !== 'plan')?.materia ?? 'Matemática';
+    lista = [{ id: `${dia}:minimo`, chave: 'minimo', cat: 'minimo', materia: ESTUDO_MATERIAS.has(materia) ? materia : 'Matemática', titulo: 'Dia mínimo', min: 45, bruto: 45, sessoes: 1,
+      metodo: 'recuperacao', dica: cfg.metodos.recuperacao, diagnostico: false, comAssunto: true, questoes: QUESTOES_DIA_MINIMO, essencial: true }];
+    lista[0].titulo = `Dia mínimo · ${lista[0].materia}`;
   }
   return lista;
 }

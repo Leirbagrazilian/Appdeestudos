@@ -4,6 +4,8 @@ import { proximoTopico } from './trilha.js';
 import { recursoPorId, recursosAtivos, vinculosDoTopico, temPaginas, ritmoDe, ritmoQuestoes, cotaPaginas, proximaPagina } from './livros.js';
 
 export const ESTUDO = ['mat', 'fis', 'qui', 'por', 'ing', 'hg'];
+export const REGISTRAVEL = [...ESTUDO, 'minimo']; // blocos que abrem o registro de resultado
+export const QUESTOES_DIA_MINIMO = 20;
 export const CAMPOS_LINK = ['video', 'qconcursos', 'estuda', 'pdf', 'outro'];
 const SITES_COTA = ['qconcursos', 'estuda'];
 
@@ -57,11 +59,20 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
   const out = {}, virt = {}, esgotados = {};
   const lim = ctx.faseId;
   for (const b of blocos) {
-    if (!ESTUDO.includes(b.cat) || b.diagnostico || ctx.done?.[b.id]) continue;
+    if (!REGISTRAVEL.includes(b.cat) || b.diagnostico || ctx.done?.[b.id]) continue;
     const materia = b.materia;
     const ex = (esgotados[materia] ??= new Set());
     const t = proximoTopico(cfg, ctx.lacunas ?? {}, materia, 3, ex);
     if (!t) { out[b.id] = { semTopico: true, materia }; continue; }
+    if (b.cat === 'minimo') {
+      // Dia mínimo: só questões (20 em 45 min) do próximo tópico; as revisões vencidas ficam na lista de revisões
+      const fontes = fontesQuestoes(cfg, materia, t.nome, ctx.cotasDia ?? {});
+      const comCota = fontes.filter((f) => f.limite != null), cotaEsgotada = comCota.length > 0 && comCota.every((f) => f.esgotada);
+      out[b.id] = { materia, topico: t.nome, concursos: t.concursos, min: b.min, partes: { video: 0, teoria: 0, questoes: b.min }, video: null, paginas: null, exercicios: null,
+        concluidoLivro: false, temLivro: false, semPaginas: false, vinculoId: null,
+        questoes: { n: b.questoes ?? QUESTOES_DIA_MINIMO, min: b.min, fontes, semLinks: fontes.length === 0, cotaEsgotada, alternativa: cotaEsgotada ? (fontes.some((f) => f.limite == null) ? 'pdf' : 'livro') : null } };
+      continue;
+    }
 
     const vincs = vinculosDoTopico(cfg, materia, t.nome);
     const vivo = (v) => temPaginas(v) && (virt[v.id] ?? proximaPagina(v, ctx.leitura?.[v.id])) <= +v.pagFim;

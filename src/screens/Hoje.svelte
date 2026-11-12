@@ -4,7 +4,7 @@
   import { blocosAjustados } from '../lib/planner.js';
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
-  import { diaNome, fmtCurta, fmtBR, fmtMin, weekday, addDays, startOfWeek, diffDays } from '../lib/dates.js';
+  import { diaNome, fmtCurta, fmtBR, fmtMin, addDays, startOfWeek, diffDays } from '../lib/dates.js';
   import { alertasInscricao, conflitosProvas } from '../lib/alerts.js';
   import { planoDoBloco } from '../lib/foco.js';
   import { tarefasDoDia } from '../lib/tarefas.js';
@@ -12,6 +12,7 @@
   import Tarefa from '../components/Tarefa.svelte';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
+  import { focoDaSemana } from '../lib/revisao.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
   import Sinal from '../components/Sinal.svelte';
@@ -68,6 +69,7 @@
   // Lembrete de backup: 7 dias depois do último (ou nunca feito depois de 3 dias de uso).
   const diasDeUso = $derived(new Set(Object.entries(app.done).map(([k, v]) => v.dia ?? k.slice(0, 10))).size);
   const lembrarBackup = $derived(app.lembreteAdiado !== app.dia && precisaBackup(app.ultimoBackup, app.dia, diasDeUso));
+  const focoSemana = $derived(focoDaSemana(app.revisoes, app.dia));
   const noite = $derived(hora >= 18 || hora < 6);
   const tarde = $derived(hora >= 22 || hora < 4);
   const mostrarCarta = $derived(verCarta || (app.cfg.carta && (dificil || (hora >= 19 && pct < 0.3))));
@@ -78,8 +80,7 @@
     'Cada bloco marcado é uma janela acesa na cidade.', 'Disciplina é o seu maior gadget.', 'Quem aparece todo dia não precisa de sorte.',
     'Respeito se constrói em silêncio, bloco a bloco.', 'A aprovação é uma missão de longo prazo. Hoje é só mais uma etapa.',
     'Treine como quem vai ser chamado ao amanhecer.', 'Pequenas vitórias, todos os dias, constroem um império.'];
-  const frase = $derived(dificil ? 'Dia difícil também conta. Faça o essencial e descanse.' : FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
-  const lembrete = $derived(weekday(app.dia) === 0 || weekday(app.dia) === 3 ? app.cfg.metodos.exercicio : app.cfg.metodos.sono);
+  const frase = $derived(dificil ? 'O dia mínimo também conta. Faça as questões e descanse.' : FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
@@ -125,13 +126,16 @@
   <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
   <p class="sr" aria-live="polite">{Math.round(pct * 100)}% do dia concluído</p>
   {#if dificil}
-    <p class="dif"><Icon nome="moon" size={16} />Modo dia difícil: só o essencial. Isso conta como dia cumprido.
+    <p class="dif"><Icon nome="moon" size={16} />Dia mínimo: 45 min de questões e as revisões vencidas. Isso conta como dia cumprido.
       <button class="lk" onclick={() => diaDificil(app.dia, false)}>Voltar ao dia completo</button></p>
   {:else if pct < 1 && blocos.length > 2}
-    <button class="lk dif-bt" onclick={() => diaDificil(app.dia, true)}>Dia difícil? Reduzir para o essencial</button>
+    <button class="lk dif-bt" onclick={() => diaDificil(app.dia, true)}>Dia corrido? Fazer só o dia mínimo (45 min)</button>
   {/if}
 </section>
 
+{#if focoSemana}
+  <p class="foco-sem"><span class="data">Foco da semana</span>{focoSemana.foco}</p>
+{/if}
 {#if lembrarBackup}
   <div class="nota backup entra">
     <p><Icon nome="clock" />{app.ultimoBackup ? 'Faz uma semana do último backup.' : 'Você ainda não fez nenhum backup.'} Guarde seu progresso fora do tablet.</p>
@@ -181,6 +185,9 @@
       {#if aberto === b.id}
         <div class="det" transition:slide={{ duration: dur(220) }}>
           <Tarefa {tarefa} materia={b.materia} />
+          {#if b.cat === 'plan'}
+            <a class="pri" href="#/revisao">Fazer a revisão da semana (3 perguntas)</a>
+          {/if}
           {#if feito && b.comAssunto}
             <button class="sec" onclick={() => (app.registroAberto = { id: b.id })}>{app.done[b.id].resultado ? 'Corrigir o resultado' : 'Registrar resultado (questões, páginas, erros)'}</button>
           {/if}
@@ -236,7 +243,6 @@
 
 {#if bRegistro}<Registro b={bRegistro} tarefa={tarefas[bRegistro.id] ?? null} soErros={!!app.registroAberto?.soErros} />{/if}
 
-<p class="lembrete"><Icon nome={weekday(app.dia) === 0 || weekday(app.dia) === 3 ? 'run' : 'moon'} size={16} />{lembrete}</p>
 <p class="lembrete">
   {#if app.cfg.carta}<button class="lk" onclick={() => (verCarta = !verCarta)}>{verCarta ? 'Fechar minha carta' : 'Ler minha carta'}</button>
   {:else}<a class="lk" href="#/ajustes">Escreva sua carta: por que você quer a farda?</a>{/if}
@@ -311,5 +317,6 @@
   .mini-foto { width: 44px; height: 44px; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
   .mini-foto img { width: 100%; height: 100%; object-fit: cover; }
   .foto { display: block; width: calc(100% - 48px); margin: 0 0 12px 48px; border-radius: 12px; }
+  .foco-sem { margin-top: 12px; padding: 12px 16px; border-left: 3px solid var(--ac2); background: var(--ac-bg); border-radius: 0 14px 14px 0; display: grid; gap: 2px; font-weight: 600; }
   .lembrete { display: flex; gap: 8px; justify-content: center; align-items: center; color: var(--tx2); font-size: .85rem; margin: 20px 0 0; text-align: center; }
 </style>
