@@ -12,11 +12,13 @@ import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas } from '../lib/trilha.js';
+import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
+import { faseDoDia, maxExtraZero } from '../lib/phases.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -214,7 +216,38 @@ export async function setLacuna(materia, topico, nota) {
   app.lacunas[materia] ??= {};
   app.lacunas[materia][topico] = nota;
   await salvarKV('lacunas');
+  const k = chaveTopico(materia, topico);
+  if (nota < 3 && app.dominio[k] && resumoTopico(app.dominio[k]).dominado) { delete app.dominio[k]; await salvarKV('dominio'); } // você reabriu o tópico: recomeça o modo domínio
   vibrar(pf(), 'toque');
+}
+
+/** Checkpoint mensal: as mesmas 10 questões de Matemática da EFOMM, cronometradas. Um por data (registrar de novo corrige). */
+export async function registrarCheckpoint({ data, acertos, minutos }) {
+  const feitas = app.cfg.checkpoint?.questoes ?? 10;
+  app.checkpoints[data] = { data, acertos: Math.max(0, Math.min(feitas, Math.round(acertos))), feitas, minutos: minutos ? Math.round(minutos) : null };
+  await salvarKV('checkpoints'); comemorar();
+  avisar('Checkpoint salvo', null, `${app.checkpoints[data].acertos} de ${feitas} em Matemática.`);
+}
+export async function apagarCheckpoint(data) { delete app.checkpoints[data]; await salvarKV('checkpoints'); }
+/** Resultado do teste de saída do Khan (9º ano), em %. null apaga. */
+export async function salvarKhan(pct) {
+  app.portao = { ...app.portao, khan: pct == null ? null : { pct: Math.max(0, Math.min(100, Math.round(pct))), data: app.dia } };
+  await salvarKV('portao');
+}
+/** O portão não passou: mais 2 semanas de Fase 0, só com os tópicos fracos. */
+export async function prorrogarZero() {
+  const mais = Math.min(app.cfg.fase0?.portao?.semanasExtras ?? 2, maxExtraZero(app.cfg) - (app.cfg.perfil.extraZero ?? 0));
+  if (mais <= 0) { avisar('Limite da prorrogação', null, 'A Fase 1 precisa de pelo menos 1 semana antes de maio.'); return; }
+  app.cfg.perfil.extraZero = (app.cfg.perfil.extraZero ?? 0) + mais;
+  await salvarCfg();
+  avisar('Fase 0 prorrogada', null, `Mais ${mais} semanas, só com os tópicos fracos.`);
+}
+
+/** Destrava um tópico do modo domínio (você pediu ajuda ou viu outra explicação): mais 3 tentativas. */
+export async function destravarTopico(materia, topico) {
+  const k = chaveTopico(materia, topico);
+  app.dominio[k] = destravar(app.dominio[k]); await salvarKV('dominio');
+  avisar('Tópico destravado', null, `${topico}: mais 3 tentativas.`);
 }
 
 // ---------- cronômetro de foco ----------
@@ -240,14 +273,32 @@ async function aplicarResultado(b, d) {
   const atual = snap(app.done[b.id]) ?? {};
   const novoReg = { ...atual, topico: d.topico ?? atual.topico, vinculoId: d.vinculoId ?? atual.vinculoId ?? null,
     questoes: d.feitas ? { feitas: d.feitas, acertos: Math.min(d.acertos ?? 0, d.feitas) } : atual.questoes,
-    resultado: { feitas: d.feitas ?? 0, acertos: Math.min(d.acertos ?? 0, d.feitas ?? 0), paginas: d.paginas ?? 0, site: d.site ?? null, errosRegistrados: antigo?.errosRegistrados ?? 0 } };
+    resultado: { feitas: d.feitas ?? 0, acertos: Math.min(d.acertos ?? 0, d.feitas ?? 0), paginas: d.paginas ?? 0, site: d.site ?? null, khan: !!d.khan, errosRegistrados: antigo?.errosRegistrados ?? 0 } };
   app.done[b.id] = novoReg; await db.put('done', b.id, snap(novoReg));
-  return delta;
+  return { ...delta, veredito: await avaliarDominio(b, d) };
 }
+/** Fase 0: o resultado do bloco entra no modo domínio do tópico (8 em 10, repetição, travado) e atualiza a nota da Trilha. */
+async function avaliarDominio(b, d) {
+  const topico = d.topico;
+  if (!topico || faseDoDia(fases(), app.dia).id !== 'zero') return null;
+  if (!app.cfg.topicos?.[b.materia]?.some((t) => t.nome === topico && t.fase === 0)) return null;
+  const k = chaveTopico(b.materia, topico), atual = app.lacunas[b.materia]?.[topico] ?? 0;
+  const r = avaliarTopico(app.dominio[k], atual, b.id, { feitas: d.feitas ?? 0, acertos: d.acertos ?? 0, khan: d.khan, data: app.dia });
+  app.dominio[k] = r.estado; await salvarKV('dominio');
+  if (r.nota !== atual) { app.lacunas[b.materia] ??= {}; app.lacunas[b.materia][topico] = r.nota; await salvarKV('lacunas'); }
+  return r.veredito;
+}
+const AVISO_DOMINIO = {
+  dominado: 'Tópico dominado. O próximo já está liberado.',
+  repetir: 'Abaixo de 8 em 10: o próximo bloco repete este tópico com exercícios novos.',
+  travado: 'Tópico travado depois de 3 tentativas. Peça ajuda (professor, colega ou outro vídeo) e destrave na Trilha.',
+  parcial: 'Faça pelo menos 10 exercícios para o tópico ser avaliado (8 em 10).',
+};
+
 /** Registro em uma tela: fiz X, acertei Y, onde fiz, páginas lidas e os erros (assunto + tipo) que vão para o caderno. */
 export async function registrarResultado(b, d) {
   if (!app.done[b.id]) await registrar(b, { assunto: d.topico ?? '', topico: d.topico, vinculoId: d.vinculoId ?? null });
-  await aplicarResultado(b, d);
+  const { veredito } = await aplicarResultado(b, d);
   let n = 0;
   for (const e of d.erros ?? []) { await addErro({ materia: b.materia, assunto: e.assunto || d.topico || b.materia, tipo: e.tipo, licao: '' }); n++; }
   if (n) {
@@ -255,6 +306,7 @@ export async function registrarResultado(b, d) {
     app.done[b.id] = r; await db.put('done', b.id, r);
   }
   app.registroAberto = null;
+  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); checarConquistas(); return; }
   avisar('Resultado registrado', null, d.feitas ? `${d.acertos ?? 0} de ${d.feitas} questões${n ? ` · ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno` : ''}` : 'Páginas e tempo salvos.');
   checarConquistas();
 }

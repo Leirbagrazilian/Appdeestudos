@@ -13,6 +13,9 @@
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
   import { focoDaSemana } from '../lib/revisao.js';
+  import { travados as listaTravados } from '../lib/dominio.js';
+  import { checkpointPendente, portaoZero } from '../lib/portao.js';
+  import { semanaZero } from '../lib/trilha.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
   import Sinal from '../components/Sinal.svelte';
@@ -28,7 +31,7 @@
   const fase = $derived(faseDoDia(fs, app.dia));
   const blocos = $derived(blocosAjustados(app.cfg, fs, app.dia, ajustes()));
   // tarefa exata de cada bloco de estudo: tópico da Trilha, vídeo, páginas, exercícios e questões
-  const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id }));
+  const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id, dominio: app.dominio }));
   const bRegistro = $derived(app.registroAberto ? blocos.find((x) => x.id === app.registroAberto.id) : null);
   const tituloDe = (b) => {
     const topico = tarefas[b.id]?.topico ?? app.done[b.id]?.topico;
@@ -40,6 +43,10 @@
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
   const conflito = $derived(conflitosProvas(app.cfg).find((c) => diffDays(app.dia, c.de) >= 0 && diffDays(app.dia, c.de) <= 120));
   const diag = $derived(blocos.some((b) => b.diagnostico));
+  // modo domínio (Fase 0): tópicos travados, checkpoint do mês e o portão da última semana
+  const travados = $derived(listaTravados(app.dominio, app.lacunas));
+  const cpPendente = $derived(!diag && checkpointPendente(app.cfg, app.checkpoints, app.dia));
+  const portaoAberto = $derived(fase.id === 'zero' && semanaZero(fs, app.dia) >= 8 && !portaoZero(app.cfg, app.portao, app.checkpoints, app.lacunas).ok);
   const dificil = $derived(!!app.dificeis[app.dia]);
   // Progresso pelo tempo planejado de cada bloco concluído (os minutos reais aparecem no bloco).
   const totalMin = $derived(blocos.reduce((s, b) => s + b.min, 0) + revs.length * REV_MIN);
@@ -135,6 +142,15 @@
 
 {#if focoSemana}
   <p class="foco-sem"><span class="data">Foco da semana</span>{focoSemana.foco}</p>
+{/if}
+{#each travados as x (x.materia + x.topico)}
+  <a class="nota" href="#/trilha"><Icon nome="clock" />Travado: {x.materia} · {x.topico}. Peça ajuda e destrave na Trilha.</a>
+{/each}
+{#if cpPendente}
+  <a class="nota" href="#/progresso"><Icon nome="clock" />Checkpoint do mês: 10 questões de Matemática da EFOMM em 30 min.</a>
+{/if}
+{#if portaoAberto}
+  <a class="nota" href="#/progresso"><Icon nome="clock" />Última semana da Fase 0: faça o teste de saída do Khan e o checkpoint para abrir o portão.</a>
 {/if}
 {#if lembrarBackup}
   <div class="nota backup entra">

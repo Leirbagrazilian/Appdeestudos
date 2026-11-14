@@ -64,6 +64,7 @@
 
 <h2>Desempenho</h2>
 <ul class="grupo card">
+  <li><a href="#/progresso"><span class="t"><strong>Progresso</strong><span class="sub">Checkpoint mensal de Matemática e o portão da Fase 0</span></span><Icon nome="ext" size={18} /></a></li>
   <li><a href="#/simulados"><span class="t"><strong>Simulados</strong><span class="sub">Notas por matéria, nota de corte e evolução</span></span><Icon nome="ext" size={18} /></a></li>
   <li><a href="#/revisao"><span class="t"><strong>Revisão da semana</strong><span class="sub">3 perguntas de domingo, resumo e o foco da próxima semana</span></span><Icon nome="clock" size={18} /></a></li>
   <li><a href="#/redacao"><span class="t"><strong>Redação</strong><span class="sub">Nota por competência, checklist e evolução</span></span><Icon nome="ext" size={18} /></a></li>

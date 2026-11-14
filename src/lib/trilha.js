@@ -1,3 +1,4 @@
+import { estaTravado } from './dominio.js';
 // Trilha: tópicos de cada matéria em ordem de estudo, com os concursos que cada um serve.
 export const NIVEIS = [['0', 'nunca vi'], ['1', 'vi pouco'], ['2', 'quase lá'], ['3', 'domino']];
 export const MATERIAS_TRILHA = (cfg) => cfg.materias.filter((m) => cfg.topicos?.[m]);
@@ -14,21 +15,45 @@ export function topicosDe(cfg, materia) {
 }
 /** Domínio de 0 a 3 (sem avaliação = 0, "nunca vi"). */
 export const dominio = (lacunas, materia, nome) => lacunas?.[materia]?.[nome] ?? 0;
-export const status = (n) => (n >= 3 ? 'dominado' : n === 0 ? 'a fazer' : 'em andamento');
+export const status = (n) => (n >= 3 ? 'dominado' : n === 0 ? 'não iniciado' : 'em andamento');
 
 /**
  * Próximo tópico a estudar: olha uma janela de `janela` tópicos a partir do primeiro ainda não dominado
  * e escolhe o que serve a mais concursos (empate: o primeiro da trilha). Assim a ordem de estudo é
  * respeitada, mas um tópico que vale para vários concursos passa na frente de vizinhos que valem para um só.
+ * Tópico travado (3 tentativas sem 8 em 10) fica de fora. `opts.faseZero`: só tópicos da Fase 0, em ordem estrita;
+ * se todos estiverem dominados ou travados, volta ao travado mais antigo e depois ao de menor acerto (reforço).
  */
-export function proximoTopico(cfg, lacunas, materia, janela = 3, excluir = new Set()) {
-  const lista = topicosDe(cfg, materia);
-  const livre = (t) => dominio(lacunas, materia, t.nome) < 3 && !excluir.has(t.nome); // `excluir`: tópicos que já usaram todo o livro no dia
+export function proximoTopico(cfg, lacunas, materia, janela = 3, excluir = new Set(), opts = {}) {
+  const { faseZero = false, dominio = {}, acertos = {} } = opts;
+  let lista = topicosDe(cfg, materia);
+  if (faseZero) lista = lista.filter((t) => t.fase === 0);
+  const travado = (t) => estaTravado(dominio[`${materia}|${t.nome}`]);
+  const livre = (t) => dominio_(lacunas, materia, t) < 3 && !travado(t) && !excluir.has(t.nome); // `excluir`: tópicos que já usaram todo o livro no dia
   const primeiro = lista.findIndex(livre);
-  if (primeiro < 0) return null;
-  const cand = lista.slice(primeiro, primeiro + janela).filter(livre);
-  return cand.reduce((melhor, t) => (t.concursos.length > melhor.concursos.length ? t : melhor), cand[0]);
+  if (primeiro >= 0) {
+    const cand = lista.slice(primeiro, primeiro + (faseZero ? 1 : janela)).filter(livre);
+    return cand.reduce((melhor, t) => (t.concursos.length > melhor.concursos.length ? t : melhor), cand[0]);
+  }
+  if (!faseZero) return null;
+  // Fase 0 sem tópico novo: revisão dos travados, depois reforço do que tem pior acerto
+  const naoDom = lista.filter((t) => dominio_(lacunas, materia, t) < 3 && !excluir.has(t.nome));
+  if (naoDom.length) return naoDom[0];
+  const pct = (t) => { const a = acertos[`${materia}|${t.nome}`]; return a?.feitas ? a.acertos / a.feitas : 1; };
+  const reforco = lista.filter((t) => !excluir.has(t.nome));
+  return reforco.length ? reforco.reduce((m, t) => (pct(t) < pct(m) ? t : m), reforco[0]) : null;
 }
+const dominio_ = (lacunas, materia, t) => dominio(lacunas, materia, t.nome);
+
+/** Semana da Fase 0 (1 a 8, ou mais com a prorrogação) em que `dia` cai; 0 fora da fase. */
+export const semanaZero = (fases, dia) => {
+  const f = fases.find((x) => x.id === 'zero');
+  if (!f || dia < f.inicio || dia > f.fim) return 0;
+  return Math.floor((Date.parse(dia) - Date.parse(f.inicio)) / (7 * 864e5)) + 1;
+};
+/** Tópicos da Fase 0 de uma matéria na semana `n` da trilha, e quantos já deveriam estar dominados até ela. */
+export const topicosDaSemana = (cfg, materia, n) => topicosDe(cfg, materia).filter((t) => t.fase === 0 && t.sem === n);
+export const esperadosAte = (cfg, materia, n) => topicosDe(cfg, materia).filter((t) => t.fase === 0 && t.sem <= n);
 
 /** Fração dominada da matéria (0 a 1). */
 export function cobertura(cfg, lacunas, materia) {

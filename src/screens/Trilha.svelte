@@ -1,21 +1,53 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, setLacuna, salvarCfg } from '../stores/app.svelte.js';
+  import { app, setLacuna, salvarCfg, fases, destravarTopico } from '../stores/app.svelte.js';
   import { dur } from '../lib/prefs.js';
   import { linksDe, acertoPorTopico } from '../lib/tarefas.js';
   import { coberturaPaginas } from '../lib/livros.js';
   import Chips from '../components/Chips.svelte';
   import Ring from '../components/Ring.svelte';
-  import { NIVEIS, MATERIAS_TRILHA, topicosDe, dominio, status, proximoTopico, cobertura } from '../lib/trilha.js';
+  import { NIVEIS, MATERIAS_TRILHA, topicosDe, dominio, proximoTopico, cobertura, semanaZero, esperadosAte } from '../lib/trilha.js';
+  import { faseDoDia } from '../lib/phases.js';
+  import { situacao, resumo, chave, MAX_TENTATIVAS } from '../lib/dominio.js';
 
   const materias = $derived(MATERIAS_TRILHA(app.cfg));
   let materia = $state('Matemática');
   const info = $derived(app.cfg.materiasInfo?.[materia] ?? {});
   const lista = $derived(topicosDe(app.cfg, materia));
-  const proximo = $derived(proximoTopico(app.cfg, app.lacunas, materia));
+  const fasesL = $derived(fases());
+  const emZero = $derived(faseDoDia(fasesL, app.dia).id === 'zero');
+  const semZ = $derived(semanaZero(fasesL, app.dia));
+  const optsProx = $derived(emZero ? { faseZero: true, dominio: app.dominio } : { dominio: app.dominio });
+  const proximo = $derived(proximoTopico(app.cfg, app.lacunas, materia, emZero ? 1 : 3, new Set(), optsProx));
   const pct = $derived(cobertura(app.cfg, app.lacunas, materia));
   const dominados = $derived(lista.filter((t) => dominio(app.lacunas, materia, t.nome) >= 3).length);
-  const proximos = $derived(materias.map((m) => ({ m, t: proximoTopico(app.cfg, app.lacunas, m) })).filter((x) => x.t));
+  const proximos = $derived(materias.map((m) => ({ m, t: proximoTopico(app.cfg, app.lacunas, m, emZero ? 1 : 3, new Set(), optsProx) })).filter((x) => x.t));
+  // Fase 0: tabela da semana (SPEC) e quantos tópicos já deveriam estar dominados até ela
+  const f0 = $derived(app.cfg.fase0 ?? null);
+  const linhaSemana = $derived(f0?.semanas?.[Math.min(Math.max(semZ, 1), f0.semanas.length) - 1] ?? null);
+  const semanaCard = $derived(!emZero || !f0 ? [] : [['Matemática', 'mat'], ['Física', 'fis'], ['Química', 'qui']].map(([m, k]) => {
+    const esp = esperadosAte(app.cfg, m, semZ);
+    return { m, texto: linhaSemana?.[k], esp: esp.length, dom: esp.filter((x) => dominio(app.lacunas, m, x.nome) >= 3).length };
+  }));
+  const diaPassa = (n) => (n <= 8 ? '' : ' (prorrogada)');
+  // agrupa a matéria por semana da Fase 0; o resto vem depois, como "Fase 1 em diante"
+  const grupos = $derived.by(() => {
+    const g = [];
+    for (const t of lista) {
+      const id = t.fase === 0 ? `s${t.sem}` : 'f1';
+      let x = g.find((y) => y.id === id);
+      if (!x) { x = { id, sem: t.fase === 0 ? t.sem : null, itens: [] }; g.push(x); }
+      x.itens.push(t);
+    }
+    for (const x of g) {
+      x.dom = x.itens.filter((t) => dominio(app.lacunas, materia, t.nome) >= 3).length;
+      x.titulo = x.sem ? `Semana ${x.sem} · ${f0?.semanas?.[x.sem - 1]?.datas ?? ''}` : g.length > 1 ? 'Fase 1 em diante' : '';
+      x.aberto = g.length === 1 || (x.sem ? (emZero ? x.sem === Math.min(semZ, 8) : false) : !emZero);
+    }
+    return g;
+  });
+  const sit = (t) => situacao(dominio(app.lacunas, materia, t.nome), app.dominio[chave(materia, t.nome)]);
+  const falhas = (t) => resumo(app.dominio[chave(materia, t.nome)]);
   const sigla = (id) => app.cfg.concursos.find((c) => c.id === id)?.sigla ?? id;
   const cor = (id) => app.cfg.concursos.find((c) => c.id === id)?.cor ?? 'var(--ac)';
   const en = $derived(app.cfg.regras?.en);
@@ -26,7 +58,7 @@
     return { m, total: l.length, dom: l.filter((t) => dominio(app.lacunas, m, t.nome) >= 3).length, pct: cobertura(app.cfg, app.lacunas, m), pag: coberturaPaginas(app.cfg, app.leitura, m) };
   }));
   const acerto = $derived(acertoPorTopico(app.done));
-  const ROTULOS = [['video', 'Vídeo ou aula do tópico'], ['qconcursos', 'QConcursos (lista filtrada)'], ['estuda', 'Estuda.com (lista)'], ['pdf', 'Prova em PDF'], ['outro', 'Outro (ex.: ENEM, enem.dev)']];
+  const ROTULOS = [['video', 'Vídeo ou aula do tópico'], ['khan', 'Khan Academy (exercícios do tópico)'], ['obmep', 'Portal da Matemática OBMEP'], ['qconcursos', 'QConcursos (lista filtrada)'], ['estuda', 'Estuda.com (lista)'], ['pdf', 'Prova em PDF'], ['outro', 'Outro (ex.: ENEM, enem.dev)']];
   const nLinks = (t) => Object.values(linksDe(app.cfg, materia, t.nome)).filter(Boolean).length;
   function colar(t, campo, valor) {
     app.cfg.questoesLinks ??= {};
@@ -41,6 +73,22 @@
 
 {#if en}
   <p class="nota"><strong>Escola Naval elimina:</strong> menos de {en.minPorMateriaPct}% em qualquer matéria, ou redação abaixo de {en.minRedacaoDe100}/100.</p>
+{/if}
+
+{#if emZero && f0}
+  <section class="card f0" aria-label="Semana da Fase 0">
+    <p class="data">Fase 0 · Base do zero</p>
+    <h2 class="semh">Semana {semZ} de 8{diaPassa(semZ)}</h2>
+    <ul class="semul">
+      {#each semanaCard as s}
+        <li><strong>{s.m}</strong><span>{s.texto}</span><small>{s.dom} de {s.esp} tópicos dominados até aqui</small></li>
+      {/each}
+      <li><strong>Português</strong><span>{f0.notas?.['Português']}</span></li>
+      <li><strong>Inglês</strong><span>{f0.notas?.['Inglês']}</span></li>
+    </ul>
+    <p class="sub">Cada tópico só avança com 8 acertos em 10. Abaixo disso, o próximo bloco repete o tópico; depois de 3 tentativas ele fica travado.</p>
+    <a class="pri" href="#/progresso">Ver o portão da Fase 0</a>
+  </section>
 {/if}
 
 <h2>Cobertura do conteúdo</h2>
@@ -81,17 +129,22 @@
 </section>
 {#if info.obs}<p class="sub obs">{info.obs}</p>{/if}
 
-<ul class="grupo card">
-  {#each lista as t, i (t.nome)}
+{#snippet topico(t)}
     {@const n = dominio(app.lacunas, materia, t.nome)}
     <li class="top" class:prox={proximo?.nome === t.nome}>
       <div class="cab">
-        <span class="num" class:ok={n >= 3}>{i + 1}</span>
+        <span class="num" class:ok={n >= 3}>{t.ordem + 1}</span>
         <span class="nm">
           <strong>{t.nome}</strong>
-          <span class="sub"><span class="cs">{#each t.concursos as id}<i style="--c:{cor(id)}" aria-hidden="true"></i>{/each}</span>{t.concursos.map(sigla).join(' · ')} · {status(n)}{proximo?.nome === t.nome ? ' · próximo' : ''}</span>
+          <span class="sub"><span class="cs">{#each t.concursos as id}<i style="--c:{cor(id)}" aria-hidden="true"></i>{/each}</span>{t.concursos.map(sigla).join(' · ')} · {sit(t)}{proximo?.nome === t.nome ? ' · próximo' : ''}</span>
         </span>
       </div>
+      {#if sit(t) === 'travado'}
+        <p class="trav" role="alert">Travado depois de {MAX_TENTATIVAS} tentativas abaixo de 8 em 10. Peça ajuda (professor, colega ou outro vídeo) e destrave para tentar de novo.</p>
+        <button class="lbtn" onclick={() => destravarTopico(materia, t.nome)}>Já pedi ajuda: destravar</button>
+      {:else if falhas(t).falhas > 0 && sit(t) !== 'dominado'}
+        <p class="sub ac">Tentativas abaixo de 8 em 10: <strong>{falhas(t).falhas} de {MAX_TENTATIVAS}</strong></p>
+      {/if}
       {#if acerto[`${materia}|${t.nome}`]}
         {@const a = acerto[`${materia}|${t.nome}`]}
         <p class="sub ac">Acerto neste tópico: <strong>{Math.round((a.acertos / a.feitas) * 100)}%</strong> · {a.acertos} de {a.feitas} questões</p>
@@ -111,11 +164,33 @@
         </div>
       {/if}
     </li>
-  {/each}
-</ul>
+{/snippet}
+
+{#each grupos as g (g.id)}
+  {#if g.titulo}
+    <details class="grp" open={g.aberto}>
+      <summary><span>{g.titulo}</span><small>{g.dom} de {g.itens.length} dominados</small></summary>
+      <ul class="grupo card">{#each g.itens as t (t.nome)}{@render topico(t)}{/each}</ul>
+    </details>
+  {:else}
+    <ul class="grupo card">{#each g.itens as t (t.nome)}{@render topico(t)}{/each}</ul>
+  {/if}
+{/each}
 <p class="sub leg">0 nunca vi · 1 vi pouco · 2 quase lá · 3 domino</p>
 
 <style>
+  .f0 { padding: 16px; margin-top: 12px; display: grid; gap: 10px; border-color: var(--ac); }
+  .semh { margin: 0; font-size: 1.2rem; text-transform: none; letter-spacing: -.01em; color: var(--tx); }
+  .semul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .semul li { display: grid; gap: 2px; }
+  .semul strong { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .04em; }
+  .semul small { color: var(--tx2); }
+  .f0 .pri { display: grid; place-items: center; min-height: 48px; border-radius: 14px; background: var(--ac); color: var(--ac-tx); font-weight: 700; text-decoration: none; }
+  .grp { margin-top: 12px; }
+  .grp summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; padding: 0 4px; font-weight: 600; }
+  .grp summary small { color: var(--tx2); font-weight: 500; }
+  .grp > .grupo { margin-top: 6px; }
+  .trav { background: var(--warn-bg); color: var(--warn); padding: 10px 12px; border-radius: 12px; font-size: .9rem; }
   .nota { margin-top: 12px; padding: 12px 16px; border-radius: 14px; background: var(--warn-bg); color: var(--warn); font-size: .9rem; }
   .prox .ln { width: 100%; display: grid; grid-template-columns: 6.2rem 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; min-height: 52px; text-align: left; }
   .m { color: var(--ac2); font-size: .8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }

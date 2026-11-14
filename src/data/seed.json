@@ -273,11 +273,11 @@
       "6": [
         {
           "ini": "08:00",
-          "fim": "13:00",
+          "fim": "14:00",
           "tipo": "prova"
         },
         {
-          "ini": "14:00",
+          "ini": "15:00",
           "fim": "18:00"
         }
       ],
@@ -754,7 +754,444 @@
   "topicos": {
     "Matemática": [
       {
-        "nome": "Matemática básica (aritmética e álgebra)"
+        "nome": "Números inteiros: adição e subtração",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Números inteiros: multiplicação e divisão",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Divisibilidade e números primos",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Fatoração em números primos",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "MMC",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "MDC",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Problemas com MMC e MDC",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Frações: conceito e frações equivalentes",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Frações: simplificação e comparação",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Frações: soma e subtração com denominadores diferentes",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Frações: multiplicação e divisão",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Frações: problemas do dia a dia",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Revisão da semana: inteiros e frações",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Decimais: leitura e comparação",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Decimais: soma e subtração",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Decimais: multiplicação e divisão",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Fração e decimal: conversão e dízimas periódicas",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Potências: definição e propriedades",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Potências de base 10 e notação científica",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Potências com expoente negativo",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Raízes quadradas e cúbicas",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Raízes: propriedades e simplificação",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Expressões numéricas: ordem das operações",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Expressões numéricas com frações e potências",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Problemas com decimais e potências",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Revisão da semana: decimais, potências e raízes",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Razão e escala",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Proporção: propriedade fundamental",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Grandezas direta e inversamente proporcionais",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Regra de três simples direta",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Regra de três simples inversa",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Regra de três composta",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Porcentagem: conceito e cálculo",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Porcentagem: aumento e desconto",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Porcentagem: problemas",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Juros simples",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Divisão proporcional",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Problemas de razão e proporção",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Revisão da semana: proporção e porcentagem",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Expressões algébricas: valor numérico",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Monômios e polinômios: operações",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Equação do 1º grau: resolução",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Equação do 1º grau com frações",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Problemas que viram equação do 1º grau",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Equações literais: isolar a variável",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Inequação do 1º grau",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Problemas com inequações",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Problemas de idades e números",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Problemas de dinheiro, tempo e movimento",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Problemas variados do 1º grau",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Revisão da semana: álgebra básica",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Sistemas 2×2: substituição",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Sistemas 2×2: adição",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Problemas com sistemas",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Produtos notáveis: quadrado da soma e da diferença",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Produtos notáveis: produto da soma pela diferença",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Cubo da soma e da diferença",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Fatoração: fator comum e agrupamento",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Fatoração: diferença de quadrados",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Fatoração: trinômio quadrado perfeito",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Simplificação de expressões com fatoração",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Problemas variados de álgebra",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Revisão da semana: sistemas e fatoração",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Equação do 2º grau: incompleta",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Equação do 2º grau: fórmula de Bhaskara",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Discriminante e número de raízes",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Soma e produto das raízes",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Problemas com equação do 2º grau",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Equações redutíveis ao 2º grau",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Frações algébricas: simplificação",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Frações algébricas: soma e subtração",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Frações algébricas: multiplicação e divisão",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Equações fracionárias",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Problemas variados do 2º grau",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Revisão da semana: 2º grau e frações algébricas",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Ângulos: tipos e medidas",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Ângulos entre paralelas e transversal",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Triângulos: classificação e soma dos ângulos",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Teorema de Pitágoras",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Áreas: quadrado, retângulo e triângulo",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Áreas: paralelogramo, trapézio e losango",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Circunferência: comprimento e área do círculo",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Semelhança de triângulos",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Teorema de Tales",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Razões trigonométricas: seno, cosseno e tangente",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Ângulos notáveis: 30°, 45° e 60°",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Problemas de trigonometria no triângulo retângulo",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Revisão da semana: geometria básica",
+        "fase": 0,
+        "sem": 7
       },
       {
         "nome": "Conjuntos, lógica e funções",
@@ -817,13 +1254,217 @@
     ],
     "Física": [
       {
-        "nome": "Grandezas e vetores"
+        "nome": "Grandezas físicas e unidades do SI",
+        "fase": 0,
+        "sem": 1
       },
       {
-        "nome": "Cinemática",
-        "antigos": [
-          "Cinemática"
-        ]
+        "nome": "Conversão de unidades: comprimento, massa e tempo",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Conversão de unidades: área, volume e velocidade",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Notação científica e ordem de grandeza",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Medidas e algarismos significativos",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Revisão da semana: unidades",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Grandezas escalares e vetoriais",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Vetores: módulo, direção e sentido",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Soma de vetores na mesma direção",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Soma de vetores perpendiculares (Pitágoras)",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Soma de vetores: regra do paralelogramo",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Revisão da semana: vetores",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Posição, deslocamento e distância percorrida",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Velocidade média",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Movimento uniforme: função horária",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Movimento uniforme: encontro e ultrapassagem",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Gráficos do movimento uniforme",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Revisão da semana: movimento uniforme",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Aceleração média",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "MUV: função da velocidade",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "MUV: função horária da posição",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Equação de Torricelli",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Gráficos do MUV",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Revisão da semana: MUV",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Queda livre",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Lançamento vertical para cima",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Lançamento vertical: altura máxima e tempo de voo",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Problemas de queda e lançamento",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Cinemática: problemas mistos",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Revisão da semana: queda livre e lançamento",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Força e a 1ª lei de Newton (inércia)",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "2ª lei de Newton: F = m·a",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "3ª lei de Newton: ação e reação",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Peso e massa",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Força resultante",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Revisão da semana: leis de Newton",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Diagrama de forças",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Força normal",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Tração em fios",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Blocos ligados por fio",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Plano inclinado sem atrito",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Revisão da semana: Newton aplicado",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Cinemática: lançamento oblíquo e movimento circular"
       },
       {
         "nome": "Dinâmica, energia, impulso e colisões",
@@ -875,11 +1516,109 @@
     ],
     "Química": [
       {
-        "nome": "Estrutura atômica e ligações",
-        "antigos": [
-          "Atomística",
-          "Tabela periódica e ligações"
-        ]
+        "nome": "Matéria, substâncias e misturas",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Estados físicos e mudanças de estado",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Separação de misturas",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Modelos atômicos",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Número atômico, número de massa e isótopos",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Íons e partículas do átomo",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Tabela periódica: famílias e períodos",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Distribuição eletrônica (diagrama de Pauling)",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Propriedades periódicas",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Ligação iônica",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Ligação covalente",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Ligação metálica e propriedades das substâncias",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Ácidos e bases",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Sais",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Óxidos",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Massa atômica e massa molecular",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Mol e constante de Avogadro",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Massa molar",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Reações químicas e balanceamento",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Leis de Lavoisier e Proust",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Estequiometria simples: mol e massa",
+        "fase": 0,
+        "sem": 7
       },
       {
         "nome": "Estequiometria e soluções",
@@ -921,6 +1660,46 @@
     ],
     "Português": [
       {
+        "nome": "Substantivo e adjetivo",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Artigo, numeral e pronome",
+        "fase": 0,
+        "sem": 2
+      },
+      {
+        "nome": "Verbo: conceito e tempos verbais",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Advérbio, preposição e conjunção",
+        "fase": 0,
+        "sem": 4
+      },
+      {
+        "nome": "Concordância nominal",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Concordância verbal",
+        "fase": 0,
+        "sem": 6
+      },
+      {
+        "nome": "Acentuação e ortografia básica",
+        "fase": 0,
+        "sem": 7
+      },
+      {
+        "nome": "Interpretação: tema, ideia central e inferência",
+        "fase": 0,
+        "sem": 8
+      },
+      {
         "nome": "Interpretação de texto",
         "antigos": [
           "Interpretação de texto"
@@ -955,6 +1734,26 @@
       }
     ],
     "Inglês": [
+      {
+        "nome": "Vocabulário essencial: verbos e substantivos comuns",
+        "fase": 0,
+        "sem": 1
+      },
+      {
+        "nome": "Verbo to be e presente simples",
+        "fase": 0,
+        "sem": 3
+      },
+      {
+        "nome": "Passado simples",
+        "fase": 0,
+        "sem": 5
+      },
+      {
+        "nome": "Leitura de textos curtos",
+        "fase": 0,
+        "sem": 7
+      },
       {
         "nome": "Leitura e vocabulário",
         "antigos": [
@@ -1178,7 +1977,8 @@
     "teoria": 10,
     "gramatica": 15,
     "questoesNaval": 6,
-    "questoesITA": 3
+    "questoesITA": 3,
+    "exerciciosZero": 15
   },
   "biblioteca": {
     "principal": {
@@ -1534,6 +2334,29 @@
         "serie": "murphy",
         "obs": "O link é a página do livro na editora (venda), não conteúdo gratuito.",
         "editora": "Cambridge"
+      },
+      {
+        "id": "khan-mat",
+        "tipo": "site",
+        "materia": "Matemática",
+        "titulo": "Khan Academy (Matemática 6º ao 9º ano)",
+        "autor": "Khan Academy",
+        "link": "https://pt.khanacademy.org/math",
+        "linkStatus": "visto na busca",
+        "volume": "",
+        "assunto": "Vídeos e exercícios por habilidade, com \"dominado\" e testes de unidade",
+        "obs": "Domínio pt.khanacademy.org visto na busca; confira o caminho dos cursos de cada ano."
+      },
+      {
+        "id": "quim-intro",
+        "tipo": "video",
+        "materia": "Química",
+        "titulo": "Vídeos introdutórios de Química",
+        "autor": "",
+        "link": "",
+        "linkStatus": "a confirmar",
+        "volume": "",
+        "assunto": "Matéria, átomo, tabela periódica, ligações e mol (cole o link da sua playlist)"
       }
     ],
     "vinculos": [
@@ -1968,6 +2791,258 @@
         "exIni": null,
         "exFim": null,
         "sugerido": true
+      },
+      {
+        "id": "feltre-1|Matéria, substâncias e misturas",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Matéria, substâncias e misturas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Estados físicos e mudanças de estado",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Estados físicos e mudanças de estado",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Separação de misturas",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Separação de misturas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Modelos atômicos",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Modelos atômicos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Número atômico, número de massa e isótopos",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Número atômico, número de massa e isótopos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Íons e partículas do átomo",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Íons e partículas do átomo",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Tabela periódica: famílias e períodos",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Tabela periódica: famílias e períodos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Distribuição eletrônica (diagrama de Pauling)",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Distribuição eletrônica (diagrama de Pauling)",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Propriedades periódicas",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Propriedades periódicas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Ligação iônica",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Ligação iônica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Ligação covalente",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Ligação covalente",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Ligação metálica e propriedades das substâncias",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Ligação metálica e propriedades das substâncias",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Ácidos e bases",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Ácidos e bases",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Sais",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Sais",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Óxidos",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Óxidos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Massa atômica e massa molecular",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Massa atômica e massa molecular",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Mol e constante de Avogadro",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Mol e constante de Avogadro",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Massa molar",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Massa molar",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Reações químicas e balanceamento",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Reações químicas e balanceamento",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Leis de Lavoisier e Proust",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Leis de Lavoisier e Proust",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Estequiometria simples: mol e massa",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Estequiometria simples: mol e massa",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
       }
     ],
     "removidos": []
@@ -2006,6 +3081,14 @@
   },
   "sitesQuestoes": [
     {
+      "id": "khan",
+      "nome": "Khan Academy"
+    },
+    {
+      "id": "obmep",
+      "nome": "OBMEP"
+    },
+    {
       "id": "qconcursos",
       "nome": "QConcursos"
     },
@@ -2021,5 +3104,123 @@
       "id": "outro",
       "nome": "Outro"
     }
-  ]
+  ],
+  "fase0": {
+    "semanas": [
+      {
+        "n": 1,
+        "datas": "16–22/11",
+        "mat": "inteiros, 4 operações, divisibilidade, MMC/MDC, frações",
+        "fis": "unidades SI, conversões, notação científica",
+        "qui": "matéria, estados, misturas e separação"
+      },
+      {
+        "n": 2,
+        "datas": "23–29/11",
+        "mat": "decimais, potências, raízes, expressões numéricas",
+        "fis": "grandezas escalares e vetoriais, soma de vetores, Pitágoras",
+        "qui": "átomo, modelos atômicos, nº atômico e de massa"
+      },
+      {
+        "n": 3,
+        "datas": "30/11–06/12",
+        "mat": "razão, proporção, regra de três, porcentagem, juros simples",
+        "fis": "velocidade média, movimento uniforme e gráficos",
+        "qui": "tabela periódica, distribuição eletrônica"
+      },
+      {
+        "n": 4,
+        "datas": "07–13/12",
+        "mat": "expressões algébricas, equação e inequação do 1º grau, problemas",
+        "fis": "movimento uniformemente variado, Torricelli",
+        "qui": "ligações químicas"
+      },
+      {
+        "n": 5,
+        "datas": "14–20/12",
+        "mat": "sistemas 2×2, produtos notáveis, fatoração",
+        "fis": "queda livre, lançamento vertical",
+        "qui": "ácidos, bases, sais e óxidos (básico)"
+      },
+      {
+        "n": 6,
+        "datas": "21–27/12",
+        "mat": "equação do 2º grau, soma e produto, frações algébricas",
+        "fis": "leis de Newton (conceitos)",
+        "qui": "mol e massa molar"
+      },
+      {
+        "n": 7,
+        "datas": "28/12–03/01",
+        "mat": "ângulos, triângulos, Pitágoras, áreas, semelhança, trigonometria no triângulo retângulo",
+        "fis": "leis de Newton aplicadas (peso, normal, tração)",
+        "qui": "balanceamento, estequiometria simples"
+      },
+      {
+        "n": 8,
+        "datas": "04–10/01",
+        "mat": "revisão dos tópicos não dominados e teste de saída",
+        "fis": "revisão",
+        "qui": "revisão"
+      }
+    ],
+    "notas": {
+      "Português": "Leia 1 texto por dia e responda 3 perguntas (tema, ideia central, uma inferência). Gramática básica nos blocos: classes de palavras e concordância.",
+      "Inglês": "Manutenção: 1 hora por semana."
+    },
+    "portao": {
+      "khanMin": 80,
+      "checkpointMin": 5,
+      "semanasExtras": 2
+    },
+    "exercicios": {
+      "Matemática": [
+        {
+          "site": "khan",
+          "rotulo": "Khan Academy · Matemática (6º ao 9º ano)",
+          "url": "https://pt.khanacademy.org/math"
+        },
+        {
+          "site": "obmep",
+          "rotulo": "Portal da Matemática (OBMEP)",
+          "url": "https://portaldaobmep.impa.br/"
+        }
+      ],
+      "Física": [
+        {
+          "site": "khan",
+          "rotulo": "Khan Academy · Física",
+          "url": "https://pt.khanacademy.org/"
+        }
+      ],
+      "Química": [
+        {
+          "site": "khan",
+          "rotulo": "Khan Academy · Química",
+          "url": "https://pt.khanacademy.org/"
+        }
+      ],
+      "Português": [
+        {
+          "site": "khan",
+          "rotulo": "Khan Academy · Português",
+          "url": "https://pt.khanacademy.org/"
+        }
+      ],
+      "Inglês": []
+    }
+  },
+  "checkpoint": {
+    "questoes": 10,
+    "minutos": 30,
+    "baseline": {
+      "data": "2026-11-15",
+      "acertos": 0
+    }
+  },
+  "divisaoBlocoZero": {
+    "video": 20,
+    "teoria": 10,
+    "questoes": 70
+  }
 }

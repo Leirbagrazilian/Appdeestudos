@@ -114,7 +114,10 @@
 <section class="card bloco">
   <label>Meta líquida por semana (horas de foco, sem as pausas)
     <input type="number" min="10" max="60" step="1" bind:value={app.cfg.rotina.metaLiquida} onchange={salvar} /></label>
-  <p class="muted">As horas de cada matéria vêm da tabela da fase (base de 50 h), escalada para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}.</p>
+  <p class="muted">As horas de cada matéria vêm da tabela da fase (43 h líquidas), escaladas para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}. Quer mais volume? Suba a meta; as janelas precisam comportar.</p>
+  <label>Peso do fim de semana (1 = igual aos outros dias)
+    <input type="number" min="1" max="2" step="0.1" bind:value={app.cfg.rotina.pesoFimDeSemana} onchange={salvar} /></label>
+  <p class="muted">Acima de 1, sábado e domingo recebem uma fatia maior das horas da semana.</p>
   <div class="tg"><span><strong>Rampa de 75%</strong><span class="muted">Nas {app.cfg.rotina.rampa.semanas} primeiras semanas do plano, 75% das horas.</span></span>
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>

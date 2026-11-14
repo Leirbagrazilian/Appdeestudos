@@ -7,6 +7,9 @@ export const provaFim = (c) => prova(c).map((e) => e.fim).sort().at(-1);
 const menor = (l) => [...l].sort()[0], maior = (l) => [...l].sort().at(-1);
 
 /** Gera as 6 fases (0 a 5). A Fase 0 e o início da Fase 2 vêm do perfil; o resto segue as datas de prova. */
+/** Quantas semanas ainda dá para prorrogar a Fase 0 sem engolir a Fase 1. */
+export const maxExtraZero = (cfg) => Math.max(0, Math.floor(diffDays(cfg.perfil.fimZero ?? '2027-01-10', addDays(cfg.perfil.inicioFase2 ?? '2027-05-01', -8)) / 7));
+
 export function gerarFases(cfg) {
   const get = (id) => cfg.concursos.find((c) => c.id === id);
   const p = cfg.perfil;
@@ -14,8 +17,9 @@ export function gerarFases(cfg) {
   const navais = [efomm, esa].filter(Boolean); // a fase 2 serve EFOMM e ESA (a ESA só entra se existir)
 
   const zIni = p.inicioZero ?? '2026-11-16';
-  const zFim = addDays(p.fimZero ?? '2027-01-10', 7 * (p.extraZero ?? 0)); // +2 semanas quando o portão não passa
   let f2Ini = p.inicioFase2 ?? '2027-05-01';
+  // +2 semanas por prorrogação quando o portão não passa, mas a Fase 1 sempre fica com pelo menos 1 semana
+  const zFim = [addDays(p.fimZero ?? '2027-01-10', 7 * (p.extraZero ?? 0)), addDays(f2Ini, -8)].sort()[0];
   if (f2Ini <= addDays(zFim, 1)) f2Ini = addDays(zFim, 2);
   const f2Fim = maior([...navais.map(provaFim), f2Ini]);
   const enFim = maior([provaFim(en), f2Fim]);
