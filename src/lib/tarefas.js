@@ -70,8 +70,11 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
     if (!REGISTRAVEL.includes(b.cat) || b.diagnostico || ctx.done?.[b.id]) continue;
     const materia = b.materia;
     const ex = (esgotados[materia] ??= new Set());
-    const t = proximoTopico(cfg, ctx.lacunas ?? {}, materia, zero ? 1 : 3, ex, { faseZero: zero, dominio: ctx.dominio ?? {}, acertos });
+    const opts = { faseZero: zero, dominio: ctx.dominio ?? {}, acertos };
+    // Fase 0: blocos ainda não feitos do mesmo dia seguem para o tópico seguinte; se o resultado do anterior for ruim, ele volta a ser o próximo
+    const t = proximoTopico(cfg, ctx.lacunas ?? {}, materia, zero ? 1 : 3, ex, opts) ?? (zero ? proximoTopico(cfg, ctx.lacunas ?? {}, materia, 1, new Set(), opts) : null);
     if (!t) { out[b.id] = { semTopico: true, materia }; continue; }
+    if (zero && b.cat !== 'minimo') ex.add(t.nome);
     if (b.cat === 'minimo') {
       // Dia mínimo: só questões (20 em 45 min) do próximo tópico; as revisões vencidas ficam na lista de revisões
       const fontes = fontesQuestoes(cfg, materia, t.nome, ctx.cotasDia ?? {}, lim);

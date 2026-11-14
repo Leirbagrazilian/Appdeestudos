@@ -383,14 +383,16 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     const mat = dias.flatMap((d) => d.blocos).filter((b) => b.cat === 'mat').reduce((a, b) => a + b.min, 0);
     expect(Math.abs(mat - 1440)).toBeLessThanOrEqual(100);
   });
-  it('fase 3 inclui Hist/Geo (ESA) e o excedente de provas vira estudo na semana', () => {
-    const dias = semana('2027-06-07'); // fase efomm: 2027-05-01 a 2027-07-26
-    const por = (cat) => dias.flatMap((d) => d.blocos).filter((b) => b.cat === cat).reduce((a, b) => a + b.min, 0);
-    expect(por('hg')).toBeGreaterThanOrEqual(200);
-    const sab = dias[5].blocos.find((b) => b.cat === 'prova');
-    expect(sab.sessoes).toBe(0); // a prova do sábado é um bloco contínuo
-    expect(dias.some((d) => d.blocos.some((b) => b.cat === 'prova' && b.sessoes))).toBe(true); // excedente em sessões de estudo
-    expect(por('prova')).toBeGreaterThanOrEqual(sab.min + 50); // sábado + excedente
+  it('fase 2 inclui Hist/Geo (ESA); na fase 3 o excedente de provas vira estudo na semana', () => {
+    const por = (dias, cat) => dias.flatMap((d) => d.blocos).filter((b) => b.cat === cat).reduce((a, b) => a + b.min, 0);
+    const dias = semana('2027-06-07'); // fase efomm: 2027-05-01 a 2027-07-26 (provas 6h: cabem no sábado)
+    expect(por(dias, 'hg')).toBeGreaterThanOrEqual(200);
+    expect(dias[5].blocos.find((b) => b.cat === 'prova').sessoes).toBe(0); // a prova do sábado é um bloco contínuo
+    const en = semana('2027-08-09'); // fase en: provas 9h, mais do que a janela de sábado comporta
+    const sab = en[5].blocos.find((b) => b.cat === 'prova');
+    expect(sab.sessoes).toBe(0);
+    expect(en.some((d) => d.blocos.some((b) => b.cat === 'prova' && b.sessoes))).toBe(true); // excedente em sessões de estudo
+    expect(por(en, 'prova')).toBeGreaterThanOrEqual(sab.min + 50); // sábado + excedente
   });
   it('encaixe nas janelas: todo bloco cabe numa janela do dia, sem sobreposição e com pausa de 10 min', () => {
     const c = cfg();
@@ -560,8 +562,6 @@ describe('Meus livros', () => {
   const c = cfg();
   const iezzi3 = () => ({ id: 'x', recurso: 'iezzi-3', materia: 'Matemática', topico: 'Trigonometria', pagIni: 1, pagFim: 100, exIni: 1, exFim: 50 });
   const rec = (id) => c.biblioteca.recursos.find((r) => r.id === id);
-  // vínculos do seed que ainda apontam para tópicos removidos na SPEC v3 (bug do seed, a corrigir; o teste não aceita novos órfãos)
-  const ORFAOS_SEED = new Set(['matzero|Matemática básica (aritmética e álgebra)', 'topicos-fisica-1|Grandezas e vetores', 'topicos-fisica-1|Cinemática', 'feltre-1|Estrutura atômica e ligações']);
 
   it('o seed tem a biblioteca do SPEC §7, sem páginas, e todo vínculo aponta para recurso e tópico que existem', () => {
     const b = c.biblioteca;
@@ -570,7 +570,7 @@ describe('Meus livros', () => {
     for (const v of b.vinculos) {
       expect(rec(v.recurso), v.id).toBeTruthy();
       // vínculos podem apontar para tópicos da Fase 0 (ex.: Feltre v.1 -> Química fase 0)
-      if (!ORFAOS_SEED.has(v.id)) expect(c.topicos[v.materia].some((t) => t.nome === v.topico), v.id).toBe(true);
+      expect(c.topicos[v.materia].some((t) => t.nome === v.topico), v.id).toBe(true);
       expect(temPaginas(v)).toBe(false); // sem páginas: você cadastra
     }
     expect(b.vinculos.some((v) => v.recurso === 'feltre-1' && c.topicos.Química.find((t) => t.nome === v.topico)?.fase === 0)).toBe(true);
