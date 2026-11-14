@@ -99,3 +99,27 @@ describe('próximo tópico na Fase 0', () => {
     expect(semanaZero(f, '2026-11-10')).toBe(0);
   });
 });
+
+describe('revisão: correções e travados', () => {
+  it('corrigir para baixo o bloco que deu o domínio devolve a nota de antes', () => {
+    let r = avaliarTopico(null, 1, 'b1', { feitas: 10, acertos: 9 });
+    expect(r.nota).toBe(3);
+    r = avaliarTopico(r.estado, r.nota, 'b1', { feitas: 10, acertos: 5 });
+    expect(r.nota).toBe(2); expect(r.veredito).toBe('repetir');
+  });
+  it('destravar guarda quais falhas foram ignoradas: corrigir uma delas não afeta a contagem nova', () => {
+    let r = avaliarTopico(null, 0, 'a', { feitas: 10, acertos: 2 }); r = avaliarTopico(r.estado, r.nota, 'b', { feitas: 10, acertos: 2 }); r = avaliarTopico(r.estado, r.nota, 'c', { feitas: 10, acertos: 2 });
+    const est = destravar(r.estado);
+    let r2 = avaliarTopico(est, r.nota, 'a', { feitas: 5, acertos: 5 });
+    for (const id of ['x', 'y']) r2 = avaliarTopico(r2.estado, r2.nota, id, { feitas: 10, acertos: 2 });
+    expect(resumo(r2.estado).falhas).toBe(2); expect(r2.veredito).toBe('repetir');
+    r2 = avaliarTopico(r2.estado, r2.nota, 'z', { feitas: 10, acertos: 2 }); expect(r2.veredito).toBe('travado');
+  });
+  it('2º bloco do dia repete o único tópico livre em vez de voltar ao travado', () => {
+    const c = cfgMini();
+    const t3 = { regs: { x1: { feitas: 10, acertos: 2 }, x2: { feitas: 10, acertos: 2 }, x3: { feitas: 10, acertos: 2 } } };
+    const lac = { Matemática: { C: 3 } };
+    const r = proximoTopico(c, lac, 'Matemática', 1, new Set(['B']), { faseZero: true, dominio: { 'Matemática|A': t3 } });
+    expect(r.nome).toBe('B');
+  });
+});

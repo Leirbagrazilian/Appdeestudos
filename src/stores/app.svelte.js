@@ -234,7 +234,7 @@ export async function setLacuna(materia, topico, nota) {
   app.lacunas[materia][topico] = nota;
   await salvarKV('lacunas');
   const k = chaveTopico(materia, topico);
-  if (nota < 3 && app.dominio[k] && resumoTopico(app.dominio[k]).dominado) { delete app.dominio[k]; await salvarKV('dominio'); } // você reabriu o tópico: recomeça o modo domínio
+  if (nota < 3 && app.dominio[k] && (resumoTopico(app.dominio[k]).dominado || resumoTopico(app.dominio[k]).travado)) { delete app.dominio[k]; await salvarKV('dominio'); } // você reabriu o tópico: recomeça o modo domínio
   vibrar(pf(), 'toque');
 }
 
@@ -297,10 +297,11 @@ async function aplicarResultado(b, d) {
 /** Fase 0: o resultado do bloco entra no modo domínio do tópico (8 em 10, repetição, travado) e atualiza a nota da Trilha. */
 async function avaliarDominio(b, d) {
   const topico = d.topico;
-  if (!topico || faseDoDia(fases(), app.dia).id !== 'zero') return null;
+  const diaBloco = /^\d{4}-\d{2}-\d{2}/.test(b.id) ? b.id.slice(0, 10) : app.dia; // corrigir outro dia vale para a fase e a data do bloco
+  if (!topico || faseDoDia(fases(), diaBloco).id !== 'zero') return null;
   if (!app.cfg.topicos?.[b.materia]?.some((t) => t.nome === topico && t.fase === 0)) return null;
   const k = chaveTopico(b.materia, topico), atual = app.lacunas[b.materia]?.[topico] ?? 0;
-  const r = avaliarTopico(app.dominio[k], atual, b.id, { feitas: d.feitas ?? 0, acertos: d.acertos ?? 0, khan: d.khan, data: app.dia });
+  const r = avaliarTopico(app.dominio[k], atual, b.id, { feitas: d.feitas ?? 0, acertos: d.acertos ?? 0, khan: d.khan, data: diaBloco });
   app.dominio[k] = r.estado; await salvarKV('dominio');
   if (r.nota !== atual) { app.lacunas[b.materia] ??= {}; app.lacunas[b.materia][topico] = r.nota; await salvarKV('lacunas'); }
   return r.veredito;

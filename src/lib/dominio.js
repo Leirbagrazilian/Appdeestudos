@@ -13,9 +13,11 @@ const passou = (r) => r.khan || (vale(r) && r.acertos / r.feitas >= ACERTO_MIN);
 
 /** Leitura do estado: dominado, tentativas que falharam, travado, resultado mais recente. */
 export function resumo(estado) {
-  const regs = Object.entries(estado?.regs ?? {}).sort((a, b) => (a[1].data ?? '').localeCompare(b[1].data ?? '') || a[0].localeCompare(b[0])).map(([, r]) => r);
+  const ign = new Set(estado?.ignorados ?? []); // falhas de antes do "destravar"
+  const ent = Object.entries(estado?.regs ?? {}).sort((a, b) => (a[1].data ?? '').localeCompare(b[1].data ?? '') || a[0].localeCompare(b[0]));
+  const regs = ent.map(([, r]) => r);
   const dominado = regs.some(passou);
-  const falhas = Math.max(0, regs.filter((r) => vale(r) && !passou(r)).length - (estado?.base ?? 0));
+  const falhas = ent.filter(([id, r]) => vale(r) && !passou(r) && !ign.has(id)).length;
   const ult = regs.at(-1) ?? null;
   return { dominado, falhas, travado: !dominado && falhas >= MAX_TENTATIVAS, ult, tentativas: regs.filter(vale).length };
 }
@@ -27,10 +29,12 @@ export function resumo(estado) {
  */
 export function avaliarTopico(estado, nota, blocoId, res) {
   const novo = { ...(estado ?? {}), regs: { ...(estado?.regs ?? {}), [blocoId]: { feitas: res.feitas ?? 0, acertos: Math.min(res.acertos ?? 0, res.feitas ?? 0), khan: !!res.khan, data: res.data ?? null } } };
+  if (novo.antes == null && (nota ?? 0) < 3) novo.antes = nota ?? 0; // nota de antes do domínio: volta a ela se você corrigir o registro para baixo
   const r = resumo(novo);
   const reg = novo.regs[blocoId];
   let veredito, n = nota ?? 0;
   if (r.dominado) { veredito = 'dominado'; n = 3; }
+  else if (n >= 3 && novo.antes != null) { n = novo.antes; veredito = 'repetir'; if (!vale(reg)) veredito = 'parcial'; n = Math.max(n, vale(reg) ? (reg.acertos / reg.feitas < 0.5 ? 1 : 2) : (reg.feitas > 0 ? 1 : 0)); if (r.travado) veredito = 'travado'; }
   else if (!vale(reg)) { veredito = 'parcial'; n = Math.max(n, reg.feitas > 0 ? 1 : 0); }
   else { veredito = r.travado ? 'travado' : 'repetir'; n = Math.max(n, reg.acertos / reg.feitas < 0.5 ? 1 : 2); }
   return { nota: n, estado: novo, veredito };
@@ -51,6 +55,6 @@ export const travados = (dominio, lacunas) => Object.entries(dominio ?? {})
 
 /** Destrava o tópico: as tentativas que falharam até agora deixam de contar (você pediu ajuda ou viu outra explicação). */
 export const destravar = (estado) => {
-  const r = resumo({ ...estado, base: 0 });
-  return { ...(estado ?? {}), base: r.falhas };
+  const falhas = Object.entries(estado?.regs ?? {}).filter(([, r]) => vale(r) && !passou(r)).map(([id]) => id);
+  return { ...(estado ?? {}), ignorados: falhas };
 };

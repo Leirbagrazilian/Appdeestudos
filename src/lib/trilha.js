@@ -36,7 +36,10 @@ export function proximoTopico(cfg, lacunas, materia, janela = 3, excluir = new S
     return cand.reduce((melhor, t) => (t.concursos.length > melhor.concursos.length ? t : melhor), cand[0]);
   }
   if (!faseZero) return null;
-  // Fase 0 sem tópico novo: revisão dos travados, depois reforço do que tem pior acerto
+  // Fase 0 sem tópico novo: antes de voltar a um travado, repete um tópico ainda livre (os de `excluir` já estão em outro bloco do dia)
+  const livres = lista.filter((t) => dominio_(lacunas, materia, t) < 3 && !travado(t));
+  if (livres.length) return livres[0];
+  // depois, revisão dos travados e reforço do que tem pior acerto
   const naoDom = lista.filter((t) => dominio_(lacunas, materia, t) < 3 && !excluir.has(t.nome));
   if (naoDom.length) return naoDom[0];
   const pct = (t) => { const a = acertos[`${materia}|${t.nome}`]; return a?.feitas ? a.acertos / a.feitas : 1; };
