@@ -6,28 +6,27 @@ export const provaFim = (c) => prova(c).map((e) => e.fim).sort().at(-1);
 
 const menor = (l) => [...l].sort()[0], maior = (l) => [...l].sort().at(-1);
 
-/** Gera as 6 fases a partir das datas de prova. Muda uma data, as fases se reajustam. */
+/** Gera as 6 fases (0 a 5). A Fase 0 e o início da Fase 2 vêm do perfil; o resto segue as datas de prova. */
 export function gerarFases(cfg) {
   const get = (id) => cfg.concursos.find((c) => c.id === id);
-  const sem = (cfg.perfil.semanasEspecifica ?? 7) * 7;
-  const ini = cfg.perfil.inicioPlano;
+  const p = cfg.perfil;
   const efomm = get('efomm'), esa = get('esa'), en = get('en'), enem = get('enem'), ita = get('ita');
-  const navais = [efomm, esa].filter(Boolean); // fase 3 serve EFOMM e ESA (a ESA só entra se existir)
+  const navais = [efomm, esa].filter(Boolean); // a fase 2 serve EFOMM e ESA (a ESA só entra se existir)
 
-  let p3Ini = addDays(menor(navais.map(provaInicio)), -sem);
-  const devIni = p3Ini < cfg.perfil.inicioDesenvolvimento ? addDays(p3Ini, -1) : cfg.perfil.inicioDesenvolvimento;
-  if (p3Ini <= devIni) p3Ini = addDays(devIni, 1);
-  const p3Fim = maior(navais.map(provaFim));
-  const enIni = maior([addDays(provaInicio(en), -sem), addDays(p3Fim, 1)]);
-  const enFim = provaFim(en);
+  const zIni = p.inicioZero ?? '2026-11-16';
+  const zFim = addDays(p.fimZero ?? '2027-01-10', 7 * (p.extraZero ?? 0)); // +2 semanas quando o portão não passa
+  let f2Ini = p.inicioFase2 ?? '2027-05-01';
+  if (f2Ini <= addDays(zFim, 1)) f2Ini = addDays(zFim, 2);
+  const f2Fim = maior([...navais.map(provaFim), f2Ini]);
+  const enFim = maior([provaFim(en), f2Fim]);
   const itaFim = maior([provaFim(ita), enFim]);
   const enemFim = maior([provaFim(enem), addDays(itaFim, 1)]);
 
   const lista = [
-    { id: 'base', inicio: ini, fim: addDays(devIni, -1) },
-    { id: 'desenvolvimento', inicio: devIni, fim: addDays(p3Ini, -1) },
-    { id: 'efomm', inicio: p3Ini, fim: p3Fim },
-    { id: 'en', inicio: enIni, fim: enFim },
+    { id: 'zero', inicio: zIni, fim: zFim },
+    { id: 'base', inicio: addDays(zFim, 1), fim: addDays(f2Ini, -1) },
+    { id: 'efomm', inicio: f2Ini, fim: f2Fim },
+    { id: 'en', inicio: addDays(f2Fim, 1), fim: enFim },
     { id: 'ita', inicio: addDays(enFim, 1), fim: itaFim },
     { id: 'enem', inicio: addDays(itaFim, 1), fim: enemFim },
   ];

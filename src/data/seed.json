@@ -3,8 +3,11 @@
     "nome": "Gabriel",
     "nascimento": "2005-11-25",
     "inicioPlano": "2026-11-10",
-    "inicioDesenvolvimento": "2027-03-01",
-    "semanasEspecifica": 7
+    "semanasEspecifica": 7,
+    "inicioZero": "2026-11-16",
+    "fimZero": "2027-01-10",
+    "extraZero": 0,
+    "inicioFase2": "2027-05-01"
   },
   "concursos": [
     {
@@ -270,25 +273,34 @@
       "6": [
         {
           "ini": "08:00",
-          "fim": "15:00",
+          "fim": "13:00",
           "tipo": "prova"
+        },
+        {
+          "ini": "14:00",
+          "fim": "18:00"
         }
       ],
       "0": [
         {
-          "ini": "09:00",
-          "fim": "12:00",
+          "ini": "08:00",
+          "fim": "12:00"
+        },
+        {
+          "ini": "13:00",
+          "fim": "17:00",
           "tipo": "domingo"
         }
       ]
     },
-    "metaNominal": 50,
+    "metaNominal": 43,
     "metaLiquida": 43,
     "rampa": {
       "ativa": false,
       "semanas": 2,
       "fator": 0.75
-    }
+    },
+    "pesoFimDeSemana": 1.3
   },
   "metodos": {
     "recuperacao": "Prática de recuperação: faça as questões sem consultar nada. Tentar lembrar fixa mais do que reler.",
@@ -298,42 +310,42 @@
     "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil."
   },
   "provaSabado": {
-    "base": "Prova antiga de qualquer concurso naval (a mais recente que você ainda não fez)",
-    "desenvolvimento": "Prova antiga alternando EFOMM e Escola Naval (a cada 2 semanas)",
+    "zero": "Sem prova antiga: só exercícios do tópico (a prova entra a partir da fase das inscrições)",
+    "base": "Sem prova antiga: exercícios e questões por tópico (a prova entra a partir da fase das inscrições)",
     "efomm": "Prova antiga da EFOMM ou da ESA, alternando (uma por semana)",
     "en": "Prova antiga da Escola Naval (CPAEN), uma por semana",
     "ita": "Prova antiga do ITA (1ª fase) e questões discursivas",
     "enem": "Prova antiga do ENEM (dia 1 e dia 2)"
   },
   "fases": {
-    "base": {
-      "nome": "Base",
-      "numero": 1,
-      "foco": "Matemática e física do básico ao intermediário, português e inglês."
+    "zero": {
+      "nome": "Base do zero",
+      "numero": 0,
+      "foco": "Matemática, Física e Química do fundamental, do zero. Cada tópico só avança com 8 acertos em 10. Nada de prova antiga ou simulado agora: só exercícios."
     },
-    "desenvolvimento": {
-      "nome": "Desenvolvimento",
-      "numero": 2,
-      "foco": "Conteúdo completo, uma prova antiga a cada 2 semanas e checklist de inscrições."
+    "base": {
+      "nome": "Ensino médio",
+      "numero": 1,
+      "foco": "Conteúdo do ensino médio com exercícios nível ENEM e depois ESA. Ainda sem simulado semanal."
     },
     "efomm": {
       "nome": "Específica EFOMM + ESA",
-      "numero": 3,
+      "numero": 2,
       "foco": "Provas antigas da EFOMM e da ESA, uma por semana. Em caso de conflito de datas, a EFOMM tem prioridade."
     },
     "en": {
       "nome": "Específica Escola Naval",
-      "numero": 4,
+      "numero": 3,
       "foco": "Provas antigas e redação no estilo da Escola Naval."
     },
     "ita": {
       "nome": "Reta final ITA",
-      "numero": 5,
+      "numero": 4,
       "foco": "Química, discursivas do ITA, redação e provas antigas."
     },
     "enem": {
       "nome": "ENEM (provas antigas)",
-      "numero": 6,
+      "numero": 5,
       "foco": "Só provas antigas do ENEM: rede de segurança para o SISU."
     }
   },
@@ -986,7 +998,7 @@
       }
     ]
   },
-  "versaoSeed": 7,
+  "versaoSeed": 8,
   "materiasInfo": {
     "Matemática": {
       "concursos": [
@@ -1051,65 +1063,65 @@
     }
   },
   "horasFase": {
-    "base": {
-      "mat": 20,
-      "fis": 14,
-      "qui": 3,
-      "por": 4,
-      "red": 2,
-      "ing": 2,
+    "zero": {
+      "mat": 24,
+      "fis": 10,
+      "qui": 5,
+      "por": 3,
+      "red": 0,
+      "ing": 1,
       "hg": 0,
-      "provas": 5
+      "provas": 0
     },
-    "desenvolvimento": {
-      "mat": 17,
-      "fis": 13,
-      "qui": 3,
+    "base": {
+      "mat": 18,
+      "fis": 12,
+      "qui": 4,
       "por": 4,
       "red": 2,
-      "ing": 2,
-      "hg": 3,
-      "provas": 6
+      "ing": 1,
+      "hg": 2,
+      "provas": 0
     },
     "efomm": {
-      "mat": 14,
-      "fis": 10,
+      "mat": 13,
+      "fis": 9,
       "qui": 2,
-      "por": 5,
+      "por": 4,
       "red": 3,
       "ing": 2,
-      "hg": 5,
-      "provas": 9
+      "hg": 4,
+      "provas": 6
     },
     "en": {
-      "mat": 15,
-      "fis": 12,
+      "mat": 13,
+      "fis": 10,
       "qui": 2,
-      "por": 5,
+      "por": 4,
       "red": 3,
       "ing": 2,
       "hg": 0,
-      "provas": 11
+      "provas": 9
     },
     "ita": {
-      "mat": 15,
-      "fis": 13,
-      "qui": 10,
+      "mat": 13,
+      "fis": 11,
+      "qui": 9,
       "por": 3,
-      "red": 3,
+      "red": 2,
       "ing": 2,
       "hg": 0,
-      "provas": 4
+      "provas": 3
     },
     "enem": {
-      "mat": 7,
-      "fis": 5,
+      "mat": 6,
+      "fis": 4,
       "qui": 2,
       "por": 2,
-      "red": 4,
+      "red": 3,
       "ing": 0,
       "hg": 0,
-      "provas": 30
+      "provas": 26
     }
   },
   "categorias": {
