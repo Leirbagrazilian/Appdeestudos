@@ -191,20 +191,37 @@ export async function protegerDados() {
     app.persistente = (await navigator.storage.persisted()) || (await navigator.storage.persist());
   } catch { app.persistente = false; }
 }
-/** Gera o backup e abre o compartilhar do sistema (Drive, WhatsApp…); sem compartilhar, baixa o arquivo. */
-export async function fazerBackup() {
+/** Backup do app. modo: 'auto' (compartilhar do sistema; sem ele, baixa o arquivo), 'baixar' ou 'copiar' (texto na área de transferência).
+ *  Qualquer falha vira um aviso claro com a saída seguinte (antes o erro sumia e parecia que o botão não fazia nada). */
+export async function fazerBackup(modo = 'auto') {
+  if (typeof modo !== 'string') modo = 'auto'; // chamado direto de um onclick
   const nome = `estuda-gabriel-backup-${app.dia}.json`;
-  const texto = montar(app);
-  const arquivo = typeof File !== 'undefined' ? new File([texto], nome, { type: 'application/json' }) : null;
+  let texto;
+  try { texto = montar(app); } catch { avisar('Não consegui montar o backup', null, 'Feche e abra o app e tente de novo.'); return false; }
+  const kb = Math.max(1, Math.round(texto.length / 1024));
+  const baixarArquivo = () => {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+    a.download = nome; a.rel = 'noopener'; a.style.display = 'none'; document.body.append(a); a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 4000);
+  };
+  let como;
   try {
-    if (arquivo && navigator.canShare?.({ files: [arquivo] })) await navigator.share({ files: [arquivo], title: 'Backup do Estuda Gabriel' });
+    if (modo === 'copiar') {
+      if (!navigator.clipboard?.writeText) throw new Error('sem área de transferência');
+      await navigator.clipboard.writeText(texto); como = `Copiado (${kb} KB). Cole numa conversa com você mesmo ou num bloco de notas.`;
+    } else if (modo === 'baixar') { baixarArquivo(); como = `Arquivo de ${kb} KB baixado. Procure em Downloads.`; }
     else {
-      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
-      a.download = nome; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      const arquivo = new File([texto], nome, { type: 'application/json' });
+      if (navigator.canShare?.({ files: [arquivo] })) { await navigator.share({ files: [arquivo], title: 'Backup do Estuda Gabriel' }); como = 'Enviado pelo compartilhar do sistema. Escolha o Drive ou mande para você mesmo.'; }
+      else { baixarArquivo(); como = `Arquivo de ${kb} KB baixado. Procure em Downloads.`; }
     }
-  } catch (e) { if (e?.name === 'AbortError') return false; throw e; }
+  } catch (e) {
+    if (e?.name === 'AbortError') return false; // você fechou o compartilhar
+    avisar('Não consegui salvar o backup', null, modo === 'copiar' ? 'Tente "Baixar arquivo".' : 'Tente "Copiar backup" e cole numa conversa com você mesmo.');
+    return false;
+  }
   app.ultimoBackup = app.dia; await db.put('kv', 'ultimoBackup', app.dia);
-  avisar('Backup feito', null, 'Guarde o arquivo no Drive ou mande para você mesmo.');
+  avisar('Backup feito', null, como);
   return true;
 }
 export async function adiarLembreteBackup() { app.lembreteAdiado = app.dia; await db.put('kv', 'lembreteAdiado', app.dia); }

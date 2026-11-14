@@ -180,7 +180,9 @@
 
 <h2>Backup e agenda</h2>
 <section class="card bloco">
-  <button class="pri" onclick={fazerBackup}>Fazer backup (salvar ou compartilhar)</button>
+  <button class="pri" onclick={() => fazerBackup('auto')}>Fazer backup (compartilhar ou salvar)</button>
+  <div class="bk3"><button class="sec" onclick={() => fazerBackup('baixar')}>Baixar arquivo</button><button class="sec" onclick={() => fazerBackup('copiar')}>Copiar backup</button></div>
+  <p class="muted">Se o compartilhar não abrir, use "Baixar arquivo" ou "Copiar backup" e cole numa conversa com você mesmo.</p>
   <p class="muted">{app.ultimoBackup ? `Último backup: ${fmtBR(app.ultimoBackup)}.` : 'Nenhum backup feito ainda.'} {app.persistente ? 'Os dados estão protegidos contra a limpeza automática do navegador.' : 'O navegador não garantiu proteção contra limpeza automática: mantenha o backup semanal.'}</p>
   <label class="sec file">Importar backup<input type="file" accept="application/json,.json" onchange={arquivo} hidden /></label>
   <button class="pri" onclick={() => baixar('estuda-gabriel.ics', gerarICS(app.cfg), 'text/calendar')}>Exportar .ics (Google Agenda)</button>
@@ -189,6 +191,7 @@
 </section>
 
 <style>
+  .bk3 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .temas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; } .temas .on { background: var(--ac); color: var(--ac-tx); border-color: var(--ac); }
   .msg { min-height: 1.5em; }
   .rot { font-weight: 600; }
