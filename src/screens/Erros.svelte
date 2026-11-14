@@ -110,7 +110,7 @@
       <p class="data">Treino concluído</p>
       <p class="grande">{treino.acertos} de {treino.ids.length}</p>
       <p>acertos nesta rodada{treino.dominados ? ` · ${treino.dominados} ${treino.dominados === 1 ? 'erro dominado' : 'erros dominados'}` : ''}.</p>
-      <p class="sub">{treino.acertos === treino.ids.length ? 'Rodada limpa. A cidade agradece.' : 'Os que você errou voltam na próxima rodada. É assim que eles somem.'}</p>
+      <p class="sub">{treino.acertos === treino.ids.length ? 'Rodada limpa. Alvos abatidos.' : 'Os que você errou voltam na próxima rodada. É assim que eles somem.'}</p>
       {#if nTreinar}<button class="pri" onclick={() => comecarTreino()}>Treinar mais {Math.min(10, nTreinar)}</button>{/if}
     </section>
   {/if}

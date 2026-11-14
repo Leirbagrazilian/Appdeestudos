@@ -3,23 +3,24 @@
   import { app, iniciar, pf } from './stores/app.svelte.js';
   import { estado, fmtRelogio } from './lib/foco.js';
   import { movimentoReduzido } from './lib/prefs.js';
-  import Enxame from './components/Enxame.svelte';
-  import Bat from './components/Bat.svelte';
+  import Esquadrilha from './components/Esquadrilha.svelte';
+  import Emblema from './components/Emblema.svelte';
   import Hoje from './screens/Hoje.svelte';
   import Semana from './screens/Semana.svelte';
-  import Calendario from './screens/Calendario.svelte';
   import Erros from './screens/Erros.svelte';
   import Mais from './screens/Mais.svelte';
-  import Simulados from './screens/Simulados.svelte';
-  import Ajustes from './screens/Ajustes.svelte';
-  import Questoes from './screens/Questoes.svelte';
-  import Foco from './screens/Foco.svelte';
-  import Trilha from './screens/Trilha.svelte';
-  import Livros from './screens/Livros.svelte';
-  import Revisao from './screens/Revisao.svelte';
-  import Progresso from './screens/Progresso.svelte';
-  import Conquistas from './screens/Conquistas.svelte';
-  import Redacao from './screens/Redacao.svelte';
+
+  // Telas menos usadas: cada uma vira um arquivo à parte, baixado só quando abre (o service worker guarda todos para o uso offline).
+  const LAZY = {
+    calendario: () => import('./screens/Calendario.svelte'), simulados: () => import('./screens/Simulados.svelte'),
+    ajustes: () => import('./screens/Ajustes.svelte'), questoes: () => import('./screens/Questoes.svelte'),
+    foco: () => import('./screens/Foco.svelte'), trilha: () => import('./screens/Trilha.svelte'),
+    livros: () => import('./screens/Livros.svelte'), revisao: () => import('./screens/Revisao.svelte'),
+    progresso: () => import('./screens/Progresso.svelte'), conquistas: () => import('./screens/Conquistas.svelte'),
+    redacao: () => import('./screens/Redacao.svelte'),
+  };
+  let telas = $state.raw({}); // id -> componente já carregado
+  const carregar = (id) => (!LAZY[id] || telas[id] ? Promise.resolve() : LAZY[id]().then((m) => { telas = { ...telas, [id]: m.default }; }, () => {}));
 
   const abas = [
     { id: 'hoje', nome: 'Hoje', d: 'M5 12.5l4.5 4.5L19 7.5' },
@@ -34,43 +35,44 @@
   const ler = () => { const r = location.hash.replace('#/', '').split('?')[0] || 'hoje'; return r === 'lacunas' ? 'trilha' : r; }; // links antigos do mapa de lacunas
   let rota = $state(ler());
 
-  function navegar() {
+  async function navegar() {
     const nova = ler();
     if (nova === rota) return;
+    await carregar(nova); // a tela chega antes da transição, que continua inteira
+    if (nova !== ler() || nova === rota) return; // você já foi para outra tela enquanto carregava
     const trocar = () => { rota = nova; scrollTo(0, 0); };
     if (!document.startViewTransition || movimentoReduzido()) return trocar();
     document.documentElement.dataset.dir = ORDEM.indexOf(nova) >= ORDEM.indexOf(rota) ? 'frente' : 'tras';
     document.startViewTransition(() => flushSync(trocar));
   }
   $effect(() => { addEventListener('hashchange', navegar); return () => removeEventListener('hashchange', navegar); });
-  $effect(() => { const t = app.cfg.tema ?? 'noir'; document.documentElement.dataset.theme = t; document.querySelector('meta[name=theme-color]')?.setAttribute('content', t === 'noir' ? '#08080b' : '#ffffff'); });
+  $effect(() => { const t = app.cfg.tema ?? 'noir'; document.documentElement.dataset.theme = t; document.querySelector('meta[name=theme-color]')?.setAttribute('content', t === 'noir' ? '#0d110c' : t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches ? '#0d110c' : '#f2efe3'); });
 
   // Relógio da barrinha do cronômetro (fora da tela Foco).
   let agora = $state(Date.now());
   $effect(() => { const i = setInterval(() => (agora = Date.now()), 1000); return () => clearInterval(i); });
   const est = $derived(app.timer ? estado(app.timer, agora) : null);
   const mostrarEnxame = $derived(pf().animacoes === 'completas');
+  carregar(rota);
   iniciar();
+  // Com o app pronto e parado, busca as outras telas em segundo plano: abrir qualquer uma fica instantâneo.
+  $effect(() => {
+    if (!app.pronto) return;
+    const ocioso = window.requestIdleCallback ?? ((f) => setTimeout(f, 1));
+    const t = setTimeout(async () => { for (const id of Object.keys(LAZY)) await new Promise((ok) => ocioso(() => carregar(id).then(ok))); }, 2500);
+    return () => clearTimeout(t);
+  });
 </script>
 
-{#if mostrarEnxame}<Enxame />{/if}
+{#if mostrarEnxame}<Esquadrilha />{/if}
 <main>
   {#if !app.pronto}
     <p class="muted">Carregando…</p>
   {:else if rota === 'hoje'}<Hoje />
-  {:else if rota === 'foco'}<Foco />
   {:else if rota === 'semana'}<Semana />
-  {:else if rota === 'calendario'}<Calendario />
   {:else if rota === 'erros'}<Erros />
-  {:else if rota === 'simulados'}<Simulados />
-  {:else if rota === 'ajustes'}<Ajustes />
-  {:else if rota === 'questoes'}<Questoes />
-  {:else if rota === 'trilha'}<Trilha />
-  {:else if rota === 'livros'}<Livros />
-  {:else if rota === 'revisao'}<Revisao />
-  {:else if rota === 'progresso'}<Progresso />
-  {:else if rota === 'conquistas'}<Conquistas />
-  {:else if rota === 'redacao'}<Redacao />
+  {:else if LAZY[rota]}
+    {#if telas[rota]}{@const Tela = telas[rota]}<Tela />{:else}<p class="muted">Carregando…</p>{/if}
   {:else}<Mais />{/if}
 </main>
 
@@ -84,8 +86,8 @@
 
 {#if app.insignia}
   <div class="insignia" role="status">
-    <span class="selo" aria-hidden="true"><Bat size={26} /></span>
-    <span><small>Insígnia desbloqueada</small><strong>{app.insignia.nome}</strong><em>{app.insignia.desc}</em></span>
+    <span class="selo" aria-hidden="true"><Emblema nome="medalha" size={30} /></span>
+    <span><small>Condecoração recebida</small><strong>{app.insignia.nome}</strong><em>{app.insignia.desc}</em></span>
   </div>
 {/if}
 
@@ -110,9 +112,10 @@
 <style>
   main { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 16px 16px calc(100px + env(safe-area-inset-bottom)); view-transition-name: tela; }
   nav { z-index: 5; position: fixed; inset: auto 0 0; display: flex; justify-content: center; background: var(--card); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); view-transition-name: nav; }
-  nav a { flex: 1; max-width: 128px; min-height: 64px; display: grid; place-items: center; align-content: center; gap: 2px; text-decoration: none; color: var(--tx2); font-size: .8125rem; font-weight: 500; }
+  nav a { position: relative; flex: 1; max-width: 128px; min-height: 64px; display: grid; place-items: center; align-content: center; gap: 2px; text-decoration: none; color: var(--tx2); font-size: .8125rem; font-weight: 500; }
   nav a svg { transition: transform .25s cubic-bezier(.3,1.6,.5,1); }
   nav a.ativa { color: var(--ac); font-weight: 700; }
+  nav a.ativa::before { content: ''; position: absolute; top: -1px; left: 50%; width: 28px; height: 3px; margin-left: -14px; border-radius: 0 0 3px 3px; background: var(--ac); }
   nav a.ativa svg { transform: translateY(-2px) scale(1.1); }
   nav svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -128,7 +131,7 @@
   .insignia span:last-child { display: grid; }
   .insignia small { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
   .insignia em { color: var(--tx2); font-size: .85rem; font-style: normal; }
-  .selo { width: 48px; height: 48px; flex: none; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 50% 40%, #f4d675, var(--ac) 70%); color: #0a0a0c; }
+  .selo { width: 48px; height: 48px; flex: none; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 50% 35%, var(--latao2), var(--latao) 72%); color: #1a1d10; }
   @keyframes desce { from { opacity: 0; transform: translate(-50%, -16px) scale(.96); } }
 
   .toast { z-index: 6; position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 8px 4px 16px; border-radius: 14px; background: var(--card); color: var(--tx); border: 1px solid var(--ac); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sobe .25s ease; view-transition-name: toast; }

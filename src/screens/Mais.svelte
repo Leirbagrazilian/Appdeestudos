@@ -45,7 +45,7 @@
     <strong>{paraTreinar}</strong><span class="sub">{paraTreinar ? 'toque para treinar' : 'nenhum pendente'}</span>
   </a>
   <a class="card c" href="#/conquistas">
-    <span class="rot">Insígnias</span>
+    <span class="rot">Condecorações</span>
     <strong>{insOk}<small> / {ins.length}</small></strong>
   </a>
   <div class="card c backup" class:atrasado={backupAtrasado}>
@@ -69,7 +69,7 @@
   <li><a href="#/revisao"><span class="t"><strong>Revisão da semana</strong><span class="sub">3 perguntas de domingo, resumo e o foco da próxima semana</span></span><Icon nome="clock" size={18} /></a></li>
   <li><a href="#/redacao"><span class="t"><strong>Redação</strong><span class="sub">Nota por competência, checklist e evolução</span></span><Icon nome="ext" size={18} /></a></li>
   <li><a href="#/trilha"><span class="t"><strong>Trilha</strong><span class="sub">Tópicos de cada matéria, seu domínio e o que estudar a seguir</span></span><Icon nome="mapa" size={18} /></a></li>
-  <li><a href="#/conquistas"><span class="t"><strong>Insígnias e capítulos</strong><span class="sub">Suas conquistas e as fases concluídas</span></span><Icon nome="trofeu" size={18} /></a></li>
+  <li><a href="#/conquistas"><span class="t"><strong>Condecorações e campanhas</strong><span class="sub">Suas medalhas e as fases concluídas</span></span><Icon nome="trofeu" size={18} /></a></li>
 </ul>
 
 <h2>Recursos</h2>

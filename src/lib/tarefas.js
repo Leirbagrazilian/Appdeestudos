@@ -45,14 +45,58 @@ export function divisaoBloco(cfg, minutos, { video, paginas }, faseId = null) {
   return { video: vv, teoria: t, questoes: Math.max(0, minutos - vv - t) };
 }
 
-/** Vídeo do tópico: o link colado para ele; senão, o primeiro vídeo/site da matéria; senão, o link que você guardou na matéria. */
+// ---------- busca automática ----------
+// Enquanto você não cola o link do tópico, o bloco já traz buscas prontas pelo nome dele (YouTube e Khan Academy).
+export const MATERIAS_BUSCA = ['Matemática', 'Física', 'Química'];
+const CANAL_BUSCA = { Matemática: ['Matemática Zero (Nerckie)', 'Matemática Zero Nerckie'], Física: ['Física Total', 'Física Total Ivys Urquiza'] };
+const consulta = (txt) => encodeURIComponent(String(txt).replace(/\s+/g, ' ').trim()).replace(/%20/g, '+');
+export const urlYouTube = (txt) => `https://www.youtube.com/results?search_query=${consulta(txt)}`;
+export const urlKhan = (txt) => `https://pt.khanacademy.org/search?page_search_query=${consulta(txt)}`;
+/** Buscas prontas do tópico: { video: [...], exercicios: [...] }, cada item { site, rotulo, url, auto: true }. Só Matemática, Física e Química. */
+export function buscasDoTopico(materia, topico) {
+  const nome = String(topico ?? '').replace(/\s+/g, ' ').trim();
+  if (!MATERIAS_BUSCA.includes(materia) || !nome) return { video: [], exercicios: [] };
+  const curto = nome.replace(/\([^)]*\)/g, ' ').replace(/[:;,]/g, ' '); // a busca do Khan acha mais com o nome enxuto
+  const item = (site, rotulo, url) => ({ site, rotulo, url, auto: true });
+  const canal = CANAL_BUSCA[materia];
+  return {
+    video: [
+      item('youtube', 'YouTube: aulas deste tópico', urlYouTube(`${nome} ${materia} aula`)),
+      ...(canal ? [item('youtube', `YouTube: ${canal[0]}`, urlYouTube(`${curto} ${canal[1]}`))] : []),
+    ],
+    exercicios: [
+      item('khan', 'Khan Academy: buscar este tópico', urlKhan(curto)),
+      item('youtube', 'YouTube: exercícios resolvidos', urlYouTube(`${nome} ${materia} exercícios resolvidos`)),
+    ],
+  };
+}
+
+/** Vídeo do tópico: o link colado para ele; senão, o primeiro vídeo/site da matéria; senão, o link que você guardou na matéria;
+ *  por último (Matemática, Física e Química), a busca automática do tópico no YouTube. */
 export function videoDe(cfg, materia, topico) {
   const l = linksDe(cfg, materia, topico).video;
   if (l) return { url: l, origem: 'topico' };
   const rec = recursosAtivos(cfg, materia).find((r) => r.tipo !== 'livro' && r.link);
   if (rec) return { url: rec.link, origem: 'recurso', rotulo: rec.titulo };
   const m = cfg.links?.[materia];
-  return m ? { url: m, origem: 'materia' } : null;
+  if (m) return { url: m, origem: 'materia' };
+  const b = buscasDoTopico(materia, topico).video[0];
+  return b ? { url: b.url, origem: 'busca', rotulo: 'Busca automática no YouTube', auto: true } : null;
+}
+/** Buscas que acompanham o passo do vídeo: só quando você não colou o vídeo do tópico (e sem repetir o link principal). */
+const buscasVideo = (video, materia, topico) => (video?.origem === 'topico' ? [] : buscasDoTopico(materia, topico).video.filter((x) => x.url !== video?.url));
+/** Buscas de exercícios: só na Fase 0 e enquanto o tópico não tem link colado (as fontes são só as do curso, ou nenhuma). */
+const buscasExercicios = (zero, fontes, materia, topico) => (zero && fontes.every((f) => f.curso) ? buscasDoTopico(materia, topico).exercicios : []);
+
+/** Links para "abrir tudo do bloco": o vídeo (ou a 1ª busca) e a 1ª lista de exercícios/questões ainda disponível, sem repetir. */
+export function linksDoBloco(tarefa) {
+  if (!tarefa || tarefa.semTopico) return [];
+  const out = [], add = (rotulo, url) => { if (url && !out.some((x) => x.url === url)) out.push({ rotulo, url }); };
+  if (tarefa.video) add('Vídeo', tarefa.video.url);
+  const q = tarefa.questoes ?? {};
+  const fonte = (q.fontes ?? []).find((f) => !f.esgotada && !f.curso) ?? q.buscas?.[0] ?? (q.fontes ?? []).find((f) => !f.esgotada);
+  if (fonte) add(fonte.rotulo, fonte.url);
+  return out;
 }
 
 const rotuloLivro = (r, v) => `${r.titulo}${r.volume ? ` v.${r.volume}` : ''}${v.cap ? `, cap. ${v.cap}` : ''}`;
@@ -81,7 +125,7 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
       const comCota = fontes.filter((f) => f.limite != null), cotaEsgotada = comCota.length > 0 && comCota.every((f) => f.esgotada);
       out[b.id] = { materia, topico: t.nome, concursos: t.concursos, min: b.min, partes: { video: 0, teoria: 0, questoes: b.min }, video: null, paginas: null, exercicios: null,
         concluidoLivro: false, temLivro: false, semPaginas: false, vinculoId: null,
-        questoes: { n: b.questoes ?? QUESTOES_DIA_MINIMO, min: b.min, fontes, semLinks: fontes.length === 0, cotaEsgotada, alternativa: cotaEsgotada ? (fontes.some((f) => f.limite == null) ? 'pdf' : 'livro') : null } };
+        questoes: { n: b.questoes ?? QUESTOES_DIA_MINIMO, min: b.min, fontes, buscas: buscasExercicios(zero, fontes, materia, t.nome), semLinks: fontes.length === 0, cotaEsgotada, alternativa: cotaEsgotada ? (fontes.some((f) => f.limite == null) ? 'pdf' : 'livro') : null } };
       continue;
     }
 
@@ -113,14 +157,14 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
     const cotaEsgotada = comCota.length > 0 && comCota.every((f) => f.esgotada);
     out[b.id] = {
       materia, topico: t.nome, concursos: t.concursos, min: b.min, partes: div,
-      video: video && div.video ? { ...video, min: div.video } : null,
+      video: video && div.video ? { ...video, min: div.video, buscas: buscasVideo(video, materia, t.nome) } : null,
       paginas, exercicios, concluidoLivro,
       temLivro: recursosAtivos(cfg, materia).some((r) => r.tipo === 'livro'),
       semPaginas: !usaPaginas && !concluidoLivro,
       zero, ...(zero ? dominioDoTopico(ctx.dominio, materia, t.nome) : {}),
       vinculoId: v?.id ?? null,
       questoes: {
-        n: nQ, min: div.questoes, fontes,
+        n: nQ, min: div.questoes, fontes, buscas: buscasExercicios(zero, fontes, materia, t.nome),
         semLinks: fontes.length === 0,
         cotaEsgotada,
         // acabou a cota grátis do dia: sugere a prova em PDF (se você colou o link) ou os exercícios do livro

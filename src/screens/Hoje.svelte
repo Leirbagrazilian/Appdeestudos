@@ -1,7 +1,7 @@
 <script>
   import { slide } from 'svelte/transition';
   import { app, fases, ajustes, fazerBackup, adiarLembreteBackup, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, verCapitulo } from '../stores/app.svelte.js';
-  import { blocosAjustados } from '../lib/planner.js';
+  import { blocosDaSemana } from '../lib/planner.js';
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
   import { diaNome, fmtCurta, fmtBR, fmtMin, addDays, startOfWeek, diffDays } from '../lib/dates.js';
@@ -18,18 +18,23 @@
   import { semanaZero } from '../lib/trilha.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
-  import Sinal from '../components/Sinal.svelte';
-  import Enxame from '../components/Enxame.svelte';
-  import Skyline from '../components/Skyline.svelte';
+  import Farol from '../components/Farol.svelte';
+  import Esquadrilha from '../components/Esquadrilha.svelte';
+  import Base from '../components/Base.svelte';
+  import Emblema from '../components/Emblema.svelte';
+  import { fraseDoDia } from '../lib/frases.js';
 
   const REV_MIN = 10;
   let aberto = $state(null), assuntos = $state({}), verCarta = $state(false), fotoAberta = $state(null);
   let hora = $state(new Date().getHours());
   $effect(() => { const i = setInterval(() => (hora = new Date().getHours()), 60000); return () => clearInterval(i); });
 
+  const EMB = { en: 'en', efomm: 'efomm', esa: 'esa', ita: 'ita', ime: 'ime' }; // emblema do concurso na contagem regressiva
   const fs = $derived(fases());
   const fase = $derived(faseDoDia(fs, app.dia));
-  const blocos = $derived(blocosAjustados(app.cfg, fs, app.dia, ajustes()));
+  // a semana é montada uma vez (e não a cada bloco marcado): serve à lista de hoje e à cidade
+  const semana = $derived(blocosDaSemana(app.cfg, fs, startOfWeek(app.dia), ajustes()));
+  const blocos = $derived(semana[diffDays(startOfWeek(app.dia), app.dia)]);
   // tarefa exata de cada bloco de estudo: tópico da Trilha, vídeo, páginas, exercícios e questões
   const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id, dominio: app.dominio }));
   const bRegistro = $derived(app.registroAberto ? blocos.find((x) => x.id === app.registroAberto.id) : null);
@@ -54,14 +59,14 @@
   const pct = $derived(totalMin ? feitoMin / totalMin : 0);
   $effect(() => { if (pct >= 1 && blocos.length) marcarCumprido(app.dia); });
 
-  // A cidade da semana: uma janela por bloco planejado, acesa quando concluído.
-  const cidade = $derived.by(() => {
-    const ini = startOfWeek(app.dia); let total = 0, acesas = 0;
-    for (let i = 0; i < 7; i++) for (const b of blocosAjustados(app.cfg, fs, addDays(ini, i), ajustes())) { total++; if (app.done[b.id]) acesas++; }
+  // A base da semana: uma luz por bloco planejado, acesa quando concluído.
+  const base = $derived.by(() => {
+    let total = 0, acesas = 0;
+    for (const lista of semana) for (const b of lista) { total++; if (app.done[b.id]) acesas++; }
     return { total, acesas };
   });
 
-  // Capítulo: quando uma fase termina, mostra o resumo dela uma vez.
+  // Campanha: quando uma fase termina, mostra o resumo dela uma vez.
   const capitulo = $derived.by(() => {
     const f = fs.find((x) => x.fim < app.dia && x.inicio <= app.dia && !app.vistos.capitulos[x.id]);
     if (!f || !Object.keys(app.done).length) return null;
@@ -80,14 +85,9 @@
   const noite = $derived(hora >= 18 || hora < 6);
   const tarde = $derived(hora >= 22 || hora < 4);
   const mostrarCarta = $derived(verCarta || (app.cfg.carta && (dificil || (hora >= 19 && pct < 0.3))));
-  const FRASES = [
-    'A cidade dorme. Você estuda.', 'Seja o sinal na escuridão: estude hoje.', 'A noite pertence a quem não desiste.',
-    'Medo é combustível. Transforme em questão resolvida.', 'Nem herói nasce pronto: treina todo dia.',
-    'Hoje você vira a versão que a prova vai respeitar.', 'Os vilões da prova têm nome: lacuna, pressa e distração.',
-    'Cada bloco marcado é uma janela acesa na cidade.', 'Disciplina é o seu maior gadget.', 'Quem aparece todo dia não precisa de sorte.',
-    'Respeito se constrói em silêncio, bloco a bloco.', 'A aprovação é uma missão de longo prazo. Hoje é só mais uma etapa.',
-    'Treine como quem vai ser chamado ao amanhecer.', 'Pequenas vitórias, todos os dias, constroem um império.'];
-  const frase = $derived(dificil ? 'O dia mínimo também conta. Faça as questões e descanse.' : FRASES[diffDays('2026-11-09', app.dia) % FRASES.length]);
+  // Frase por contexto (noite, dia cumprido, dia mínimo, bloco feito, prova próxima, domingo, início), estável ao longo do dia.
+  const feitos = $derived(blocos.filter((b) => app.done[b.id]).length);
+  const frase = $derived(fraseDoDia(app.cfg.frases, { hora, pct, feitos, dificil, diaSemana: new Date(app.dia + 'T12:00').getDay(), diasProva: prox?.dias ?? null }, app.dia) || 'Disciplina hoje, farda amanhã.');
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
@@ -99,24 +99,25 @@
 </script>
 
 <header>
-  <Skyline total={cidade.total} acesas={cidade.acesas} /><Sinal {pct} {noite} />{#if pct >= 1}<Enxame festa />{/if}
+  <Farol {pct} {noite} />{#if pct >= 1}<Esquadrilha festa />{/if}
   <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
-  <h1>{pct >= 1 ? 'Missão cumprida.' : `Bora, ${app.cfg.perfil.nome}.`}</h1>
+  <h1>{pct >= 1 ? 'Missão cumprida.' : `Avante, ${app.cfg.perfil.nome}.`}</h1>
   <p class="frase">{frase}</p>
   <p class="fase">Fase {fase.numero} · {fase.nome}<span> · semana {semanaDaFase(fase, app.dia)}/{totalSemanas(fase)}</span></p>
-  <p class="luzes"><span class="ponto" aria-hidden="true"></span>Cidade da semana: <strong>{cidade.acesas}</strong> de {cidade.total} luzes acesas</p>
+  <Base total={base.total} acesas={base.acesas} {noite} />
+  <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
 </header>
 
 {#if capitulo}
-  <section class="card cap entra" aria-label="Capítulo concluído">
-    <p class="data">Capítulo concluído</p>
+  <section class="card cap entra" aria-label="Campanha concluída">
+    <p class="data">Campanha concluída</p>
     <h2 class="capt">Fase {capitulo.f.numero} · {capitulo.f.nome}</h2>
     <ul class="nums">
       <li><strong>{capitulo.horas}h</strong>de estudo</li><li><strong>{capitulo.blocos}</strong>blocos</li>
       <li><strong>{capitulo.questoes}</strong>questões</li><li><strong>{capitulo.erros}</strong>erros registrados</li>
     </ul>
-    <p class="sub">Próximo capítulo: {fase.nome}. {fase.foco}</p>
-    <button class="pri" onclick={() => verCapitulo(capitulo.f.id)}>Seguir para o próximo capítulo</button>
+    <p class="sub">Próxima campanha: {fase.nome}. {fase.foco}</p>
+    <button class="pri" onclick={() => verCapitulo(capitulo.f.id)}>Seguir para a próxima campanha</button>
   </section>
 {/if}
 
@@ -125,6 +126,7 @@
     <span class="num">{prox.dias}</span>
     <span class="lbl"><strong>dias para {prox.concurso.nome}{prox.evento.nome ? ` · ${prox.evento.nome}` : ''}</strong>
       <span>{fmtBR(prox.evento.inicio)} · {prox.evento.status}</span></span>
+    <span class="emb" aria-hidden="true"><Emblema nome={EMB[prox.concurso.id] ?? 'estrela'} size={40} /></span>
   </a>
 {/if}
 
@@ -144,7 +146,7 @@
   <p class="foco-sem"><span class="data">Foco da semana</span>{focoSemana.foco}</p>
 {/if}
 {#each travados as x (x.materia + x.topico)}
-  <a class="nota" href="#/trilha"><Icon nome="clock" />Travado: {x.materia} · {x.topico}. Peça ajuda e destrave na Trilha.</a>
+  <a class="nota alerta" href="#/trilha"><Icon nome="clock" />Travado: {x.materia} · {x.topico}. Peça ajuda e destrave na Trilha.</a>
 {/each}
 {#if cpPendente}
   <a class="nota" href="#/progresso"><Icon nome="clock" />Checkpoint do mês: 10 questões de Matemática da EFOMM em 30 min.</a>
@@ -159,11 +161,11 @@
   </div>
 {/if}
 {#if conflito}
-  <a class="nota" href="#/calendario"><Icon nome="clock" />{conflito.a.sigla} e {conflito.b.sigla} caem {conflito.de === conflito.ate ? `em ${fmtBR(conflito.de)}` : `de ${fmtBR(conflito.de)} a ${fmtBR(conflito.ate)}`}. Prioridade: {conflito.vence.sigla}.</a>
+  <a class="nota alerta" href="#/calendario"><Icon nome="clock" />{conflito.a.sigla} e {conflito.b.sigla} caem {conflito.de === conflito.ate ? `em ${fmtBR(conflito.de)}` : `de ${fmtBR(conflito.de)} a ${fmtBR(conflito.ate)}`}. Prioridade: {conflito.vence.sigla}.</a>
 {/if}
 {#if tarde}<p class="nota"><Icon nome="moon" />Já passou das 22h. Feche o caderno: dormir bem fixa o que você estudou hoje.</p>{/if}
 {#each alertas as a}
-  <a class="nota" href="#/calendario"><Icon nome="clock" />Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`}</a>
+  <a class="nota alerta" href="#/calendario"><Icon nome="clock" />Inscrição {a.concurso.nome} fecha {a.dias === 0 ? 'hoje' : a.dias === 1 ? 'amanhã' : `em ${a.dias} dias`}</a>
 {/each}
 {#if diag}
   <details class="nota">
@@ -265,33 +267,36 @@
 </p>
 
 <style>
-  header { padding: 20px 4px 28px; position: relative; }
-  header > :global(*:not(.sk):not(.sinal):not(.enxame)) { position: relative; }
-  .data { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
-  h1 { margin-top: 4px; font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; }
-  .frase { margin-top: 6px; color: var(--ac2); font-style: italic; font-size: .95rem; max-width: 30ch; }
+  header { padding: 20px 4px 18px; position: relative; }
+  header > :global(*:not(.farol):not(.esquadrilha)) { position: relative; }
+  .data { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
+  h1 { margin-top: 4px; font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; max-width: calc(100% - 104px); }
+  .frase { margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--ac); color: var(--tx); font-size: .95rem; line-height: 1.4; max-width: min(32ch, calc(100% - 112px)); min-height: 2.8em; text-wrap: pretty; }
   .fase { margin-top: 14px; display: inline-block; background: var(--bg); padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; font-size: .8125rem; font-weight: 600; color: var(--ac); }
   .fase span { color: var(--tx2); font-weight: 400; }
-  .luzes { margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: .8125rem; color: var(--tx2); }
+  .luzes { margin-top: 10px; display: flex; align-items: center; gap: 8px; font-size: .8125rem; color: var(--tx2); }
   .luzes strong { color: var(--ac); }
-  .ponto { width: 8px; height: 8px; border-radius: 2px; background: var(--ac); box-shadow: 0 0 6px var(--ac); }
+  .luzes strong { font-variant-numeric: tabular-nums; }
+  .ponto { width: 8px; height: 8px; border-radius: 2px; background: var(--luz); box-shadow: 0 0 6px var(--brilho); border: 1px solid var(--sil2); }
   .cap { padding: 16px; display: grid; gap: 10px; margin-bottom: 12px; border-color: var(--ac); }
   .capt { margin: 0; font-size: 1.2rem; text-transform: none; letter-spacing: -.01em; color: var(--tx); }
   .nums { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .nums li { display: grid; font-size: .85rem; color: var(--tx2); } .nums strong { font-size: 1.4rem; color: var(--ac); }
   .prova { display: flex; align-items: center; gap: 16px; padding: 12px 4px; text-decoration: none; color: inherit; min-height: 64px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .num { font-size: 2.6rem; font-weight: 300; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 3.2ch; text-align: right; color: var(--ac); }
+  .emb { margin-left: auto; color: var(--ac); flex: none; display: grid; }
   .lbl { display: grid; font-size: .85rem; color: var(--tx2); border-left: 3px solid var(--c); padding-left: 12px; }
   .lbl strong { color: var(--tx); font-size: .95rem; font-weight: 600; }
   .prog { padding: 20px 4px 8px; }
   .topo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; color: var(--tx2); font-size: .85rem; font-variant-numeric: tabular-nums; }
   .topo strong { color: var(--ac); font-size: 1.4rem; font-weight: 600; }
   .bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
-  .bar i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); box-shadow: 0 0 10px var(--ac); }
+  .bar i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); box-shadow: 0 0 10px var(--brilho); }
   .dif { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: .85rem; color: var(--warn); }
   .dif-bt { margin-top: 6px; min-height: 44px; font-size: .85rem; }
   .lk { color: var(--ac); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
   .nota { display: block; margin-top: 12px; padding: 12px 16px; border-radius: 14px; background: var(--warn-bg); color: var(--warn); font-size: .9rem; text-decoration: none; font-weight: 500; }
+  .nota.alerta { background: var(--al-bg); color: var(--al); box-shadow: inset 3px 0 0 var(--al); }
   .nota :global(svg), summary :global(svg) { vertical-align: -3px; margin-right: 8px; }
   .nota summary { cursor: pointer; font-weight: 600; min-height: 24px; }
   .nota p, .nota ol { margin: 8px 0 0; color: var(--tx); } .nota ol { padding-left: 20px; }
@@ -327,9 +332,8 @@
   .mini { min-height: 44px; flex: none; font-size: .85rem; }
   .notas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 4px 10px 48px; }
   .nt { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); font-size: .85rem; font-weight: 600; }
-  .nt.dificil { color: #ff8a8a; border-color: color-mix(in srgb, #ff6b6b 45%, var(--line)); }
+  .nt.dificil { color: var(--al); border-color: color-mix(in srgb, var(--al) 45%, var(--line)); }
   .nt.facil { color: var(--ac); border-color: color-mix(in srgb, var(--ac) 45%, var(--line)); }
-  :global(:root[data-theme=claro]) .nt.dificil, :global(:root[data-theme=auto]) .nt.dificil { color: #b42318; }
   .mini-foto { width: 44px; height: 44px; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
   .mini-foto img { width: 100%; height: 100%; object-fit: cover; }
   .foto { display: block; width: calc(100% - 48px); margin: 0 0 12px 48px; border-radius: 12px; }

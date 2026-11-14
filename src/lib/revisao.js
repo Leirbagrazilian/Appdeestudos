@@ -15,7 +15,8 @@ export function resumoSemana(cfg, fases, ctx, seg) {
   const dentro = (d) => d && d >= seg && d <= fim;
   const adiados = ctx.adiados ?? {};
   let planMin = 0;
-  for (const d of dias) planMin += blocosAjustados(cfg, fases, d, { adiados, exams: ctx.exams ?? {} }).reduce((a, b) => a + b.min, 0);
+  const planos = new Map(); // a semana é montada uma vez para os 7 dias
+  for (const d of dias) planMin += blocosAjustados(cfg, fases, d, { adiados, exams: ctx.exams ?? {}, planos }).reduce((a, b) => a + b.min, 0);
   let feitoMin = 0, feitas = 0, acertos = 0;
   const porMateria = {};
   for (const [k, v] of Object.entries(ctx.done ?? {})) {

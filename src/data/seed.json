@@ -48,7 +48,7 @@
         "max": 22,
         "texto": "23 anos incompletos em 1º de janeiro do ano da matrícula."
       },
-      "link": "https://www.marinha.mil.br/ciaga",
+      "link": "https://www.marinha.mil.br/ciaga/efommadmissao",
       "eventos": [
         {
           "tipo": "inscricao",
@@ -677,8 +677,8 @@
       "nome": "EFOMM",
       "oficial": [
         {
-          "nome": "Site do CIAGA",
-          "url": "https://www.marinha.mil.br/ciaga"
+          "nome": "CIAGA: EFOMM - Admissão (editais e provas)",
+          "url": "https://www.marinha.mil.br/ciaga/efommadmissao"
         }
       ],
       "terceiros": [
@@ -1797,7 +1797,94 @@
       }
     ]
   },
-  "versaoSeed": 8,
+  "versaoSeed": 9,
+  "frases": {
+    "inicio": [
+      "Sua família vai se orgulhar do homem que você está construindo hoje.",
+      "Um dia você vai vestir a farda. Hoje você a costura, bloco a bloco.",
+      "Sua mãe vai chorar de orgulho na formatura. Comece o dia por ela.",
+      "Seus futuros filhos agradecem cada hora de hoje.",
+      "O suor no estudo poupa sangue no campo.",
+      "Disciplina é fazer o que precisa ser feito, mesmo sem vontade.",
+      "Ninguém nasce oficial. Oficial se forma, um dia de cada vez.",
+      "Quem quer servir à Pátria começa servindo à própria rotina.",
+      "A vaga tem dono. Trabalhe para que o nome seja o seu.",
+      "Sua família vai estar protegida porque você não fugiu do dever hoje.",
+      "Alvorada. O concorrente ainda dorme e você já está de pé.",
+      "Honra não se promete, se pratica. Primeiro bloco, agora.",
+      "O juramento que você vai fazer um dia começa a valer hoje.",
+      "Hoje ninguém vê o seu esforço. Na formatura, todos vão ver o resultado.",
+      "Missão dada é missão cumprida. A de hoje está logo abaixo.",
+      "Você não está só estudando: está mudando a história da sua família.",
+      "Constância vence o talento que falta ao serviço.",
+      "Cada questão resolvida é um degrau a menos até o portão da Escola Naval."
+    ],
+    "bloco": [
+      "Bloco cumprido. É assim que se conquista terreno.",
+      "Mais uma luz acesa na base. Siga para a próxima.",
+      "Bom trabalho, guerreiro. Beba água e volte ao posto.",
+      "Isso é disciplina: fazer, registrar e seguir.",
+      "Você de farda, lá na frente, agradece o que acabou de ser feito.",
+      "Um bloco por vez. É assim que se atravessa um oceano.",
+      "O dever de agora está cumprido. Mantenha o ritmo.",
+      "Sua família ainda não sabe, mas hoje você lutou por ela.",
+      "Terreno conquistado não se devolve. Próximo objetivo.",
+      "Sem alarde: você fez o que disse que faria.",
+      "Cada bloco feito é uma promessa cumprida a você mesmo.",
+      "Avançou. Quem avança todo dia chega."
+    ],
+    "dificil": [
+      "Dia difícil também é dia de serviço. Cumpra o mínimo e mantenha a posição.",
+      "Recuar para reorganizar não é desistir. Faça o mínimo com honra.",
+      "Nem toda batalha é de avanço. Hoje a missão é não abandonar o posto.",
+      "O soldado cansado que cumpre o mínimo vale mais que o descansado que falta.",
+      "Quarenta e cinco minutos hoje protegem semanas de trabalho.",
+      "Sua família não precisa que você seja perfeito. Precisa que você não desista.",
+      "Dia ruim passa. O hábito fica.",
+      "Manter a linha em dia difícil separa quem chega de quem só tentou."
+    ],
+    "domingo": [
+      "Domingo é dia de manutenção: revise o equipamento antes da próxima marcha.",
+      "Quem revisa não é pego de surpresa. Confira a semana.",
+      "Tropa descansada rende mais. Revise, planeje e respire.",
+      "Olhe para a semana com honestidade: o que funcionou, o que falhou, o que muda.",
+      "Um bom comandante estuda o mapa antes de a semana começar.",
+      "Aproveite a família hoje. É por ela que a próxima semana existe.",
+      "Revisão é o que transforma esforço em aprovação.",
+      "Arrume o material, ajuste o plano e durma cedo. Segunda tem alvorada."
+    ],
+    "noite": [
+      "Toque de silêncio. Dormir também faz parte da missão.",
+      "Soldado sem sono erra o alvo. Feche o caderno e descanse.",
+      "O dia de serviço acabou. Amanhã você rende mais se dormir agora.",
+      "Descansar é disciplina. Recolher.",
+      "A memória trabalha enquanto você dorme. Deixe que ela faça a parte dela.",
+      "Quem dorme bem acorda pronto para o combate. Boa noite, guerreiro.",
+      "Nenhuma questão das 23h vale o bloco perdido de amanhã cedo."
+    ],
+    "prova": [
+      "A prova está perto. Treine como vai combater: tempo marcado, sem consulta.",
+      "Reta final. Agora é revisar erro, não abrir assunto novo.",
+      "Você treinou para esse dia. Confie no que construiu.",
+      "Perto da prova, calma é arma. Rotina, sono e questões.",
+      "Faltam poucos dias. Sua família já se orgulha de você ter chegado até aqui.",
+      "Soldado preparado não teme a inspeção.",
+      "Os últimos dias são de ajuste fino. Caderno de erros na mão.",
+      "No dia da prova, você só vai repetir o que fez aqui todos os dias."
+    ],
+    "cumprido": [
+      "Missão cumprida. Sua família pode se orgulhar do dia de hoje.",
+      "Dia inteiro cumprido. É assim que se veste uma farda.",
+      "Base toda acesa. Descanse com a consciência tranquila.",
+      "Você honrou a palavra que deu a si mesmo. Dispensado por hoje.",
+      "Cem por cento. O sacrifício de hoje é a conquista de amanhã.",
+      "Serviço encerrado. Seus futuros filhos agradecem.",
+      "Hoje você foi o homem que quer ser. Repita amanhã.",
+      "Dia vencido. Sua mãe ainda vai contar essa história com orgulho.",
+      "Dever cumprido. Poucos fazem o que você fez hoje.",
+      "Tudo feito. Recolher, descansar e voltar amanhã."
+    ]
+  },
   "materiasInfo": {
     "Matemática": {
       "concursos": [
@@ -2341,22 +2428,22 @@
         "materia": "Matemática",
         "titulo": "Khan Academy (Matemática 6º ao 9º ano)",
         "autor": "Khan Academy",
-        "link": "https://pt.khanacademy.org/math",
+        "link": "https://pt.khanacademy.org/math/brazil-math-grades",
         "linkStatus": "visto na busca",
         "volume": "",
         "assunto": "Vídeos e exercícios por habilidade, com \"dominado\" e testes de unidade",
-        "obs": "Domínio pt.khanacademy.org visto na busca; confira o caminho dos cursos de cada ano."
+        "obs": "Página \"Matemática por ano\" vista na busca. Cursos vistos: /math/6-ano-matematica, /math/pt-8-ano e /math/pt-9-ano; o do 7º ano não apareceu (entre pela página por ano)."
       },
       {
         "id": "quim-intro",
         "tipo": "video",
         "materia": "Química",
-        "titulo": "Vídeos introdutórios de Química",
-        "autor": "",
-        "link": "",
-        "linkStatus": "a confirmar",
+        "titulo": "Khan Academy · Química (Ensino Médio)",
+        "autor": "Khan Academy",
+        "link": "https://pt.khanacademy.org/science/quimica-ensino-medio",
+        "linkStatus": "visto na busca",
         "volume": "",
-        "assunto": "Matéria, átomo, tabela periódica, ligações e mol (cole o link da sua playlist)"
+        "assunto": "Matéria, átomo, tabela periódica, ligações e mol: vídeos e exercícios (troque pelo link da sua playlist se preferir)"
       }
     ],
     "vinculos": [
@@ -3141,8 +3228,8 @@
       "Matemática": [
         {
           "site": "khan",
-          "rotulo": "Khan Academy · Matemática (6º ao 9º ano)",
-          "url": "https://pt.khanacademy.org/math"
+          "rotulo": "Khan Academy · Matemática por ano (6º ao 9º)",
+          "url": "https://pt.khanacademy.org/math/brazil-math-grades"
         },
         {
           "site": "obmep",
@@ -3153,22 +3240,27 @@
       "Física": [
         {
           "site": "khan",
-          "rotulo": "Khan Academy · Física",
-          "url": "https://pt.khanacademy.org/"
+          "rotulo": "Khan Academy · Biblioteca de Física",
+          "url": "https://pt.khanacademy.org/science/physics"
         }
       ],
       "Química": [
         {
           "site": "khan",
-          "rotulo": "Khan Academy · Química",
-          "url": "https://pt.khanacademy.org/"
+          "rotulo": "Khan Academy · Química (Ensino Médio)",
+          "url": "https://pt.khanacademy.org/science/quimica-ensino-medio"
         }
       ],
       "Português": [
         {
           "site": "khan",
-          "rotulo": "Khan Academy · Português",
-          "url": "https://pt.khanacademy.org/"
+          "rotulo": "Khan Academy · Português 6º ano (classes de palavras, concordância)",
+          "url": "https://pt.khanacademy.org/humanities/portugues-6-ano"
+        },
+        {
+          "site": "khan",
+          "rotulo": "Khan Academy · Português 7º ano (sujeito, predicado, vírgula)",
+          "url": "https://pt.khanacademy.org/humanities/portugues-7-ano"
         }
       ],
       "Inglês": []

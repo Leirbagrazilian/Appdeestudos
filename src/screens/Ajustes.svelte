@@ -57,7 +57,7 @@
   <div class="temas" role="radiogroup" aria-label="Animações">
     {#each OPCOES.animacoes as [id, nome]}<button role="radio" aria-checked={pf().animacoes === id} class:on={pf().animacoes === id} onclick={() => setPref('animacoes', id)}>{nome}</button>{/each}
   </div>
-  <p class="muted">Discretas tira os morcegos voando e os efeitos contínuos. Nenhuma desliga tudo.</p>
+  <p class="muted">Discretas tira as silhuetas à deriva e os efeitos contínuos. Nenhuma desliga tudo.</p>
   <span class="rot">Tamanho do texto</span>
   <div class="temas" role="radiogroup" aria-label="Tamanho do texto">
     {#each OPCOES.texto as [id, nome]}<button role="radio" aria-checked={pf().texto === id} class:on={pf().texto === id} onclick={() => setPref('texto', id)}>{nome}</button>{/each}
@@ -84,7 +84,7 @@
 <h2>Tema</h2>
 <section class="card bloco">
   <div class="temas" role="radiogroup" aria-label="Tema">
-    {#each [['noir', 'Noir'], ['claro', 'Claro'], ['auto', 'Automático']] as [id, nome]}
+    {#each [['noir', 'Militar'], ['claro', 'Claro'], ['auto', 'Automático']] as [id, nome]}
       <button role="radio" aria-checked={(app.cfg.tema ?? 'noir') === id} class:on={(app.cfg.tema ?? 'noir') === id} onclick={() => { app.cfg.tema = id; salvar(); }}>{nome}</button>
     {/each}
   </div>

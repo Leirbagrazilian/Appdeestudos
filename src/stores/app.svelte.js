@@ -31,7 +31,12 @@ export const pf = () => prefs(app.cfg);
 const snap = (v) => $state.snapshot(v);
 
 export async function iniciar() {
-  const salvo = await db.get('kv', 'config');
+  // Tudo que está no aparelho é lido de uma vez, em paralelo (antes era uma leitura depois da outra).
+  const chaves = Object.keys(EXTRAS);
+  const [salvo, done, reviews, errors, exams, timer, ultimoBackup, lembreteAdiado, ...extras] = await Promise.all([
+    db.get('kv', 'config'), db.all('done'), db.all('reviews'), db.all('errors'), db.all('exams'),
+    db.get('kv', 'timer'), db.get('kv', 'ultimoBackup'), db.get('kv', 'lembreteAdiado'), ...chaves.map((k) => db.get('kv', k)),
+  ]);
   let antes = seed.versaoSeed ?? 1;
   if (salvo) {
     antes = salvo.versaoSeed ?? 1;
@@ -39,15 +44,12 @@ export async function iniciar() {
     if ((app.cfg.versaoSeed ?? 1) !== antes) await db.put('kv', 'config', snap(app.cfg));
   }
   aplicarPrefs(pf());
-  app.done = await db.all('done');
-  app.reviews = await db.all('reviews');
-  app.errors = await db.all('errors');
-  app.exams = await db.all('exams');
-  for (const k of Object.keys(EXTRAS)) app[k] = (await db.get('kv', k)) ?? structuredClone(EXTRAS[k]);
+  Object.assign(app, { done, reviews, errors, exams });
+  chaves.forEach((k, i) => { app[k] = extras[i] ?? structuredClone(EXTRAS[k]); });
   if (antes < 3) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); } // notas do mapa de lacunas antigo
-  app.timer = (await db.get('kv', 'timer')) ?? null;
-  app.ultimoBackup = (await db.get('kv', 'ultimoBackup')) ?? null;
-  app.lembreteAdiado = (await db.get('kv', 'lembreteAdiado')) ?? null;
+  app.timer = timer ?? null;
+  app.ultimoBackup = ultimoBackup ?? null;
+  app.lembreteAdiado = lembreteAdiado ?? null;
   protegerDados();
   // Primeira vez com insígnias: as já conquistadas entram como vistas, sem enxurrada de avisos.
   if (!Object.keys(app.vistos.conquistas).length) { for (const c of conquistas(dadosConquistas())) if (c.ok) app.vistos.conquistas[c.id] = true; await salvarKV('vistos'); }
@@ -61,7 +63,7 @@ export async function salvarCfg() { aplicarPrefs(pf()); await db.put('kv', 'conf
 export const salvarKV = (k) => db.put('kv', k, snap(app[k]));
 
 let timerToast;
-const ELOGIOS = ['Mais um morcego no céu.', 'A cidade está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.', 'Uma janela a mais acesa na cidade.'];
+const ELOGIOS = ['Mais um bloco cumprido.', 'A base está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.', 'Uma luz a mais acesa na base.'];
 export function avisar(msg, desfazer, sub, acao = null) {
   clearTimeout(timerToast);
   app.toast = { msg, desfazer, acao, sub: sub ?? ELOGIOS[Math.floor(Math.random() * ELOGIOS.length)] };
@@ -355,7 +357,7 @@ export async function checarConquistas() {
   for (const c of novas) app.vistos.conquistas[c.id] = true;
   await salvarKV('vistos');
   clearTimeout(timerInsignia);
-  app.insignia = novas.length === 1 ? novas[0] : { nome: `${novas.length} insígnias novas`, desc: novas.map((c) => c.nome).join(' · ') };
+  app.insignia = novas.length === 1 ? novas[0] : { nome: `${novas.length} condecorações novas`, desc: novas.map((c) => c.nome).join(' · ') };
   timerInsignia = setTimeout(() => (app.insignia = null), 5000);
 }
 export const listaConquistas = () => conquistas(dadosConquistas());

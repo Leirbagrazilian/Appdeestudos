@@ -4,7 +4,7 @@
   import { vibrar } from '../lib/prefs.js';
   import { sino, ambiente, ambienteLigado } from '../lib/audio.js';
   import Icon from '../components/Icon.svelte';
-  import Bat from '../components/Bat.svelte';
+  import Emblema from '../components/Emblema.svelte';
   import Tarefa from '../components/Tarefa.svelte';
   import Chips from '../components/Chips.svelte';
   import { limitesCota } from '../lib/tarefas.js';
@@ -79,7 +79,7 @@
         <span class="tempo">{est.acabou ? 'Tempo!' : fmtRelogio(est.restante)}</span>
         <span class="fase">{t.fase === 'pausa' ? 'pausa' : 'foco'}</span>
       </div>
-      {#if est.acabou}<span class="bat-fim" aria-hidden="true"><Bat size={36} /></span>{/if}
+      {#if est.acabou}<span class="fim-emb" aria-hidden="true"><Emblema nome="estrela" size={34} /></span>{/if}
     </div>
   {/if}
 
@@ -155,8 +155,8 @@
   .tempo { font-size: clamp(2.4rem, 12vw, 3.4rem); font-weight: 300; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
   .fase { color: var(--tx2); text-transform: uppercase; letter-spacing: .14em; font-size: .8125rem; }
   .acabou .tempo { color: var(--ac); font-weight: 600; }
-  .bat-fim { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); color: var(--ac); animation: voa 1.6s ease-in-out infinite alternate; }
-  @keyframes voa { to { transform: translate(-50%, -8px) scaleY(.8); } }
+  .fim-emb { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); color: var(--ac); animation: voa 1.6s ease-in-out infinite alternate; }
+  @keyframes voa { to { transform: translate(-50%, -8px); } }
   .aviso { text-align: center; color: var(--ac); font-weight: 600; margin-bottom: 12px; }
   .bloco { display: flex; width: 100%; margin-top: 10px; }
   .pri, .sec { min-height: 52px; border-radius: 14px; font-weight: 700; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 0 16px; text-align: center; }

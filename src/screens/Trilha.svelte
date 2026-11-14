@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition';
   import { app, setLacuna, salvarCfg, fases, destravarTopico } from '../stores/app.svelte.js';
   import { dur } from '../lib/prefs.js';
-  import { linksDe, acertoPorTopico } from '../lib/tarefas.js';
+  import { linksDe, acertoPorTopico, buscasDoTopico } from '../lib/tarefas.js';
   import { coberturaPaginas } from '../lib/livros.js';
   import Chips from '../components/Chips.svelte';
   import Ring from '../components/Ring.svelte';
@@ -112,7 +112,7 @@
       <span class="m">{p.m}</span><span class="tp">{p.t.nome}</span>
       <span class="cs">{#each p.t.concursos as id}<i style="--c:{cor(id)}" title={sigla(id)}></i>{/each}<small>{p.t.concursos.length}</small><span class="sr"> concursos</span></span>
     </button></li>
-  {:else}<li class="vazio sub">Tudo dominado. A cidade está em ordem.</li>{/each}
+  {:else}<li class="vazio sub">Tudo dominado. Terreno conquistado.</li>{/each}
 </ul>
 <p class="sub leg">Os pontos coloridos mostram a quantos concursos o tópico serve. Dentro da janela dos próximos 3 tópicos, vale primeiro o que serve a mais concursos.</p>
 
@@ -156,7 +156,12 @@
       </div>
       <button class="lbtn" aria-expanded={painel === t.nome} onclick={() => (painel = painel === t.nome ? null : t.nome)}>Links de questões e vídeo{nLinks(t) ? ` · ${nLinks(t)} colados` : ''}</button>
       {#if painel === t.nome}
+        {@const bs = buscasDoTopico(materia, t.nome)}
         <div class="links" transition:slide={{ duration: dur(220) }}>
+          {#if bs.video.length}
+            <p class="sub">Buscas prontas (automáticas): abra, escolha a melhor aula ou lista e cole o link abaixo.</p>
+            <p class="buscas">{#each [...bs.video, ...bs.exercicios] as f}<a href={f.url} target="_blank" rel="noopener">{f.rotulo} ↗</a>{/each}</p>
+          {/if}
           {#each ROTULOS as [campo, rot]}
             <label>{rot}<input type="url" inputmode="url" placeholder="cole o link" value={linksDe(app.cfg, materia, t.nome)[campo]} onchange={(e) => colar(t, campo, e.currentTarget.value)} /></label>
           {/each}
@@ -221,6 +226,8 @@
   .ac strong { color: var(--ac); }
   .lbtn { min-height: 44px; text-align: left; color: var(--ac); font-weight: 600; font-size: .85rem; }
   .links { display: grid; gap: 8px; }
+  .buscas { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; }
+  .buscas a { min-height: 44px; display: inline-flex; align-items: center; color: var(--ac); font-weight: 600; font-size: .9rem; text-decoration: none; }
   .links label { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }
   .links input { width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
   .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
