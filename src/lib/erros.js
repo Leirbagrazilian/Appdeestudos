@@ -40,6 +40,18 @@ export function viloes(erros) {
   return { top, tipos, total, dica: total >= 3 ? DICAS[maior[0]] : null };
 }
 
+/** Ficha de revisão rápida do tópico: os seus erros mais recentes nele, para reler antes de começar o bloco.
+ *  Vale o erro da mesma matéria cujo assunto é o tópico (ou um contém o outro). Os ainda não dominados vêm primeiro; depois, os mais novos. */
+export function fichaDoTopico(erros, materia, topico, limite = 3) {
+  const t = norm(topico);
+  if (!t) return { total: 0, abertos: 0, itens: [] };
+  const bate = (e) => { const a = norm(e.assunto); return e.materia === materia && a.length >= 3 && (a === t || t.includes(a) || a.includes(t)); };
+  const todos = (erros ?? []).filter(bate);
+  const aberto = (e) => situacao(e) !== 'dominado';
+  const itens = [...todos].sort((a, b) => aberto(b) - aberto(a) || (b.dia ?? '').localeCompare(a.dia ?? '') || String(b.id).localeCompare(String(a.id))).slice(0, limite);
+  return { total: todos.length, abertos: todos.filter(aberto).length, itens };
+}
+
 /** Lembrete de backup: 7 dias desde o último, ou nunca feito depois de 3 dias de uso. */
 export function precisaBackup(ultimo, dia, diasDeUso) {
   if (!ultimo) return diasDeUso >= 3;

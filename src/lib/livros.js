@@ -46,7 +46,7 @@ export function ritmoDe(cfg, recurso, registros = []) {
   return { base, ritmo, ajustado: true };
 }
 /** Questões por hora: 6 para Escola Naval/EFOMM, 3 para o ITA. */
-export const ritmoQuestoes = (cfg, faseId) => (faseId === 'ita' ? cfg.ritmos?.questoesITA ?? 3 : cfg.ritmos?.questoesNaval ?? 6);
+export const ritmoQuestoes = (cfg, faseId) => (faseId === 'zero' ? cfg.ritmos?.exerciciosZero ?? 15 : faseId === 'ita' ? cfg.ritmos?.questoesITA ?? 3 : cfg.ritmos?.questoesNaval ?? 6);
 
 /** Próxima página a ler: continua de onde você parou. */
 export const proximaPagina = (v, leit) => Math.max(+v.pagIni, leit?.proxima ?? +v.pagIni);

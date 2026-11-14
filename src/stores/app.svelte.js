@@ -12,11 +12,13 @@ import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas } from '../lib/trilha.js';
+import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
+import { faseDoDia, maxExtraZero } from '../lib/phases.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -29,7 +31,12 @@ export const pf = () => prefs(app.cfg);
 const snap = (v) => $state.snapshot(v);
 
 export async function iniciar() {
-  const salvo = await db.get('kv', 'config');
+  // Tudo que está no aparelho é lido de uma vez, em paralelo (antes era uma leitura depois da outra).
+  const chaves = Object.keys(EXTRAS);
+  const [salvo, done, reviews, errors, exams, timer, ultimoBackup, lembreteAdiado, ...extras] = await Promise.all([
+    db.get('kv', 'config'), db.all('done'), db.all('reviews'), db.all('errors'), db.all('exams'),
+    db.get('kv', 'timer'), db.get('kv', 'ultimoBackup'), db.get('kv', 'lembreteAdiado'), ...chaves.map((k) => db.get('kv', k)),
+  ]);
   let antes = seed.versaoSeed ?? 1;
   if (salvo) {
     antes = salvo.versaoSeed ?? 1;
@@ -37,15 +44,12 @@ export async function iniciar() {
     if ((app.cfg.versaoSeed ?? 1) !== antes) await db.put('kv', 'config', snap(app.cfg));
   }
   aplicarPrefs(pf());
-  app.done = await db.all('done');
-  app.reviews = await db.all('reviews');
-  app.errors = await db.all('errors');
-  app.exams = await db.all('exams');
-  for (const k of Object.keys(EXTRAS)) app[k] = (await db.get('kv', k)) ?? structuredClone(EXTRAS[k]);
+  Object.assign(app, { done, reviews, errors, exams });
+  chaves.forEach((k, i) => { app[k] = extras[i] ?? structuredClone(EXTRAS[k]); });
   if (antes < 3) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); } // notas do mapa de lacunas antigo
-  app.timer = (await db.get('kv', 'timer')) ?? null;
-  app.ultimoBackup = (await db.get('kv', 'ultimoBackup')) ?? null;
-  app.lembreteAdiado = (await db.get('kv', 'lembreteAdiado')) ?? null;
+  app.timer = timer ?? null;
+  app.ultimoBackup = ultimoBackup ?? null;
+  app.lembreteAdiado = lembreteAdiado ?? null;
   protegerDados();
   // Primeira vez com insígnias: as já conquistadas entram como vistas, sem enxurrada de avisos.
   if (!Object.keys(app.vistos.conquistas).length) { for (const c of conquistas(dadosConquistas())) if (c.ok) app.vistos.conquistas[c.id] = true; await salvarKV('vistos'); }
@@ -59,7 +63,7 @@ export async function salvarCfg() { aplicarPrefs(pf()); await db.put('kv', 'conf
 export const salvarKV = (k) => db.put('kv', k, snap(app[k]));
 
 let timerToast;
-const ELOGIOS = ['Mais um morcego no céu.', 'A cidade está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.', 'Uma janela a mais acesa na cidade.'];
+const ELOGIOS = ['Mais um bloco cumprido.', 'A base está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.', 'Uma luz a mais acesa na base.'];
 export function avisar(msg, desfazer, sub, acao = null) {
   clearTimeout(timerToast);
   app.toast = { msg, desfazer, acao, sub: sub ?? ELOGIOS[Math.floor(Math.random() * ELOGIOS.length)] };
@@ -189,20 +193,37 @@ export async function protegerDados() {
     app.persistente = (await navigator.storage.persisted()) || (await navigator.storage.persist());
   } catch { app.persistente = false; }
 }
-/** Gera o backup e abre o compartilhar do sistema (Drive, WhatsApp…); sem compartilhar, baixa o arquivo. */
-export async function fazerBackup() {
+/** Backup do app. modo: 'auto' (compartilhar do sistema; sem ele, baixa o arquivo), 'baixar' ou 'copiar' (texto na área de transferência).
+ *  Qualquer falha vira um aviso claro com a saída seguinte (antes o erro sumia e parecia que o botão não fazia nada). */
+export async function fazerBackup(modo = 'auto') {
+  if (typeof modo !== 'string') modo = 'auto'; // chamado direto de um onclick
   const nome = `estuda-gabriel-backup-${app.dia}.json`;
-  const texto = montar(app);
-  const arquivo = typeof File !== 'undefined' ? new File([texto], nome, { type: 'application/json' }) : null;
+  let texto;
+  try { texto = montar(app); } catch { avisar('Não consegui montar o backup', null, 'Feche e abra o app e tente de novo.'); return false; }
+  const kb = Math.max(1, Math.round(texto.length / 1024));
+  const baixarArquivo = () => {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
+    a.download = nome; a.rel = 'noopener'; a.style.display = 'none'; document.body.append(a); a.click();
+    setTimeout(() => { a.remove(); URL.revokeObjectURL(a.href); }, 4000);
+  };
+  let como;
   try {
-    if (arquivo && navigator.canShare?.({ files: [arquivo] })) await navigator.share({ files: [arquivo], title: 'Backup do Estuda Gabriel' });
+    if (modo === 'copiar') {
+      if (!navigator.clipboard?.writeText) throw new Error('sem área de transferência');
+      await navigator.clipboard.writeText(texto); como = `Copiado (${kb} KB). Cole numa conversa com você mesmo ou num bloco de notas.`;
+    } else if (modo === 'baixar') { baixarArquivo(); como = `Arquivo de ${kb} KB baixado. Procure em Downloads.`; }
     else {
-      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([texto], { type: 'application/json' }));
-      a.download = nome; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      const arquivo = new File([texto], nome, { type: 'application/json' });
+      if (navigator.canShare?.({ files: [arquivo] })) { await navigator.share({ files: [arquivo], title: 'Backup do Estuda Gabriel' }); como = 'Enviado pelo compartilhar do sistema. Escolha o Drive ou mande para você mesmo.'; }
+      else { baixarArquivo(); como = `Arquivo de ${kb} KB baixado. Procure em Downloads.`; }
     }
-  } catch (e) { if (e?.name === 'AbortError') return false; throw e; }
+  } catch (e) {
+    if (e?.name === 'AbortError') return false; // você fechou o compartilhar
+    avisar('Não consegui salvar o backup', null, modo === 'copiar' ? 'Tente "Baixar arquivo".' : 'Tente "Copiar backup" e cole numa conversa com você mesmo.');
+    return false;
+  }
   app.ultimoBackup = app.dia; await db.put('kv', 'ultimoBackup', app.dia);
-  avisar('Backup feito', null, 'Guarde o arquivo no Drive ou mande para você mesmo.');
+  avisar('Backup feito', null, como);
   return true;
 }
 export async function adiarLembreteBackup() { app.lembreteAdiado = app.dia; await db.put('kv', 'lembreteAdiado', app.dia); }
@@ -214,7 +235,38 @@ export async function setLacuna(materia, topico, nota) {
   app.lacunas[materia] ??= {};
   app.lacunas[materia][topico] = nota;
   await salvarKV('lacunas');
+  const k = chaveTopico(materia, topico);
+  if (nota < 3 && app.dominio[k] && (resumoTopico(app.dominio[k]).dominado || resumoTopico(app.dominio[k]).travado)) { delete app.dominio[k]; await salvarKV('dominio'); } // você reabriu o tópico: recomeça o modo domínio
   vibrar(pf(), 'toque');
+}
+
+/** Checkpoint mensal: as mesmas 10 questões de Matemática da EFOMM, cronometradas. Um por data (registrar de novo corrige). */
+export async function registrarCheckpoint({ data, acertos, minutos }) {
+  const feitas = app.cfg.checkpoint?.questoes ?? 10;
+  app.checkpoints[data] = { data, acertos: Math.max(0, Math.min(feitas, Math.round(acertos))), feitas, minutos: minutos ? Math.round(minutos) : null };
+  await salvarKV('checkpoints'); comemorar();
+  avisar('Checkpoint salvo', null, `${app.checkpoints[data].acertos} de ${feitas} em Matemática.`);
+}
+export async function apagarCheckpoint(data) { delete app.checkpoints[data]; await salvarKV('checkpoints'); }
+/** Resultado do teste de saída do Khan (9º ano), em %. null apaga. */
+export async function salvarKhan(pct) {
+  app.portao = { ...app.portao, khan: pct == null ? null : { pct: Math.max(0, Math.min(100, Math.round(pct))), data: app.dia } };
+  await salvarKV('portao');
+}
+/** O portão não passou: mais 2 semanas de Fase 0, só com os tópicos fracos. */
+export async function prorrogarZero() {
+  const mais = Math.min(app.cfg.fase0?.portao?.semanasExtras ?? 2, maxExtraZero(app.cfg) - (app.cfg.perfil.extraZero ?? 0));
+  if (mais <= 0) { avisar('Limite da prorrogação', null, 'A Fase 1 precisa de pelo menos 1 semana antes de maio.'); return; }
+  app.cfg.perfil.extraZero = (app.cfg.perfil.extraZero ?? 0) + mais;
+  await salvarCfg();
+  avisar('Fase 0 prorrogada', null, `Mais ${mais} semanas, só com os tópicos fracos.`);
+}
+
+/** Destrava um tópico do modo domínio (você pediu ajuda ou viu outra explicação): mais 3 tentativas. */
+export async function destravarTopico(materia, topico) {
+  const k = chaveTopico(materia, topico);
+  app.dominio[k] = destravar(app.dominio[k]); await salvarKV('dominio');
+  avisar('Tópico destravado', null, `${topico}: mais 3 tentativas.`);
 }
 
 // ---------- cronômetro de foco ----------
@@ -240,14 +292,33 @@ async function aplicarResultado(b, d) {
   const atual = snap(app.done[b.id]) ?? {};
   const novoReg = { ...atual, topico: d.topico ?? atual.topico, vinculoId: d.vinculoId ?? atual.vinculoId ?? null,
     questoes: d.feitas ? { feitas: d.feitas, acertos: Math.min(d.acertos ?? 0, d.feitas) } : atual.questoes,
-    resultado: { feitas: d.feitas ?? 0, acertos: Math.min(d.acertos ?? 0, d.feitas ?? 0), paginas: d.paginas ?? 0, site: d.site ?? null, errosRegistrados: antigo?.errosRegistrados ?? 0 } };
+    resultado: { feitas: d.feitas ?? 0, acertos: Math.min(d.acertos ?? 0, d.feitas ?? 0), paginas: d.paginas ?? 0, site: d.site ?? null, khan: !!d.khan, errosRegistrados: antigo?.errosRegistrados ?? 0 } };
   app.done[b.id] = novoReg; await db.put('done', b.id, snap(novoReg));
-  return delta;
+  return { ...delta, veredito: await avaliarDominio(b, d) };
 }
+/** Fase 0: o resultado do bloco entra no modo domínio do tópico (8 em 10, repetição, travado) e atualiza a nota da Trilha. */
+async function avaliarDominio(b, d) {
+  const topico = d.topico;
+  const diaBloco = /^\d{4}-\d{2}-\d{2}/.test(b.id) ? b.id.slice(0, 10) : app.dia; // corrigir outro dia vale para a fase e a data do bloco
+  if (!topico || faseDoDia(fases(), diaBloco).id !== 'zero') return null;
+  if (!app.cfg.topicos?.[b.materia]?.some((t) => t.nome === topico && t.fase === 0)) return null;
+  const k = chaveTopico(b.materia, topico), atual = app.lacunas[b.materia]?.[topico] ?? 0;
+  const r = avaliarTopico(app.dominio[k], atual, b.id, { feitas: d.feitas ?? 0, acertos: d.acertos ?? 0, khan: d.khan, data: diaBloco });
+  app.dominio[k] = r.estado; await salvarKV('dominio');
+  if (r.nota !== atual) { app.lacunas[b.materia] ??= {}; app.lacunas[b.materia][topico] = r.nota; await salvarKV('lacunas'); }
+  return r.veredito;
+}
+const AVISO_DOMINIO = {
+  dominado: 'Tópico dominado. O próximo já está liberado.',
+  repetir: 'Abaixo de 8 em 10: o próximo bloco repete este tópico com exercícios novos.',
+  travado: 'Tópico travado depois de 3 tentativas. Peça ajuda (professor, colega ou outro vídeo) e destrave na Trilha.',
+  parcial: 'Faça pelo menos 10 exercícios para o tópico ser avaliado (8 em 10).',
+};
+
 /** Registro em uma tela: fiz X, acertei Y, onde fiz, páginas lidas e os erros (assunto + tipo) que vão para o caderno. */
 export async function registrarResultado(b, d) {
   if (!app.done[b.id]) await registrar(b, { assunto: d.topico ?? '', topico: d.topico, vinculoId: d.vinculoId ?? null });
-  await aplicarResultado(b, d);
+  const { veredito } = await aplicarResultado(b, d);
   let n = 0;
   for (const e of d.erros ?? []) { await addErro({ materia: b.materia, assunto: e.assunto || d.topico || b.materia, tipo: e.tipo, licao: '' }); n++; }
   if (n) {
@@ -255,6 +326,7 @@ export async function registrarResultado(b, d) {
     app.done[b.id] = r; await db.put('done', b.id, r);
   }
   app.registroAberto = null;
+  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); checarConquistas(); return; }
   avisar('Resultado registrado', null, d.feitas ? `${d.acertos ?? 0} de ${d.feitas} questões${n ? ` · ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno` : ''}` : 'Páginas e tempo salvos.');
   checarConquistas();
 }
@@ -285,7 +357,7 @@ export async function checarConquistas() {
   for (const c of novas) app.vistos.conquistas[c.id] = true;
   await salvarKV('vistos');
   clearTimeout(timerInsignia);
-  app.insignia = novas.length === 1 ? novas[0] : { nome: `${novas.length} insígnias novas`, desc: novas.map((c) => c.nome).join(' · ') };
+  app.insignia = novas.length === 1 ? novas[0] : { nome: `${novas.length} condecorações novas`, desc: novas.map((c) => c.nome).join(' · ') };
   timerInsignia = setTimeout(() => (app.insignia = null), 5000);
 }
 export const listaConquistas = () => conquistas(dadosConquistas());

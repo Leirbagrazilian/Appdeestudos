@@ -1,5 +1,6 @@
 <script>
-  import { app, registrarResultado, fecharRegistro, pf } from '../stores/app.svelte.js';
+  import { app, registrarResultado, fecharRegistro, pf, fases } from '../stores/app.svelte.js';
+  import { faseDoDia } from '../lib/phases.js';
   import Chips from './Chips.svelte';
   import { limitesCota } from '../lib/tarefas.js';
   import { vibrar } from '../lib/prefs.js';
@@ -13,6 +14,8 @@
   const vinculoId = feito.vinculoId ?? tarefa?.vinculoId ?? null;
   const temPaginas = !!vinculoId || (feito.paginasPlan ?? tarefa?.paginas?.n ?? 0) > 0;
   const errosJa = res?.errosRegistrados ?? 0;
+  const zero = faseDoDia(fases(), app.dia).id === 'zero' && !!topico; // Fase 0: exercícios (Khan/OBMEP) e modo domínio
+  let khan = $state(res?.khan ?? false);
 
   let feitas = $state(res?.feitas ?? feito.questoesPlan ?? tarefa?.questoes?.n ?? 0);
   let acertos = $state(res ? res.acertos : null);
@@ -21,7 +24,7 @@
   let linhas = $state([]), treme = $state(false), falta = $state('');
 
   const tipos = $derived(app.cfg.tiposErro);
-  const opcoesSite = $derived([...(app.cfg.sitesQuestoes ?? []).map((s) => ({ id: s.id, nome: s.nome })), { id: 'livro', nome: 'Livro' }]);
+  const opcoesSite = $derived([...(app.cfg.sitesQuestoes ?? []).filter((s) => (zero ? !['qconcursos', 'estuda'].includes(s.id) : !['khan', 'obmep'].includes(s.id))).map((s) => ({ id: s.id, nome: s.nome })), { id: 'livro', nome: 'Livro' }]);
   const nErros = $derived(acertos == null ? 0 : Math.max(0, feitas - acertos - errosJa));
   const visiveis = $derived(Math.min(nErros, 8));
   const lim = $derived(limitesCota(app.cfg));
@@ -42,11 +45,11 @@
   };
   async function salvar(ev) {
     ev.preventDefault();
-    if (!soErros && feitas > 0 && acertos == null) {
+    if (!soErros && !khan && feitas > 0 && acertos == null) {
       falta = 'Diga quantas você acertou.'; vibrar(pf(), 'erro'); treme = false; requestAnimationFrame(() => (treme = true)); return;
     }
     await registrarResultado(b, {
-      feitas, acertos: acertos ?? 0, site: feitas ? site : null, paginas: temPaginas ? +paginas || 0 : 0,
+      feitas, acertos: acertos ?? 0, khan: zero && khan, site: feitas ? site : null, paginas: temPaginas ? +paginas || 0 : 0,
       erros: linhas.slice(0, visiveis), topico, vinculoId, minutosLeitura: feito.minLeitura ?? tarefa?.paginas?.min ?? 0,
     });
   }
@@ -66,18 +69,22 @@
 
   {#if !soErros}
     <section aria-label="Questões">
-      <div class="lin"><span>Questões feitas</span>
+      <div class="lin"><span>{zero ? 'Exercícios feitos' : 'Questões feitas'}</span>
         <span class="step"><button type="button" aria-label="Menos uma questão feita" onclick={() => mexer('feitas', -1)}>−</button><strong>{feitas}</strong><button type="button" aria-label="Mais uma questão feita" onclick={() => mexer('feitas', 1)}>+</button></span></div>
       {#if feitas > 0}
         <div class="lin"><span>Acertei</span>
           <span class="step"><button type="button" aria-label="Menos um acerto" onclick={() => mexer('acertos', -1)}>−</button><strong>{acertos ?? '–'}</strong><button type="button" aria-label="Mais um acerto" onclick={() => mexer('acertos', 1)}>+</button></span></div>
         <button type="button" class="todas" onclick={() => { acertos = feitas; vibrar(pf(), 'ok'); }}>Acertei todas</button>
+        {#if zero}<p class="sub meta">{feitas < 10 ? 'Faça pelo menos 10 para o tópico ser avaliado.' : acertos != null && acertos / feitas >= 0.8 ? 'Passou: 8 em 10 ou mais.' : acertos != null ? 'Abaixo de 8 em 10: o tópico se repete.' : 'Meta: 8 em 10.'}</p>{/if}
         <p class="sub rot">Onde você fez</p>
         <Chips opcoes={opcoesSite} bind:valor={site} rotulo="Onde você fez as questões" />
         {#if naCota}<p class="sub cota" class:fim={usadas + delta >= lim[site]}>{opcoesSite.find((o) => o.id === site)?.nome} hoje: {usadas + delta} de {lim[site]} da cota grátis{usadas + delta >= lim[site] ? '. Acabou: use o PDF da prova ou os exercícios do livro.' : '.'}</p>{/if}
       {/if}
     </section>
 
+    {#if zero}
+      <label class="khan"><input type="checkbox" bind:checked={khan} /> Marquei como dominado no Khan (vale como dominado)</label>
+    {/if}
     {#if temPaginas}
       <label class="pag">Páginas lidas<input type="number" inputmode="numeric" min="0" bind:value={paginas} /></label>
     {/if}
@@ -111,6 +118,9 @@
   .todas { min-height: 44px; border-radius: 12px; border: 1px dashed var(--ac); color: var(--ac); font-weight: 600; }
   .rot { margin-top: 4px; }
   .cota { margin-top: 6px; } .cota.fim { color: var(--warn); font-weight: 600; }
+  .meta { color: var(--ac); }
+  .khan { display: flex; gap: 10px; align-items: center; min-height: 44px; font-size: .92rem; }
+  .khan input { width: 22px; height: 22px; min-height: 0; accent-color: var(--ac); flex: none; }
   .pag { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }
   input, select { width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
   .erro { display: grid; grid-template-columns: 1fr 9.5rem; gap: 6px; margin-top: 6px; }

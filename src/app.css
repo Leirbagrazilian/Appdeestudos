@@ -1,38 +1,46 @@
 @font-face { font-family: Inter; src: url(/fonts/inter.woff2) format('woff2'); font-weight: 100 900; font-display: swap; }
-:root, :root[data-theme=claro] {
-  --bg: #f7f8fa; --card: #fff; --tx: #14181f; --tx2: #4b5563; --line: #e5e7eb;
-  --ac: #0b7a6f; --ac2: #0369a1; --ac-bg: #dff3ef; --ac-tx: #fff; --warn: #92400e; --warn-bg: #fef3c7;
-  --glow: transparent; --r: 16px; --sh: 0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.04); --cc: 1;
+:root, :root[data-theme=claro], :root[data-theme=auto] {
+  --bg: #f2efe3; --card: #fffdf7; --tx: #171c12; --tx2: #4a5140; --line: #d9d4bf;
+  --ac: #46561f; --ac2: #1c3d66; --ac-bg: #e4e8cf; --ac-tx: #fff; --warn: #7a4b00; --warn-bg: #f8e9c4; --al: #9b1c13; --al-bg: #fbe3de;
+  --latao: #c9a03c; --latao2: #f1d98a; --brilho: transparent; --sil: #5c6846; --sil2: #454f30; --luz: #ffd75e;
+  --glow: transparent; --r: 14px; --sh: 0 1px 2px rgba(40,44,20,.07), 0 4px 16px rgba(40,44,20,.05); --cc: 1;
   --s1: #1d4f91; --s2: #c2410c; --s3: #0b7a6f; --s4: #9d2b5b; --s5: #7c3aed; --s6: #4d7c0f; --s7: #a16207;
 }
-/* Noir: carvão + dourado envelhecido */
+/* Militar (padrão; id "noir" mantido por causa dos dados salvos): verde-oliva grafite + latão, azul naval nos rótulos, vermelho sinal nos alertas */
 :root[data-theme=noir] {
-  --bg: #08080b; --card: #131319; --tx: #fffaf0; --tx2: #cfc9bb; --line: #2b2b35;
-  --ac: #ffc61a; --ac2: #3fd9ff; --ac-bg: #2a2208; --ac-tx: #0a0a0c; --warn: #ffd45c; --warn-bg: #261e06;
-  --glow: rgba(255,198,26,.17); --sh: none; --cc: 2.1;
-  --s1: #ffc61a; --s2: #5aa9ff; --s3: #36e0b4; --s4: #ff6fa5; --s5: #b794ff; --s6: #9cf03c; --s7: #ffa94d;
+  --bg: #0d110c; --card: #161c14; --tx: #f3f0e4; --tx2: #c4c6b4; --line: #2d3626;
+  --ac: #d8b24c; --ac2: #a9c4dc; --ac-bg: #242c19; --ac-tx: #12160e; --warn: #f1c670; --warn-bg: #2a2310; --al: #ff9c8f; --al-bg: #30140f;
+  --latao: #d8b24c; --latao2: #f6e3a1; --brilho: rgba(216,178,76,.5); --sil: #212b1c; --sil2: #37432d; --luz: #ffd15c;
+  --glow: rgba(216,178,76,.11); --sh: none; --cc: 2.1;
+  --s1: #d8b24c; --s2: #6fb0ff; --s3: #36e0b4; --s4: #ff7fa9; --s5: #b9a0ff; --s6: #a5e05a; --s7: #ffa94d;
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-theme=auto] { --bg: #0f1217; --card: #181d25; --tx: #eef1f5; --tx2: #a3acb9; --line: #2a313c; --ac: #3cc3b1; --ac2: #7dd3fc; --ac-bg: #17332f; --ac-tx: #06201c; --warn: #fcd34d; --warn-bg: #3a2c0a; --glow: transparent; --sh: none; --cc: 1.6; }
+  :root[data-theme=auto] {
+    --bg: #0d110c; --card: #161c14; --tx: #f3f0e4; --tx2: #c4c6b4; --line: #2d3626;
+    --ac: #d8b24c; --ac2: #a9c4dc; --ac-bg: #242c19; --ac-tx: #12160e; --warn: #f1c670; --warn-bg: #2a2310; --al: #ff9c8f; --al-bg: #30140f;
+    --latao: #d8b24c; --latao2: #f6e3a1; --brilho: rgba(216,178,76,.5); --sil: #212b1c; --sil2: #37432d; --luz: #ffd15c;
+    --glow: rgba(216,178,76,.11); --sh: none; --cc: 2.1;
+    --s1: #d8b24c; --s2: #6fb0ff; --s3: #36e0b4; --s4: #ff7fa9; --s5: #b9a0ff; --s6: #a5e05a; --s7: #ffa94d;
+  }
 }
-:root[data-theme=auto] { --bg: #f7f8fa; --card: #fff; --tx: #14181f; --tx2: #4b5563; --line: #e5e7eb; --ac: #0b7a6f; --ac2: #0369a1; --ac-bg: #dff3ef; --ac-tx: #fff; --warn: #92400e; --warn-bg: #fef3c7; --glow: transparent; --r: 16px; --sh: 0 1px 2px rgba(16,24,40,.06); --cc: 1; }
-:root { --r: 16px; }
 * { box-sizing: border-box; margin: 0; }
 html { -webkit-text-size-adjust: 100%; }
 body { font: 1rem/1.5 Inter, system-ui, sans-serif; background: radial-gradient(120% 60% at 50% -10%, var(--glow), transparent 60%) no-repeat, var(--bg); background-attachment: fixed; color: var(--tx); min-height: 100dvh; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: 0; }
 :focus-visible { outline: 3px solid var(--ac); outline-offset: 2px; border-radius: 8px; }
-h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
-h2 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ac); margin: 24px 4px 8px; }
+h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+h2 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--ac); margin: 24px 4px 8px; }
+main > h2 { display: flex; align-items: center; gap: 8px; }
+main > h2::before { content: ''; flex: none; width: 14px; height: 2px; border-radius: 1px; background: currentColor; }
 .muted { color: var(--tx2); font-size: .875rem; }
 .card { background: var(--card); border-radius: var(--r); box-shadow: var(--sh); border: 1px solid var(--line); }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } .enxame { display: none; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } .esquadrilha { display: none; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
 
 /* ---------- Vocabulário de animações ----------
    toque: o elemento "afunda" (100 ms) · confirmação: check + anel (Check.svelte)
    abrir/fechar: desliza (220 ms) · navegar: a tela desliza na direção da aba (280 ms)
-   alerta: tremor curto · conquista: bando de morcegos dourados */
+   alerta: tremor curto · conquista: revoada de aviões, estrelas e medalhas em latão */
 :where(button, a, summary, label.sec, label.pri, [role=radio], [role=checkbox]) {
   -webkit-tap-highlight-color: transparent; touch-action: manipulation;
   transition: transform .1s ease, filter .12s ease, background-color .18s ease, color .18s ease, border-color .18s ease;
@@ -55,16 +63,17 @@ h2 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spaci
 @keyframes entraEsq { from { opacity: 0; transform: translateX(-28px); } }
 
 /* Preferência do app: animações discretas ou desligadas. */
-:root[data-motion=discretas] .enxame, :root[data-motion=nenhuma] .enxame { display: none; }
-:root[data-motion=discretas] :is(.voa, .disco, .pulso) { animation: none !important; }
+:root[data-motion=discretas] .esquadrilha, :root[data-motion=nenhuma] .esquadrilha { display: none; }
+:root[data-motion=discretas] :is(.voa, .disco, .raios, .holo path, .pulso) { animation: none !important; }
 :root[data-motion=nenhuma] *, :root[data-motion=nenhuma] *::before, :root[data-motion=nenhuma] *::after { animation: none !important; transition: none !important; }
 
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* utilitários compartilhados (estilo Noir) */
+/* utilitários compartilhados (tema militar) */
 .pg { padding: 20px 4px 8px; }
-.data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
+.data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
 .pg h1 { margin-top: 4px; font-size: 1.9rem; letter-spacing: -.03em; }
+.pg { border-bottom: 1px solid var(--line); margin-bottom: 14px; padding-bottom: 14px; }
 .sub { color: var(--tx2); font-size: .85rem; }
 .pg .sub { margin-top: 4px; }
 .grupo { list-style: none; padding: 0; overflow: hidden; }

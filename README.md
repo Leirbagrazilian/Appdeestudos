@@ -80,6 +80,14 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - **Ajustes**: janelas de estudo, meta, rampa e livro principal de cada matéria.
 - O lembrete de sono/exercício foi removido.
 
+## Base do zero (SPEC v3)
+- **Fase 0 · Base do zero** (16/11/2026 a 10/01/2027, 8 semanas): 24 h Mat, 10 Fís, 5 Quím, 3 Port, 1 Ing por semana. Sem prova antiga, sem simulado e sem dia livre (Natal e Ano Novo também têm estudo). As fases seguintes: 1 Ensino médio, 2 EFOMM+ESA (maio), 3 Escola Naval, 4 ITA, 5 ENEM.
+- **Sábado e domingo mais cheios:** janelas novas e `peso do fim de semana` (Ajustes). O total semanal continua na meta.
+- **Modo domínio:** cada tópico da Fase 0 só avança com 8 acertos em 10 (ou "dominado no Khan"). Abaixo disso o próximo bloco repete o tópico; depois de 3 tentativas ele fica **travado** (aviso na Hoje, botão de destravar na Trilha).
+- **Trilha da Fase 0:** tópicos pequenos (1 tópico ≈ 1 bloco de 2×50 min), agrupados por semana da tabela do SPEC.
+- **Bloco da Fase 0:** vídeo curto (até 20 min), exercícios (Khan/OBMEP) e livro, com no mínimo 10 exercícios.
+- **Progresso** (QG): checkpoint mensal (10 questões de Matemática da EFOMM em 30 min, aviso no primeiro sábado do mês), gráfico e o **portão da Fase 0**: teste de saída do Khan com 80% ou mais e checkpoint com pelo menos 5 acertos (e melhor que o diagnóstico). Se falhar, prorroga 2 semanas só com os tópicos fracos.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

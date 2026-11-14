@@ -57,7 +57,7 @@
   <div class="temas" role="radiogroup" aria-label="Animações">
     {#each OPCOES.animacoes as [id, nome]}<button role="radio" aria-checked={pf().animacoes === id} class:on={pf().animacoes === id} onclick={() => setPref('animacoes', id)}>{nome}</button>{/each}
   </div>
-  <p class="muted">Discretas tira os morcegos voando e os efeitos contínuos. Nenhuma desliga tudo.</p>
+  <p class="muted">Discretas tira as silhuetas à deriva e os efeitos contínuos. Nenhuma desliga tudo.</p>
   <span class="rot">Tamanho do texto</span>
   <div class="temas" role="radiogroup" aria-label="Tamanho do texto">
     {#each OPCOES.texto as [id, nome]}<button role="radio" aria-checked={pf().texto === id} class:on={pf().texto === id} onclick={() => setPref('texto', id)}>{nome}</button>{/each}
@@ -84,7 +84,7 @@
 <h2>Tema</h2>
 <section class="card bloco">
   <div class="temas" role="radiogroup" aria-label="Tema">
-    {#each [['noir', 'Noir'], ['claro', 'Claro'], ['auto', 'Automático']] as [id, nome]}
+    {#each [['noir', 'Militar'], ['claro', 'Claro'], ['auto', 'Automático']] as [id, nome]}
       <button role="radio" aria-checked={(app.cfg.tema ?? 'noir') === id} class:on={(app.cfg.tema ?? 'noir') === id} onclick={() => { app.cfg.tema = id; salvar(); }}>{nome}</button>
     {/each}
   </div>
@@ -114,7 +114,10 @@
 <section class="card bloco">
   <label>Meta líquida por semana (horas de foco, sem as pausas)
     <input type="number" min="10" max="60" step="1" bind:value={app.cfg.rotina.metaLiquida} onchange={salvar} /></label>
-  <p class="muted">As horas de cada matéria vêm da tabela da fase (base de 50 h), escalada para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}.</p>
+  <p class="muted">As horas de cada matéria vêm da tabela da fase (43 h líquidas), escaladas para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}. Quer mais volume? Suba a meta; as janelas precisam comportar.</p>
+  <label>Peso do fim de semana (1 = igual aos outros dias)
+    <input type="number" min="1" max="2" step="0.1" bind:value={app.cfg.rotina.pesoFimDeSemana} onchange={salvar} /></label>
+  <p class="muted">Acima de 1, sábado e domingo recebem uma fatia maior das horas da semana.</p>
   <div class="tg"><span><strong>Rampa de 75%</strong><span class="muted">Nas {app.cfg.rotina.rampa.semanas} primeiras semanas do plano, 75% das horas.</span></span>
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>
@@ -177,7 +180,9 @@
 
 <h2>Backup e agenda</h2>
 <section class="card bloco">
-  <button class="pri" onclick={fazerBackup}>Fazer backup (salvar ou compartilhar)</button>
+  <button class="pri" onclick={() => fazerBackup('auto')}>Fazer backup (compartilhar ou salvar)</button>
+  <div class="bk3"><button class="sec" onclick={() => fazerBackup('baixar')}>Baixar arquivo</button><button class="sec" onclick={() => fazerBackup('copiar')}>Copiar backup</button></div>
+  <p class="muted">Se o compartilhar não abrir, use "Baixar arquivo" ou "Copiar backup" e cole numa conversa com você mesmo.</p>
   <p class="muted">{app.ultimoBackup ? `Último backup: ${fmtBR(app.ultimoBackup)}.` : 'Nenhum backup feito ainda.'} {app.persistente ? 'Os dados estão protegidos contra a limpeza automática do navegador.' : 'O navegador não garantiu proteção contra limpeza automática: mantenha o backup semanal.'}</p>
   <label class="sec file">Importar backup<input type="file" accept="application/json,.json" onchange={arquivo} hidden /></label>
   <button class="pri" onclick={() => baixar('estuda-gabriel.ics', gerarICS(app.cfg), 'text/calendar')}>Exportar .ics (Google Agenda)</button>
@@ -186,6 +191,7 @@
 </section>
 
 <style>
+  .bk3 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .temas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; } .temas .on { background: var(--ac); color: var(--ac-tx); border-color: var(--ac); }
   .msg { min-height: 1.5em; }
   .rot { font-weight: 600; }

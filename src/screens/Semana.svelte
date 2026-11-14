@@ -1,6 +1,6 @@
 <script>
   import { app, fases, ajustes } from '../stores/app.svelte.js';
-  import { blocosAjustados } from '../lib/planner.js';
+  import { blocosDaSemana } from '../lib/planner.js';
   import { addDays, startOfWeek, diaNome, fmtMin, parse } from '../lib/dates.js';
   import Ring from '../components/Ring.svelte';
   import { fmtCurta } from '../lib/dates.js';
@@ -8,8 +8,8 @@
   const fs = $derived(fases());
   const diaDe = (k, v) => v.dia ?? k.slice(0, 10);
   const feitoNoDia = (dia) => Object.entries(app.done).filter(([k, v]) => diaDe(k, v) === dia).reduce((s, [, v]) => s + v.min, 0);
-  const semana = (ini) => Array.from({ length: 7 }, (_, i) => {
-    const dia = addDays(ini, i), plan = blocosAjustados(app.cfg, fs, dia, ajustes());
+  const semana = (ini) => blocosDaSemana(app.cfg, fs, ini, ajustes()).map((plan, i) => { // a semana é montada uma vez para os 7 dias
+    const dia = addDays(ini, i);
     const planMin = plan.reduce((s, b) => s + b.min, 0);
     return { dia, plan, planMin, feito: feitoNoDia(dia), meta: planMin };
   });

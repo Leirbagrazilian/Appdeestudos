@@ -80,6 +80,31 @@ export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
   return min;
 }
 
+/** Partes das outras janelas do dia que ficam fora da janela especial `esp` (prova ou domingo): nada é perdido nem sobreposto. */
+function foraDe(lista, esp) {
+  const out = [];
+  for (const j of lista) {
+    if (j === esp || (j.ini === esp.ini && j.fim === esp.fim && j.tipo === esp.tipo)) continue;
+    if (j.ini < esp.ini) out.push({ ...j, fim: Math.min(j.fim, esp.ini) });
+    if (j.fim > esp.fim) out.push({ ...j, ini: Math.max(j.ini, esp.fim) });
+  }
+  return out.filter((j) => j.fim > j.ini);
+}
+
+/** Como `repartir`, mas cada posição tem um teto; o que passa do teto vai para as outras, na mesma proporção dos pesos. */
+export function repartirComTeto(pesos, tetos, total) {
+  const res = pesos.map(() => 0);
+  let livre = pesos.map((_, i) => i).filter((i) => tetos[i] > 0 && pesos[i] > 0), resto = total;
+  while (resto > 0 && livre.length) {
+    const alvo = repartir(Object.fromEntries(livre.map((i) => [i, pesos[i]])), resto);
+    let sobra = 0, mexeu = 0;
+    for (const i of livre) { const add = Math.min(alvo[i], tetos[i] - res[i]); res[i] += add; mexeu += add; sobra += alvo[i] - add; }
+    resto = sobra; livre = livre.filter((i) => res[i] < tetos[i]);
+    if (!mexeu) break;
+  }
+  return res;
+}
+
 /** Divide `n` sessões em blocos de 2 (ou 3 no fim), 1 só quando a janela tem uma única sessão. */
 const proximoTamanho = (rem) => (rem === 3 ? 3 : rem >= 2 ? 2 : 1);
 
@@ -101,27 +126,31 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   const sab = janelas(6).find((j) => j.tipo === 'prova') ?? janelas(6)[0];
   if (sab) {
     const dur = sab.fim - sab.ini, P = min.provas;
-    const prova = Math.min(300, r10((P * 5) / 7), dur);
+    const reserva = P > 0 ? Math.min(60, Math.floor(dur / 3 / 10) * 10) : 0; // a correção sempre tem lugar na janela
+    const prova = Math.min(300, r10((P * 5) / 7), dur - reserva);
     const cor = Math.max(0, Math.min(120, r10(P) - prova, dur - prova));
     excedente.prova = Math.max(0, P - prova - cor);
     if (prova > 0) dias[5].blocos.push(bloco('prova', sab.ini, prova, 0));
     if (cor > 0) dias[5].blocos.push(bloco('corr', sab.ini + prova, cor, 0));
     const ini = sab.ini + prova + cor + (prova + cor > 0 ? p : 0); // 10 min de pausa depois da correção
     if (sab.fim - ini >= s) janelasLivres.push({ i: 5, ini, fim: sab.fim });
-    for (const j of janelas(6)) if (j !== sab && (j.fim <= sab.ini || j.ini >= sab.fim)) janelasLivres.push({ i: 5, ini: j.ini, fim: j.fim });
+    for (const j of foraDe(janelas(6), sab)) janelasLivres.push({ i: 5, ini: j.ini, fim: j.fim });
   }
-  // Domingo: redação + planejamento da semana (o que passar da janela vira estudo na semana).
-  const dom = janelas(0).find((j) => j.tipo === 'domingo') ?? janelas(0)[0];
+  // Domingo: dia de estudo. Na janela do domingo ficam a redação (no começo) e o planejamento da semana (no fim); o resto é estudo.
+  const dom = janelas(0).find((j) => j.tipo === 'domingo') ?? janelas(0).at(-1);
   if (dom) {
     const dur = dom.fim - dom.ini, plano = Math.min(30, dur);
     const red = Math.max(0, Math.min(r10(min.red), dur - plano));
     excedente.red = Math.max(0, min.red - red);
     if (red > 0) dias[6].blocos.push(bloco('red', dom.ini, red, 0));
     if (plano > 0) dias[6].blocos.push(bloco('plan', dom.fim - plano, plano, 0));
-    for (const j of janelas(0)) if (j !== dom && (j.fim <= dom.ini || j.ini >= dom.fim)) janelasLivres.push({ i: 6, ini: j.ini, fim: j.fim });
+    const ini = dom.ini + red + (red > 0 ? p : 0), fim = dom.fim - plano - (plano > 0 ? p : 0);
+    if (fim - ini >= s) janelasLivres.push({ i: 6, ini, fim });
+    for (const j of foraDe(janelas(0), dom)) janelasLivres.push({ i: 6, ini: j.ini, fim: j.fim });
   }
   // Segunda a sexta.
-  for (let i = 0; i < 5; i++) for (const j of janelas(i + 1)) janelasLivres.push({ i, ini: j.ini, fim: j.fim });
+  // segunda a sexta: o tipo não importa, então janelas que se sobrepõem viram uma só
+  for (let i = 0; i < 5; i++) for (const j of janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined })))) janelasLivres.push({ i, ini: j.ini, fim: j.fim });
   janelasLivres.sort((a, b) => a.i - b.i || a.ini - b.ini);
 
   // Orçamento em sessões inteiras, limitado pela capacidade das janelas.
@@ -135,7 +164,9 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   const aloc = repartir(demanda, alvo);
   // Se sobrar capacidade, as janelas são reduzidas de forma proporcional (os dias não ficam vazios no fim da semana).
   const nJan = janelasLivres.map((j) => slotsDaJanela(j.fim - j.ini, s, p));
-  const uso = repartir(Object.fromEntries(nJan.map((n, k) => [k, n])), alvo);
+  // fim de semana pesa mais (rotina.pesoFimDeSemana): sábado e domingo recebem uma fatia maior do que a proporção das janelas
+  const peso = Math.max(1, Number(cfg.rotina?.pesoFimDeSemana) || 1);
+  const uso = repartirComTeto(janelasLivres.map((j, k) => nJan[k] * (j.i >= 5 ? peso : 1)), nJan, alvo);
 
   const ordem = [...POOL, 'prova', 'red'];
   const rest = { ...aloc }, cred = Object.fromEntries(ordem.map((c) => [c, 0]));

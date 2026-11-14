@@ -1,4 +1,4 @@
-import { diaNome, startOfWeek } from './dates.js';
+import { diaNome, startOfWeek, addDays } from './dates.js';
 import { faseDoDia, revisaoLeve } from './phases.js';
 import { planoSemana, toHHMM } from './semana.js';
 import { ESTUDO, QUESTOES_DIA_MINIMO } from './tarefas.js';
@@ -22,7 +22,10 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
     }));
   }
 
-  const dias = planoSemana(cfg, fases, startOfWeek(dia), ctx);
+  // `ctx.planos` (Map opcional, criado por quem chama e válido só durante aquela conta): a semana é montada uma vez e serve aos 7 dias
+  const seg = startOfWeek(dia);
+  let dias = ctx.planos?.get(seg);
+  if (!dias) { dias = planoSemana(cfg, fases, seg, ctx); ctx.planos?.set(seg, dias); }
   const d = dias.find((x) => x.dia === dia);
   let blocos = d.blocos;
 
@@ -59,8 +62,8 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
 
 /** Blocos que realmente valem para o dia: o que foi passado para outro dia sai,
  *  o que veio de outro dia entra, e no "dia mínimo" o dia inteiro vira 45 min de questões (20 do próximo tópico), mais as revisões vencidas. */
-export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, exams = {} } = {}) {
-  const ctx = { exams };
+export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, exams = {}, planos } = {}) {
+  const ctx = { exams, planos: planos ?? new Map() };
   let lista = blocosDoDia(cfg, fases, dia, ctx).filter((b) => !adiados[b.id] || adiados[b.id] === dia);
   for (const [id, alvo] of Object.entries(adiados)) {
     const orig = id.slice(0, 10);
@@ -76,5 +79,10 @@ export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, 
     lista[0].titulo = `Dia mínimo · ${lista[0].materia}`;
   }
   return lista;
+}
+/** Os 7 dias da semana de `segunda` de uma vez (mesmo resultado de chamar `blocosAjustados` dia a dia, montando a semana uma única vez). */
+export function blocosDaSemana(cfg, fases, segunda, aj = {}) {
+  const planos = new Map();
+  return Array.from({ length: 7 }, (_, i) => blocosAjustados(cfg, fases, addDays(segunda, i), { ...aj, planos }));
 }
 export { diaNome };
