@@ -11,7 +11,7 @@
   const feito = $derived(treinoFeito(reg));
   let aberto = $state(false), km = $state(null);
   const kmTxt = (x) => String(x).replace('.', ',');
-  const NOME = { leve: 'Corrida leve', 'bem leve': 'Corrida bem leve', strides: 'Corrida leve + strides', qualidade: 'Corrida com 1 km forte', longao: 'Longão', caminhada: 'Caminhada' };
+  const NOME = { prova: 'Prova', descanso: 'Descanso', leve: 'Corrida leve', 'bem leve': 'Corrida bem leve', strides: 'Corrida leve + strides', qualidade: 'Corrida com 1 km forte', longao: 'Longão', caminhada: 'Caminhada' };
   async function marcar() {
     if (feito) return registrarTreino(dia, { feito: false, minimo: false });
     await registrarTreino(dia, { feito: true, km: km != null && km !== '' ? +km : t.km });
@@ -25,15 +25,16 @@
       <span class="ic" aria-hidden="true"><Emblema nome="estrela" size={22} /></span>
       <span class="tx">
         <span class="data">Treino · {t.hora}{t.min ? ` · ~${t.min} min` : ''}{t.semanaLeve ? ' · semana leve' : ''}</span>
-        <strong>{NOME[t.tipo] ?? 'Corrida'}{t.km ? ` · ${kmTxt(t.km)} km` : ''}</strong>
+        <strong>{t.prova ? t.prova.nome : NOME[t.tipo] ?? 'Corrida'}{t.km ? ` · ${kmTxt(t.km)} km` : ''}</strong>
         <span class="sub">{t.intensidade}</span>
       </span>
       <button class="chk" role="checkbox" aria-checked={feito} aria-label="Treino feito" onclick={marcar}>{feito ? '✓' : ''}</button>
     </div>
     {#if t.alerta}<p class="al" role="alert">{t.alerta}</p>{/if}
+    {#if t.choque && !t.alerta}<p class="al" role="status">{t.choque}</p>{/if}
     <ul class="info">
       <li>Tênis: {t.tenis}</li>
-      {#if t.musculacao}<li>Musculação {t.musculacao.tipo} às {t.musculacao.ini}{t.musculacao.antesCorrer ? ' (a corrida vem antes)' : ''}</li>{/if}
+      {#if t.musculacao}<li>Musculação {t.musculacao.tipo} às {t.musculacao.ini}{t.musculacao.correrAntes ? ' (a corrida vem antes)' : ''}</li>{/if}
       {#if t.fortalecimento}<li>Fortalecimento: {t.fortalecimento.join(', ')}</li>{/if}
       <li>{t.dica}</li>
     </ul>

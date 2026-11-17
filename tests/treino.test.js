@@ -17,10 +17,10 @@ describe('treino de corrida: plano', () => {
     expect(faseCorrida(cfg(), '2027-11-25').n).toBe(5);
     expect(faseCorrida(cfg(), '2026-11-16')).toBe(null);
   });
-  it('semana 1 é a semana modelo: 2/3/2/4/2/2 + longão 5 = 20 km', () => {
+  it('semana 1 é a semana modelo (3/2/4/2/2 + longão 5); a segunda 16/11 fica de fora: começa na terça', () => {
     const s = planoSemanaCorrida(cfg(), '2026-11-16');
-    expect(s.dias).toEqual({ 0: 5, 1: 2, 2: 3, 3: 2, 4: 4, 5: 2, 6: 2 });
-    expect(soma(s.dias)).toBe(20);
+    expect(s.dias).toEqual({ 0: 5, 1: 0, 2: 3, 3: 2, 4: 4, 5: 2, 6: 2 });
+    expect(s.km).toBe(18);
   });
   it('fase 1: km e longão do seed; resto em 2:3:2:4:2:2 arredondado a 0,5', () => {
     const kms = [20, 22, 25, 20, 27, 30, 33, 26], lg = [5, 6, 7, 5, 8, 9, 10, 8];
@@ -28,7 +28,7 @@ describe('treino de corrida: plano', () => {
       const s = planoSemanaCorrida(cfg(), addDays('2026-11-16', 7 * i));
       expect(s.km).toBe(kms[i]); expect(s.dias[0]).toBe(lg[i]);
       for (const v of Object.values(s.dias)) expect(v * 2).toBe(Math.round(v * 2));
-      expect(Math.abs(soma(s.dias) - kms[i])).toBeLessThanOrEqual(1.5);
+      expect(soma(s.dias)).toBe(kms[i]);
     }
     expect(planoSemanaCorrida(cfg(), '2026-12-07').leve).toBe(true); // semana 4 (20 km)
     expect(planoSemanaCorrida(cfg(), '2027-01-04').leve).toBe(true); // semana 8 (26 km)
@@ -43,7 +43,7 @@ describe('treino de corrida: plano', () => {
 });
 
 describe('treino de corrida: dia e regras', () => {
-  it('terça 17/11: corrida às 5h30, 3 km + strides, X-Step e Metaspeed só nos strides; lower às 15h antes de correr', () => {
+  it('terça 17/11: corrida às 5h30, 3 km + strides, X-Step e Metaspeed só nos strides; lower às 15h com a corrida antes', () => {
     const t = treinoDoDia(cfg(), '2026-11-17');
     expect(t).toMatchObject({ tipo: 'strides', km: 3, hora: '05:30' });
     expect(t.tenis).toMatch(/Metaspeed/); expect(t.musculacao).toMatchObject({ ini: '15:00', tipo: 'lower' });
@@ -80,7 +80,7 @@ describe('treino de corrida: dia e regras', () => {
     expect(sequencia(cfg(), { cumpridos: { '2026-11-18': true, '2026-11-19': true }, treinos }, '2026-11-19')).toBe(2);
   });
   it('km da semana: soma o registrado e mostra a meta', () => {
-    expect(kmDaSemana(cfg(), '2026-11-16', { '2026-11-17': { km: 3.2 }, '2026-11-18': { km: 2 } })).toEqual({ feitos: 5.2, meta: 20 });
+    expect(kmDaSemana(cfg(), '2026-11-16', { '2026-11-17': { km: 3.2 }, '2026-11-18': { km: 2 } })).toEqual({ feitos: 5.2, meta: 18 });
   });
 });
 
@@ -114,11 +114,40 @@ describe('revisão de domingo: resumo da corrida', () => {
     const tr = { '2026-11-17': { feito: true, km: 3.2 }, '2026-11-19': { dor: 4 }, '2026-11-20': { minimo: true } };
     const t = textoResumoCorrida(seed, '2026-11-16', tr, { joelho: 4, sono: '7 h', cansaco: 5, temperos: 'ok' });
     expect(t).toMatch(/Fase 1 Retomada diária, semana 1/);
-    expect(t).toMatch(/Km: 3,2 de 20/);
+    expect(t).toMatch(/Km: 3,2 de 18/);
     expect(t).toMatch(/Ter: 3,2 km de 3 km/);
     expect(t).toMatch(/Qui: não fez de 4 km \(dor joelho 4/);
     expect(t).toMatch(/Sex: caminhada 20 min/);
     expect(t).toMatch(/Sono: 7 h · Cansaço \(0–10\): 5/);
     expect(t).toMatch(/Temperos: ok/);
+  });
+});
+
+describe('revisão da 7a: provas, polimento e choques', () => {
+  it('semana da maratona: dias curtos antes, 42,2 km na quinta, descanso depois, sem longão', () => {
+    const s = planoSemanaCorrida(cfg(), '2027-10-04');
+    expect(s.dias[4]).toBe(42.2); expect(s.dias[5]).toBe(0); expect(s.dias[6]).toBe(0); expect(s.dias[0]).toBe(0);
+    expect(s.dias[1]).toBeLessThanOrEqual(4); expect(s.dias[3]).toBeLessThanOrEqual(2);
+    expect(treinoDoDia(cfg(), '2027-10-07')).toMatchObject({ tipo: 'prova', km: 42.2 });
+    expect(treinoDoDia(cfg(), '2027-10-10')).toMatchObject({ tipo: 'descanso', km: 0 });
+  });
+  it('semana dos 100 km: prova na quinta 25/11/2027 e nada de longão no domingo', () => {
+    expect(treinoDoDia(cfg(), '2027-11-25')).toMatchObject({ tipo: 'prova', km: 100 });
+    expect(treinoDoDia(cfg(), '2027-11-28').km).toBe(0);
+  });
+  it('polimento (fase 5) só desce', () => {
+    const kms = []; for (let d = '2027-10-11'; d <= '2027-11-15'; d = addDays(d, 7)) kms.push(planoSemanaCorrida(cfg(), d).km);
+    for (let i = 1; i < kms.length; i++) expect(kms[i]).toBeLessThanOrEqual(kms[i - 1]);
+  });
+  it('a soma dos dias fecha com a meta em todas as semanas sem prova', () => {
+    for (let d = '2026-11-23'; d <= '2027-09-27'; d = addDays(d, 7)) { const s = planoSemanaCorrida(cfg(), d); expect(soma(s.dias), d).toBeCloseTo(s.km, 5); }
+  });
+  it('jiu-jitsu no domingo gera aviso', () => {
+    const c = cfg(); c.rotina.aulas.push({ dia: 0, inicio: '10:00', fim: '11:00', nome: 'Jiu-jitsu' });
+    expect(alertasTreino(c, '2026-11-17').some((x) => /domingo/.test(x))).toBe(true);
+  });
+  it('corrida longa que invade a janela de estudo vira aviso; a da semana 1 não', () => {
+    expect(treinoDoDia(cfg(), '2026-11-19').choque).toBe(null); // 4 km: ~38 min, termina 6h08, estudo 6h30
+    expect(treinoDoDia(cfg(), '2027-07-01').choque).toMatch(/estudo começa/); // quinta da construção: 10+ km
   });
 });
