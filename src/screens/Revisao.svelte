@@ -83,10 +83,10 @@
       <p class="sub">Meta: {String(kmSem.meta).replace('.', ',')} km · registrados: {String(kmSem.feitos).replace('.', ',')} km</p>
       <button type="button" class="sec" onclick={copiar}>Copiar resumo da corrida</button>
       {#if planoProx}
-        <p class="sub">Km de cada dia da próxima semana (meta {String(planoProx.km).replace('.', ',')} km{planoProx.leve ? ', semana leve' : ''}). Deixe vazio para usar o plano.</p>
+        <p class="sub">Km de cada dia da próxima semana (meta {String(planoProx.km).replace('.', ',')} km{planoProx.leve ? ', semana leve' : ''}). Deixe vazio para usar o plano.{planoProx.prova ? ` Semana de prova (${planoProx.prova.nome ?? 'prova'}): o dia da prova e os dias depois dela são fixos.` : ''}</p>
         <div class="g7">
           {#each DIAS_KM as [wd, nome]}
-            <label>{nome}<input type="number" inputmode="decimal" step="0.5" min="0" placeholder={String(planoProx.dias[wd] ?? 0).replace('.', ',')} value={app.treinoSemanas[prox]?.dias?.[wd] ?? ''} onchange={(e) => kmDia(wd, e.currentTarget.value)} /></label>
+            <label>{nome}<input type="number" inputmode="decimal" step="0.5" min="0" placeholder={String(planoProx.dias[wd] ?? 0).replace('.', ',')} value={planoProx.travados?.includes(wd) ? '' : app.treinoSemanas[prox]?.dias?.[wd] ?? ''} disabled={planoProx.travados?.includes(wd)} title={planoProx.travados?.includes(wd) ? 'Fixo: semana de prova' : undefined} onchange={(e) => kmDia(wd, e.currentTarget.value)} /></label>
           {/each}
         </div>
       {/if}

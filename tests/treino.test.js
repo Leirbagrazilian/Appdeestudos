@@ -151,3 +151,49 @@ describe('revisão da 7a: provas, polimento e choques', () => {
     expect(treinoDoDia(cfg(), '2027-07-01').choque).toMatch(/estudo começa/); // quinta da construção: 10+ km
   });
 });
+
+describe('revisão do treino: choque real, prova travada, polimento e musculação', () => {
+  const dias = (c, wd, js) => { c.rotina.janelas[wd] = js; return c; };
+  it('choque: janela que começou antes da corrida e ainda está aberta é detectada', () => {
+    const c = dias(cfg(), 4, [{ ini: '05:00', fim: '06:00' }, { ini: '12:30', fim: '18:30' }]);
+    const t = treinoDoDia(c, '2026-11-19'); // 4 km: 5h30 a ~6h08
+    expect(t.choque).toMatch(/06:08/); expect(t.choque).toMatch(/05:00/);
+  });
+  it('choque: janela que termina antes da corrida ou começa depois do fim não avisa; horas inválidas são ignoradas', () => {
+    const c = dias(cfg(), 4, [{ ini: '04:00', fim: '05:30' }, { ini: '06:08', fim: '07:00' }, { ini: '', fim: '06:00' }, { ini: '05:40', fim: 'xx' }]);
+    expect(treinoDoDia(c, '2026-11-19').choque).toBe(null);
+    const d = cfg(); d.treino.corrida = '';
+    expect(treinoDoDia(d, '2026-11-19').choque).toBe(null);
+  });
+  it('sem choque em dia sem corrida: caminhada (dor), descanso pós-prova e km 0', () => {
+    const j = [{ ini: '05:00', fim: '07:00' }];
+    const c = dias(cfg(), 4, j);
+    expect(treinoDoDia(c, '2026-11-19').choque).toMatch(/05:00/);
+    expect(treinoDoDia(c, '2026-11-19', { treinos: { '2026-11-19': { dor: 5 } } }).choque).toBe(null);
+    expect(treinoDoDia(c, '2026-11-19', { editadas: { '2026-11-16': { dias: { 4: 0 } } } }).choque).toBe(null);
+    expect(treinoDoDia(dias(cfg(), 5, j), '2027-10-08')).toMatchObject({ tipo: 'descanso', choque: null });
+  });
+  it('semana de prova: edições não sobrescrevem a prova nem os dias depois; antes da prova valem', () => {
+    const ed = { '2027-10-04': { dias: { 1: 3, 4: 10, 5: 8, 6: 8, 0: 20 } } };
+    const s = planoSemanaCorrida(cfg(), '2027-10-04', ed);
+    expect(s.dias).toMatchObject({ 1: 3, 4: 42.2, 5: 0, 6: 0, 0: 0 });
+    expect(s.travados).toEqual([4, 5, 6, 0]);
+    expect(planoSemanaCorrida(cfg(), '2027-01-25').travados).toEqual([]);
+    expect(treinoDoDia(cfg(), '2027-10-07', { editadas: ed })).toMatchObject({ tipo: 'prova', km: 42.2 });
+  });
+  it('polimento não tem semana leve; a 4ª semana da fase 2 continua leve', () => {
+    for (let d = '2027-10-11'; d <= '2027-11-22'; d = addDays(d, 7)) expect(planoSemanaCorrida(cfg(), d).leve, d).toBe(false);
+    expect(planoSemanaCorrida(cfg(), '2027-02-01').leve).toBe(true);
+  });
+  it('musculação some nos 2 dias antes da prova, no dia e depois dela na semana, com dica', () => {
+    const c = cfg(); for (const wd of [0, 1, 2, 3, 4, 5, 6]) c.treino.musculacao[wd] = { ini: '15:00', tipo: wd === 2 ? 'lower' : 'upper' };
+    expect(treinoDoDia(c, '2027-10-04').musculacao).not.toBe(null); // segunda: 3 dias antes
+    for (const d of ['2027-10-05', '2027-10-06', '2027-10-07', '2027-10-08', '2027-10-10']) {
+      const t = treinoDoDia(c, d);
+      expect(t.musculacao, d).toBe(null); expect(t.dica, d).toMatch(/Sem musculação: semana de prova/);
+    }
+    const t = treinoDoDia(c, '2027-10-11'); // semana seguinte
+    expect(t.musculacao).not.toBe(null); expect(t.dica).not.toMatch(/Sem musculação/);
+    expect(treinoDoDia(cfg(), '2027-10-06').dica).not.toMatch(/Sem musculação/); // quarta sem musculação no padrão
+  });
+});
