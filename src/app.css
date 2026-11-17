@@ -1,25 +1,25 @@
 @font-face { font-family: Inter; src: url(/fonts/inter.woff2) format('woff2'); font-weight: 100 900; font-display: swap; }
 :root, :root[data-theme=claro], :root[data-theme=auto] {
-  --bg: #f2efe3; --card: #fffdf7; --tx: #171c12; --tx2: #4a5140; --line: #d9d4bf;
-  --ac: #46561f; --ac2: #1c3d66; --ac-bg: #e4e8cf; --ac-tx: #fff; --warn: #7a4b00; --warn-bg: #f8e9c4; --al: #9b1c13; --al-bg: #fbe3de;
+  --bg: #f8f8f6; --card: #ffffff; --tx: #1a1a17; --tx2: #5a5a53; --line: #e6e5df;
+  --ac: #46561f; --ac2: #5a5a53; --ac-bg: #f0f0eb; --ac-tx: #fff; --warn: #7a4b00; --warn-bg: #f8e9c4; --al: #9b1c13; --al-bg: #fbe3de;
   --latao: #c9a03c; --latao2: #f1d98a; --brilho: transparent; --sil: #5c6846; --sil2: #454f30; --luz: #ffd75e;
-  --glow: transparent; --r: 14px; --sh: 0 1px 2px rgba(40,44,20,.07), 0 4px 16px rgba(40,44,20,.05); --cc: 1;
+  --glow: transparent; --r: 14px; --sh: none; --cc: 1;
   --s1: #1d4f91; --s2: #c2410c; --s3: #0b7a6f; --s4: #9d2b5b; --s5: #7c3aed; --s6: #4d7c0f; --s7: #a16207;
 }
 /* Militar (padrão; id "noir" mantido por causa dos dados salvos): verde-oliva grafite + latão, azul naval nos rótulos, vermelho sinal nos alertas */
 :root[data-theme=noir] {
-  --bg: #0d110c; --card: #161c14; --tx: #f3f0e4; --tx2: #c4c6b4; --line: #2d3626;
-  --ac: #d8b24c; --ac2: #a9c4dc; --ac-bg: #242c19; --ac-tx: #12160e; --warn: #f1c670; --warn-bg: #2a2310; --al: #ff9c8f; --al-bg: #30140f;
+  --bg: #101010; --card: #181817; --tx: #f2f1ea; --tx2: #b3b2a7; --line: #2a2a27;
+  --ac: #d8b24c; --ac2: #b3b2a7; --ac-bg: #1f1f1c; --ac-tx: #12160e; --warn: #f1c670; --warn-bg: #2a2310; --al: #ff9c8f; --al-bg: #30140f;
   --latao: #d8b24c; --latao2: #f6e3a1; --brilho: rgba(216,178,76,.5); --sil: #212b1c; --sil2: #37432d; --luz: #ffd15c;
-  --glow: rgba(216,178,76,.11); --sh: none; --cc: 2.1;
+  --glow: transparent; --sh: none; --cc: 2.1;
   --s1: #d8b24c; --s2: #6fb0ff; --s3: #36e0b4; --s4: #ff7fa9; --s5: #b9a0ff; --s6: #a5e05a; --s7: #ffa94d;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-theme=auto] {
-    --bg: #0d110c; --card: #161c14; --tx: #f3f0e4; --tx2: #c4c6b4; --line: #2d3626;
-    --ac: #d8b24c; --ac2: #a9c4dc; --ac-bg: #242c19; --ac-tx: #12160e; --warn: #f1c670; --warn-bg: #2a2310; --al: #ff9c8f; --al-bg: #30140f;
+    --bg: #101010; --card: #181817; --tx: #f2f1ea; --tx2: #b3b2a7; --line: #2a2a27;
+    --ac: #d8b24c; --ac2: #b3b2a7; --ac-bg: #1f1f1c; --ac-tx: #12160e; --warn: #f1c670; --warn-bg: #2a2310; --al: #ff9c8f; --al-bg: #30140f;
     --latao: #d8b24c; --latao2: #f6e3a1; --brilho: rgba(216,178,76,.5); --sil: #212b1c; --sil2: #37432d; --luz: #ffd15c;
-    --glow: rgba(216,178,76,.11); --sh: none; --cc: 2.1;
+    --glow: transparent; --sh: none; --cc: 2.1;
     --s1: #d8b24c; --s2: #6fb0ff; --s3: #36e0b4; --s4: #ff7fa9; --s5: #b9a0ff; --s6: #a5e05a; --s7: #ffa94d;
   }
 }
@@ -35,6 +35,8 @@ main > h2 { display: flex; align-items: center; gap: 8px; }
 main > h2::before { content: ''; flex: none; width: 14px; height: 2px; border-radius: 1px; background: currentColor; }
 .muted { color: var(--tx2); font-size: .875rem; }
 .card { background: var(--card); border-radius: var(--r); box-shadow: var(--sh); border: 1px solid var(--line); }
+/* sem caixa dentro de caixa */
+.card .card, .card .grupo { background: transparent; border: 0; box-shadow: none; border-radius: 0; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; } .esquadrilha { display: none; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
 
 /* ---------- Vocabulário de animações ----------
@@ -73,7 +75,7 @@ main > h2::before { content: ''; flex: none; width: 14px; height: 2px; border-ra
 .pg { padding: 20px 4px 8px; }
 .data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
 .pg h1 { margin-top: 4px; font-size: 1.9rem; letter-spacing: -.03em; }
-.pg { border-bottom: 1px solid var(--line); margin-bottom: 14px; padding-bottom: 14px; }
+.pg { margin-bottom: 18px; padding-bottom: 6px; }
 .sub { color: var(--tx2); font-size: .85rem; }
 .pg .sub { margin-top: 4px; }
 .grupo { list-style: none; padding: 0; overflow: hidden; }
