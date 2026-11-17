@@ -3,6 +3,7 @@
   import { blocosDaSemana } from '../lib/planner.js';
   import { addDays, startOfWeek, diaNome, fmtMin, parse } from '../lib/dates.js';
   import Ring from '../components/Ring.svelte';
+  import { planoSemanaCorrida, kmDaSemana } from '../lib/treino.js';
   import { fmtCurta } from '../lib/dates.js';
 
   const fs = $derived(fases());
@@ -47,6 +48,10 @@
     return n;
   });
   const msg = $derived(media >= 80 ? 'Ritmo excelente. Mantenha o ritmo.' : media >= 50 ? 'Bom ritmo. Uma semana mais fraca não apaga o que você construiu.' : 'Recomeçar é parte do processo. Faça só o próximo bloco.');
+  // treino: km planejados e feitos, lado a lado com as horas de estudo
+  const corrida = $derived(planoSemanaCorrida(app.cfg, ini, app.treinoSemanas));
+  const km = $derived(kmDaSemana(app.cfg, ini, app.treinos, app.treinoSemanas));
+  const kmTxt = (x) => String(x).replace('.', ',');
   const letra = (d) => diaNome(d).slice(0, 3);
   const hm = (m) => `${(m / 60).toFixed(1).replace('.', ',').replace(',0', '')}h`;
 </script>
@@ -55,7 +60,7 @@
   <p class="data">Semana · {fmtCurta(ini)} a {fmtCurta(addDays(ini, 6))}</p>
   <h1>{hm(feitoTotal)}<span> de {hm(metaTotal)}</span></h1>
   <div class="bar" role="progressbar" aria-label="Meta semanal" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
-  <p class="sub">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal</p>
+  <p class="sub">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal{corrida ? ` · corrida: ${kmTxt(km.feitos)} de ${kmTxt(km.meta)} km` : ''}</p>
 </header>
 
 <section class="aneis" aria-label="Progresso por dia">
@@ -65,6 +70,7 @@
       <Ring pct={p} size={40} stroke={4} />
       <span class="l">{letra(d.dia)}</span>
       <span class="v">{d.feito ? fmtMin(d.feito) : '–'}</span>
+      {#if corrida}<span class="km">{app.treinos[d.dia]?.km ? `${kmTxt(app.treinos[d.dia].km)}` : app.treinos[d.dia]?.minimo ? 'cam.' : '–'}<small>/{kmTxt(corrida.dias[parse(d.dia).getDay()] ?? 0)} km</small></span>{/if}
     </div>
   {/each}
 </section>
@@ -95,6 +101,7 @@
 </section>
 
 <style>
+  .km { font-size: .75rem; color: var(--ac2); font-variant-numeric: tabular-nums; } .km small { color: var(--tx2); }
   header { padding: 20px 4px 8px; }
   .data { color: var(--ac2); font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; font-weight: 500; }
   h1 { margin-top: 4px; font-size: 2.4rem; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }

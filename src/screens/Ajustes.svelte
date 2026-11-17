@@ -8,6 +8,7 @@
   import { fmtBR } from '../lib/dates.js';
   import { slotsDaJanela, janelasValidas, toHHMM } from '../lib/semana.js';
   import { series, principalDe } from '../lib/livros.js';
+  import { alertasTreino } from '../lib/treino.js';
 
   const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
   const ordem = [1, 2, 3, 4, 5, 6, 0];
@@ -122,6 +123,35 @@
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>
 
+<h2>Oração</h2>
+<section class="card bloco">
+  <p class="muted">Horários (o tempo dos terços, do Ângelus e da lectio sai das janelas de estudo). O 2º terço é depois do almoço e o 3º depois da corrida.</p>
+  <div class="duas">
+    {#each [['manha', 'Manhã'], ['terco3', '3º terço'], ['angelus', 'Ângelus'], ['terco2', '2º terço'], ['terco1', 'Terço'], ['noite', 'Noite'], ['lectio', 'Lectio divina']] as [k, nome]}
+      <label>{nome}<input type="time" bind:value={app.cfg.oracao[k]} onchange={salvar} /></label>
+    {/each}
+  </div>
+</section>
+
+<h2>Treino</h2>
+<section class="card bloco">
+  <div class="duas">
+    <label>Corrida (seg a sáb)<input type="time" bind:value={app.cfg.treino.corrida} onchange={salvar} /></label>
+    <label>Longão (domingo)<input type="time" bind:value={app.cfg.treino.longao} onchange={salvar} /></label>
+  </div>
+  <p class="muted">Musculação (~1 h). Deixe o horário vazio para tirar o dia.</p>
+  {#each [[1, 'Segunda'], [2, 'Terça'], [3, 'Quarta'], [4, 'Quinta'], [5, 'Sexta'], [6, 'Sábado']] as [wd, nome]}
+    {@const m = app.cfg.treino.musculacao?.[wd]}
+    <div class="duas">
+      <label>{nome}<input type="time" value={m?.ini ?? ''} onchange={(e) => { const v = e.currentTarget.value; app.cfg.treino.musculacao ??= {}; if (v) app.cfg.treino.musculacao[wd] = { ini: v, tipo: m?.tipo ?? 'upper' }; else delete app.cfg.treino.musculacao[wd]; salvar(); }} /></label>
+      <label>Tipo<select value={m?.tipo ?? 'upper'} disabled={!m} onchange={(e) => { app.cfg.treino.musculacao[wd].tipo = e.currentTarget.value; salvar(); }}><option value="upper">Upper</option><option value="lower">Lower</option></select></label>
+    </div>
+  {/each}
+  {#each alertasTreino(app.cfg, app.dia).filter((a) => !/fisio/.test(a)) as a}<p class="aviso-t" role="status">{a}</p>{/each}
+  <div class="tg"><span><strong>Liberação do fisio/ortopedista</strong><span class="muted">Necessária antes da Fase 2 da corrida (11/01/2027).</span></span>
+    <button role="switch" aria-checked={!!app.cfg.treino.liberadoFisio} aria-label="Liberação do fisio" class="sw" class:on={app.cfg.treino.liberadoFisio} onclick={() => { app.cfg.treino.liberadoFisio = !app.cfg.treino.liberadoFisio; salvar(); }}><i></i></button></div>
+</section>
+
 <h2>Livros principais</h2>
 <section class="card bloco">
   <p class="muted">Cada matéria usa os volumes do livro principal nos blocos. Cadastre páginas e outros livros em QG → Meus livros.</p>
@@ -191,6 +221,7 @@
 </section>
 
 <style>
+  .aviso-t { background: var(--warn-bg); color: var(--warn); padding: 10px 12px; border-radius: 12px; font-size: .9rem; }
   .bk3 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .temas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; } .temas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; } .temas .on { background: var(--ac); color: var(--ac-tx); border-color: var(--ac); }
   .msg { min-height: 1.5em; }

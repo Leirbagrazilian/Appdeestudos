@@ -99,7 +99,7 @@ describe('planner', () => {
   it('depois da semana diagnóstica vale o planner: blocos com horário e id por matéria', () => {
     const f = gerarFases(cfg());
     const b = blocosDoDia(cfg(), f, '2026-11-23');
-    expect(b[0]).toMatchObject({ ini: '06:00', fim: '06:50', min: 50, bruto: 50 });
+    expect(b[0]).toMatchObject({ ini: '06:40', fim: '07:10', min: 30, bruto: 30 });
     expect(b.every((x) => /^2026-11-23:[a-z]+(@\d{4})?$/.test(x.id))).toBe(true);
     expect(new Set(b.map((x) => x.id)).size).toBe(b.length);
     expect(b.at(-1).cat).toBe('erros'); // caderno de erros: 10 min, sem horário fixo
@@ -276,7 +276,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(6);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(9);
+    expect(novo.versaoSeed).toBe(11);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
@@ -540,11 +540,11 @@ describe('planner v2: casos de borda (revisão)', () => {
   });
   it('o id do bloco usa o horário: editar outra janela não troca o id dos blocos que não mudaram', () => {
     const c = cfg(); const g = gerarFases(c);
-    const antes = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:00');
+    const antes = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:40');
     c.rotina.janelas[2][0].fim = '11:00'; // mexe só na terça
-    const depois = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:00');
+    const depois = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:40');
     expect(depois.id).toBe(antes.id);
-    expect(antes.id).toMatch(/^2026-11-23:[a-z]+@0600$/);
+    expect(antes.id).toMatch(/^2026-11-23:[a-z]+@0640$/);
   });
   it('migração: janelas e meta que você editou sobrevivem a uma nova versão do seed', () => {
     const salvo = cfg(); salvo.versaoSeed = 3;
@@ -664,7 +664,7 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(9); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(11); expect(novo.ritmos.teoria).toBe(10);
   });
 });
 

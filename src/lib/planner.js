@@ -62,8 +62,8 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
 
 /** Blocos que realmente valem para o dia: o que foi passado para outro dia sai,
  *  o que veio de outro dia entra, e no "dia mínimo" o dia inteiro vira 45 min de questões (20 do próximo tópico), mais as revisões vencidas. */
-export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, exams = {}, planos } = {}) {
-  const ctx = { exams, planos: planos ?? new Map() };
+export function blocosAjustados(cfg, fases, dia, { adiados = {}, dificeis = {}, exams = {}, planos, reservas } = {}) {
+  const ctx = { exams, reservas, planos: planos ?? new Map() };
   let lista = blocosDoDia(cfg, fases, dia, ctx).filter((b) => !adiados[b.id] || adiados[b.id] === dia);
   for (const [id, alvo] of Object.entries(adiados)) {
     const orig = id.slice(0, 10);

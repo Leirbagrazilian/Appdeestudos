@@ -91,6 +91,15 @@ function foraDe(lista, esp) {
   return out.filter((j) => j.fim > j.ini);
 }
 
+/** Tira das janelas os intervalos reservados (ex.: terço, Ângelus), partindo a janela quando precisa. */
+export function recortar(lista, reservas = []) {
+  let out = lista.map((j) => ({ ...j }));
+  for (const r of reservas) {
+    out = out.flatMap((j) => (r.fim <= j.ini || r.ini >= j.fim ? [j] : [{ ...j, fim: r.ini }, { ...j, ini: r.fim }].filter((x) => x.fim > x.ini)));
+  }
+  return out;
+}
+
 /** Como `repartir`, mas cada posição tem um teto; o que passa do teto vai para as outras, na mesma proporção dos pesos. */
 export function repartirComTeto(pesos, tetos, total) {
   const res = pesos.map(() => 0);
@@ -117,7 +126,12 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   const fase = faseDoDia(fases, addDays(segunda, 3));
   const min = orcamentoSemana(cfg, fase.id, segunda, ctx);
   const dias = Array.from({ length: 7 }, (_, i) => ({ dia: addDays(segunda, i), wd: (i + 1) % 7, blocos: [] }));
-  const janelas = (wd) => janelasValidas(cfg.rotina?.janelas?.[wd]);
+  // oração: esse tempo sai das janelas de estudo (a janela da prova de sábado não é partida); `ctx.reservas` pode ser função da segunda-feira
+  const reservas = (typeof ctx.reservas === 'function' ? ctx.reservas(segunda) : ctx.reservas) ?? {};
+  // janela curta de verdade (30 a 49 min, ex.: segunda depois da corrida) é marcada antes do recorte: sobras do recorte não viram bloco curto
+  const marcar = (l) => l.map((j) => ({ ...j, curta: j.fim - j.ini >= 30 && j.fim - j.ini < s }));
+  const corta = (l, r) => l.flatMap((j) => (j.tipo === 'prova' && min.provas > 0 ? [j] : recortar([j], r))); // prova cronometrada não é partida
+  const janelas = (wd) => corta(marcar(janelasValidas(cfg.rotina?.janelas?.[wd])), reservas[wd]);
   const bloco = (cat, ini, dur, sessoes = 1) => ({ cat, ini, fim: ini + dur, min: sessoes ? sessoes * s : dur, bruto: dur, sessoes });
   const excedente = { prova: 0, red: 0 };
   const janelasLivres = []; // janelas de estudo em ordem cronológica
@@ -134,7 +148,7 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
     if (cor > 0) dias[5].blocos.push(bloco('corr', sab.ini + prova, cor, 0));
     const ini = sab.ini + prova + cor + (prova + cor > 0 ? p : 0); // 10 min de pausa depois da correção
     if (sab.fim - ini >= s) janelasLivres.push({ i: 5, ini, fim: sab.fim });
-    for (const j of foraDe(janelas(6), sab)) janelasLivres.push({ i: 5, ini: j.ini, fim: j.fim });
+    for (const j of foraDe(janelas(6), sab)) janelasLivres.push({ i: 5, ini: j.ini, fim: j.fim, curta: j.curta });
   }
   // Domingo: dia de estudo. Na janela do domingo ficam a redação (no começo) e o planejamento da semana (no fim); o resto é estudo.
   const dom = janelas(0).find((j) => j.tipo === 'domingo') ?? janelas(0).at(-1);
@@ -146,12 +160,20 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
     if (plano > 0) dias[6].blocos.push(bloco('plan', dom.fim - plano, plano, 0));
     const ini = dom.ini + red + (red > 0 ? p : 0), fim = dom.fim - plano - (plano > 0 ? p : 0);
     if (fim - ini >= s) janelasLivres.push({ i: 6, ini, fim });
-    for (const j of foraDe(janelas(0), dom)) janelasLivres.push({ i: 6, ini: j.ini, fim: j.fim });
+    for (const j of foraDe(janelas(0), dom)) janelasLivres.push({ i: 6, ini: j.ini, fim: j.fim, curta: j.curta });
   }
   // Segunda a sexta.
   // segunda a sexta: o tipo não importa, então janelas que se sobrepõem viram uma só
-  for (let i = 0; i < 5; i++) for (const j of janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined })))) janelasLivres.push({ i, ini: j.ini, fim: j.fim });
+  for (let i = 0; i < 5; i++) for (const j of corta(marcar(janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined })))), reservas[i + 1])) janelasLivres.push({ i, ini: j.ini, fim: j.fim, curta: j.curta });
   janelasLivres.sort((a, b) => a.i - b.i || a.ini - b.ini);
+  // janela curta (30 a 49 min, ex.: segunda 6h30–7h10 depois da corrida): uma sessão curta de Matemática, descontada do orçamento
+  for (let k = janelasLivres.length - 1; k >= 0; k--) {
+    const j = janelasLivres[k], dur = j.fim - j.ini;
+    if (j.curta && dur >= 30 && dur < s) {
+      dias[j.i].blocos.push({ cat: 'mat', ini: j.ini, fim: j.fim, min: dur, bruto: dur, sessoes: 1, curta: true });
+      min.mat = Math.max(0, min.mat - dur); janelasLivres.splice(k, 1);
+    }
+  }
 
   // Orçamento em sessões inteiras, limitado pela capacidade das janelas.
   const demanda = {};

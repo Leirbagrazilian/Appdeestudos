@@ -9,6 +9,11 @@
   import { planoDoBloco } from '../lib/foco.js';
   import { tarefasDoDia } from '../lib/tarefas.js';
   import Registro from '../components/Registro.svelte';
+  import Treino from '../components/Treino.svelte';
+  import Oracao from '../components/Oracao.svelte';
+  import { sequencia, alertasTreino, treinoDoDia, treinoFeito } from '../lib/treino.js';
+  import { oracoesDoDia } from '../lib/oracao.js';
+  import Linha from '../components/Linha.svelte';
   import Tarefa from '../components/Tarefa.svelte';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
@@ -20,7 +25,6 @@
   import Icon from '../components/Icon.svelte';
   import Farol from '../components/Farol.svelte';
   import Esquadrilha from '../components/Esquadrilha.svelte';
-  import Base from '../components/Base.svelte';
   import Emblema from '../components/Emblema.svelte';
   import { fraseDoDia } from '../lib/frases.js';
 
@@ -48,6 +52,9 @@
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
   const conflito = $derived(conflitosProvas(app.cfg).find((c) => diffDays(app.dia, c.de) >= 0 && diffDays(app.dia, c.de) <= 120));
   const diag = $derived(blocos.some((b) => b.diagnostico));
+  // sequência única: dias seguidos com estudo E treino feitos
+  const seq = $derived(sequencia(app.cfg, { cumpridos: app.cumpridos, treinos: app.treinos, oracoes: app.oracoes }, app.dia));
+  const avisosTreino = $derived(alertasTreino(app.cfg, app.dia));
   // modo domínio (Fase 0): tópicos travados, checkpoint do mês e o portão da última semana
   const travados = $derived(listaTravados(app.dominio, app.lacunas));
   const cpPendente = $derived(!diag && checkpointPendente(app.cfg, app.checkpoints, app.dia));
@@ -96,17 +103,46 @@
   }
   const fotoDe = (r) => (r.origem?.startsWith('erro:') ? app.errors[r.origem.slice(5)]?.foto : null);
   const descSessoes = (b) => { const p = planoDoBloco(b, app.cfg.foco); return p.sessoes > 1 ? `${p.sessoes} × ${p.len} min` : fmtMin(b.min); };
-</script>
 
+  // Linha do tempo única: estudo + treino + oração, em Manhã · Tarde · Noite.
+  const temProva = $derived(blocos.some((b) => ['prova', 'diag'].includes(b.cat)) || cpPendente);
+  const trn = $derived(treinoDoDia(app.cfg, app.dia, { treinos: app.treinos, editadas: app.treinoSemanas }));
+  const orac = $derived(oracoesDoDia(app.cfg, app.dia, { oracoes: app.oracoes, temProva }));
+  const emMin = (h) => { const m = /^(\d{1,2}):(\d{2})/.exec(h ?? ''); return m ? +m[1] * 60 + +m[2] : null; };
+  const itens = $derived([
+    ...blocos.map((b) => ({ k: 'e', id: 'e' + b.id, b, m: emMin(b.ini), feito: !!app.done[b.id] })),
+    ...(trn ? [{ k: 't', id: 't', m: emMin(trn.hora), feito: treinoFeito(app.treinos[app.dia] ?? {}) }] : []),
+    ...orac.map((o) => ({ k: 'o', id: 'o' + o.id, o, m: emMin(o.hora), feito: !!app.oracoes[app.dia]?.[o.id] })),
+  ]);
+  const PERIODOS = [['Manhã', 0, 720], ['Tarde', 720, 1080], ['Noite', 1080, 1441]];
+  const grupos = $derived([
+    ...PERIODOS.map(([nome, a, z]) => ({ nome, lista: itens.filter((i) => i.m != null && i.m >= a && i.m < z).sort((x, y) => x.m - y.m) })),
+    { nome: 'Sem horário', lista: itens.filter((i) => i.m == null) },
+  ].filter((g) => g.lista.length));
+  const SEDES = ['mat', 'fis', 'qui', 'por', 'ing', 'hg', 'red', 'prova', 'diag', 'minimo'];
+  const abrir = (id) => (aberto = aberto === id ? null : id);
+</script>
 <header>
-  <Farol {pct} {noite} />{#if pct >= 1}<Esquadrilha festa />{/if}
+  <div class="mini-farol" aria-hidden="true"><Farol {pct} {noite} /></div>{#if pct >= 1}<Esquadrilha festa />{/if}
   <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
   <h1>{pct >= 1 ? 'Missão cumprida.' : `Avante, ${app.cfg.perfil.nome}.`}</h1>
   <p class="frase">{frase}</p>
-  <p class="fase">Fase {fase.numero} · {fase.nome}<span> · semana {semanaDaFase(fase, app.dia)}/{totalSemanas(fase)}</span></p>
-  <Base total={base.total} acesas={base.acesas} {noite} />
-  <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
 </header>
+
+<section class="prog" aria-label="Progresso do dia">
+  <div class="topo"><strong>{Math.round(pct * 100)}%</strong><span>{fmtMin(feitoMin)} de {fmtMin(totalMin)}</span></div>
+  <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
+  <p class="fase">Fase {fase.numero} · {fase.nome}<span> · semana {semanaDaFase(fase, app.dia)}/{totalSemanas(fase)}</span></p>
+  <p class="sr" aria-live="polite">{Math.round(pct * 100)}% do dia concluído</p>
+  {#if dificil}
+    <p class="dif"><Icon nome="moon" size={16} />Dia mínimo: 45 min de questões e as revisões vencidas. Isso conta como dia cumprido.
+      <button class="lk" onclick={() => diaDificil(app.dia, false)}>Voltar ao dia completo</button></p>
+  {:else if pct < 1 && blocos.length > 2}
+    <button class="lk dif-bt" onclick={() => diaDificil(app.dia, true)}>Dia corrido? Fazer só o dia mínimo (45 min)</button>
+  {/if}
+  <p class="luzes seq">Sequência: <strong>{seq}</strong> {seq === 1 ? 'dia' : 'dias'} com estudo, treino e oração</p>
+  <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
+</section>
 
 {#if capitulo}
   <section class="card cap entra" aria-label="Campanha concluída">
@@ -130,17 +166,7 @@
   </a>
 {/if}
 
-<section class="prog" aria-label="Progresso do dia">
-  <div class="topo"><strong>{Math.round(pct * 100)}%</strong><span>{fmtMin(feitoMin)} de {fmtMin(totalMin)}</span></div>
-  <div class="bar" role="progressbar" aria-label="Progresso" aria-valuenow={Math.round(pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{pct * 100}%"></i></div>
-  <p class="sr" aria-live="polite">{Math.round(pct * 100)}% do dia concluído</p>
-  {#if dificil}
-    <p class="dif"><Icon nome="moon" size={16} />Dia mínimo: 45 min de questões e as revisões vencidas. Isso conta como dia cumprido.
-      <button class="lk" onclick={() => diaDificil(app.dia, false)}>Voltar ao dia completo</button></p>
-  {:else if pct < 1 && blocos.length > 2}
-    <button class="lk dif-bt" onclick={() => diaDificil(app.dia, true)}>Dia corrido? Fazer só o dia mínimo (45 min)</button>
-  {/if}
-</section>
+{#each avisosTreino as a}<p class="nota" role="status">{a}</p>{/each}
 
 {#if focoSemana}
   <p class="foco-sem"><span class="data">Foco da semana</span>{focoSemana.foco}</p>
@@ -180,64 +206,69 @@
   <blockquote class="carta entra"><p class="data">Sua carta</p><p>{app.cfg.carta}</p></blockquote>
 {/if}
 
-<h2>Hoje</h2>
-<ul class="lista card">
-  {#each blocos as b (b.id)}
-    {@const feito = !!app.done[b.id]}
-    {@const rodando = app.timer?.id === b.id}
-    {@const tarefa = tarefas[b.id]}
-    <li class:feito>
-      <div class="linha">
-        <Check {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onclick={() => alternarBloco(b, assuntos[b.id] ?? '', tarefas[b.id])} />
-        <button class="txt" aria-expanded={aberto === b.id} onclick={() => (aberto = aberto === b.id ? null : b.id)}>
-          <span class="tit">{tituloDe(b)}</span>
-          <span class="sub">{b.ini ? `${b.ini}–${b.fim} · ` : ''}{feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}{app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}{app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}{b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}</span>
-        </button>
-        {#if !feito}
-          <button class="play" class:rodando aria-label={rodando ? `Abrir cronômetro de ${b.titulo}` : `Começar cronômetro de ${b.titulo}`} onclick={() => comecar(b)}>
-            {#if rodando}<span class="onda" aria-hidden="true"></span>{:else}<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" /></svg>{/if}
-          </button>
-        {/if}
-        <span class="seta" class:aberta={aberto === b.id}><Icon nome="down" /></span>
-      </div>
-      {#if aberto === b.id}
-        <div class="det" transition:slide={{ duration: dur(220) }}>
-          <Tarefa {tarefa} materia={b.materia} />
-          {#if b.cat === 'plan'}
-            <a class="pri" href="#/revisao">Fazer a revisão da semana (3 perguntas)</a>
-          {/if}
-          {#if feito && b.comAssunto}
-            <button class="sec" onclick={() => (app.registroAberto = { id: b.id })}>{app.done[b.id].resultado ? 'Corrigir o resultado' : 'Registrar resultado (questões, páginas, erros)'}</button>
-          {/if}
-          <p class="dica"><Icon nome="bulb" />{b.dica}</p>
-          {#if b.como}<strong>Como fazer</strong><ul>{#each b.como as c}<li>{c}</li>{/each}</ul>{/if}
-          {#if b.onde}<strong>Onde achar</strong><ul>{#each b.onde as c}<li>{c}</li>{/each}</ul>{/if}
-          <label for="l-{b.id}">Aula ou playlist de {b.materia} (link)</label>
-          <div class="link">
-            <input id="l-{b.id}" type="url" inputmode="url" placeholder="cole o link do vídeo" value={app.cfg.links?.[b.materia] ?? ''}
-              onchange={(e) => { app.cfg.links = { ...(app.cfg.links ?? {}), [b.materia]: e.currentTarget.value.trim() }; salvarCfg(); }} />
-            {#if app.cfg.links?.[b.materia]}<a class="sec mini" href={app.cfg.links[b.materia]} target="_blank" rel="noopener">Abrir <Icon nome="ext" size={14} /></a>{/if}
-          </div>
-          {#if b.comAssunto && !feito}
-            <label for="a-{b.id}">Assunto estudado (agenda revisões em 1, 7 e 30 dias)</label>
-            <input id="a-{b.id}" placeholder="ex.: funções do 2º grau" bind:value={assuntos[b.id]} />
-          {/if}
-          {#if !feito}
-            <div class="acoes">
-              <button class="pri" onclick={() => comecar(b)}>{rodando ? 'Abrir cronômetro' : `Começar · ${descSessoes(b)}`}</button>
-              {#if !b.diagnostico}<button class="sec" onclick={() => { aberto = null; adiar(b, addDays(app.dia, 1)); }}>Passar para amanhã</button>{/if}
-            </div>
-          {/if}
-        </div>
+{#each grupos as g (g.nome)}
+  <h2 class="gr">{g.nome}<span class="n">{g.lista.filter((i) => i.feito).length}/{g.lista.length}</span></h2>
+  <ul class="lista">
+    {#each g.lista as it (it.id)}
+      {#if it.k === 't'}
+        <Treino dia={app.dia} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
+      {:else if it.k === 'o'}
+        <Oracao dia={app.dia} it={it.o} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
+      {:else}
+        {@render estudo(it.b, it.id)}
       {/if}
-    </li>
-  {/each}
-</ul>
+    {/each}
+  </ul>
+{/each}
+
+{#snippet estudo(b, id)}
+  {@const feito = !!app.done[b.id]}
+  {@const rodando = app.timer?.id === b.id}
+  {@const tarefa = tarefas[b.id]}
+  <Linha {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onToggle={() => alternarBloco(b, assuntos[b.id] ?? '', tarefas[b.id])}
+    aberto={aberto === id} onAbrir={() => abrir(id)} icone="livro" hora={b.ini ? `${b.ini}–${b.fim}` : ''} titulo={tituloDe(b)}
+    sub={`${feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}${app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}${app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}${b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}`}>
+    {#snippet extra()}{#if SEDES.includes(b.cat)}<span class="sedes">Sedes Sapientiae, rogai por nós</span>{/if}{/snippet}
+    {#snippet acao()}
+      {#if !feito}
+        <button class="play" class:rodando aria-label={rodando ? `Abrir cronômetro de ${b.titulo}` : `Começar cronômetro de ${b.titulo}`} onclick={() => comecar(b)}>
+          {#if rodando}<span class="onda" aria-hidden="true"></span>{:else}<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" /></svg>{/if}
+        </button>
+      {/if}
+    {/snippet}
+    <Tarefa {tarefa} materia={b.materia} />
+    {#if b.cat === 'plan'}
+      <a class="pri" href="#/revisao">Fazer a revisão da semana (3 perguntas)</a>
+    {/if}
+    {#if feito && b.comAssunto}
+      <button class="sec" onclick={() => (app.registroAberto = { id: b.id })}>{app.done[b.id].resultado ? 'Corrigir o resultado' : 'Registrar resultado (questões, páginas, erros)'}</button>
+    {/if}
+    <p class="dica"><Icon nome="bulb" />{b.dica}</p>
+    {#if b.como}<strong>Como fazer</strong><ul>{#each b.como as c}<li>{c}</li>{/each}</ul>{/if}
+    {#if b.onde}<strong>Onde achar</strong><ul>{#each b.onde as c}<li>{c}</li>{/each}</ul>{/if}
+    <label for="l-{b.id}">Aula ou playlist de {b.materia} (link)</label>
+    <div class="link">
+      <input id="l-{b.id}" type="url" inputmode="url" placeholder="cole o link do vídeo" value={app.cfg.links?.[b.materia] ?? ''}
+        onchange={(e) => { app.cfg.links = { ...(app.cfg.links ?? {}), [b.materia]: e.currentTarget.value.trim() }; salvarCfg(); }} />
+      {#if app.cfg.links?.[b.materia]}<a class="sec mini" href={app.cfg.links[b.materia]} target="_blank" rel="noopener">Abrir <Icon nome="ext" size={14} /></a>{/if}
+    </div>
+    {#if b.comAssunto && !feito}
+      <label for="a-{b.id}">Assunto estudado (agenda revisões em 1, 7 e 30 dias)</label>
+      <input id="a-{b.id}" placeholder="ex.: funções do 2º grau" bind:value={assuntos[b.id]} />
+    {/if}
+    {#if !feito}
+      <div class="acoes">
+        <button class="pri" onclick={() => comecar(b)}>{rodando ? 'Abrir cronômetro' : `Começar · ${descSessoes(b)}`}</button>
+        {#if !b.diagnostico}<button class="sec" onclick={() => { aberto = null; adiar(b, addDays(app.dia, 1)); }}>Passar para amanhã</button>{/if}
+      </div>
+    {/if}
+  </Linha>
+{/snippet}
 
 {#if revs.length}
   {@const pend = revs.filter((r) => !r.feita).length}
-  <h2>Revisões · {pend} {pend === 1 ? 'pendente' : 'pendentes'}</h2>
-  <ul class="lista card">
+  <h2 class="gr">Revisões<span class="n">{pend} {pend === 1 ? 'pendente' : 'pendentes'}</span></h2>
+  <ul class="lista">
     {#each revs as r (r.id)}
       {@const foto = fotoDe(r)}
       <li class:feito={r.feita}>
@@ -267,51 +298,53 @@
 </p>
 
 <style>
-  header { padding: 20px 4px 18px; position: relative; }
-  header > :global(*:not(.farol):not(.esquadrilha)) { position: relative; }
-  .data { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
-  h1 { margin-top: 4px; font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; max-width: calc(100% - 104px); }
-  .frase { margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--ac); color: var(--tx); font-size: .95rem; line-height: 1.4; max-width: min(32ch, calc(100% - 112px)); min-height: 2.8em; text-wrap: pretty; }
-  .fase { margin-top: 14px; display: inline-block; background: var(--bg); padding: 4px 12px; border: 1px solid var(--line); border-radius: 99px; font-size: .8125rem; font-weight: 600; color: var(--ac); }
+  .sedes { display: block; font-size: .75rem; font-style: italic; color: var(--tx2); }
+  header { padding: 20px 4px 4px; position: relative; }
+  .mini-farol { position: absolute; right: 0; top: 0; width: 62px; height: 48px; transform: scale(.5); transform-origin: right top; opacity: .7; pointer-events: none; }
+  .data { color: var(--tx2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
+  h1 { margin-top: 4px; font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em; max-width: calc(100% - 60px); }
+  .frase { margin-top: 8px; color: var(--tx2); font-size: .95rem; line-height: 1.45; max-width: 36ch; text-wrap: pretty; }
+  .fase { margin-top: 12px; display: block; font-size: .8125rem; font-weight: 600; color: var(--ac); }
   .fase span { color: var(--tx2); font-weight: 400; }
-  .luzes { margin-top: 10px; display: flex; align-items: center; gap: 8px; font-size: .8125rem; color: var(--tx2); }
-  .luzes strong { color: var(--ac); }
-  .luzes strong { font-variant-numeric: tabular-nums; }
-  .ponto { width: 8px; height: 8px; border-radius: 2px; background: var(--luz); box-shadow: 0 0 6px var(--brilho); border: 1px solid var(--sil2); }
-  .cap { padding: 16px; display: grid; gap: 10px; margin-bottom: 12px; border-color: var(--ac); }
+  .luzes { margin-top: 6px; display: flex; align-items: center; gap: 8px; font-size: .8125rem; color: var(--tx2); }
+  .luzes strong { color: var(--tx); font-variant-numeric: tabular-nums; }
+  .ponto { width: 8px; height: 8px; border-radius: 2px; background: var(--luz); border: 1px solid var(--sil2); }
+  .cap { padding: 16px; display: grid; gap: 10px; margin-top: 16px; border-color: var(--ac); }
   .capt { margin: 0; font-size: 1.2rem; text-transform: none; letter-spacing: -.01em; color: var(--tx); }
   .nums { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .nums li { display: grid; font-size: .85rem; color: var(--tx2); } .nums strong { font-size: 1.4rem; color: var(--ac); }
-  .prova { display: flex; align-items: center; gap: 16px; padding: 12px 4px; text-decoration: none; color: inherit; min-height: 64px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .num { font-size: 2.6rem; font-weight: 300; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 3.2ch; text-align: right; color: var(--ac); }
-  .emb { margin-left: auto; color: var(--ac); flex: none; display: grid; }
-  .lbl { display: grid; font-size: .85rem; color: var(--tx2); border-left: 3px solid var(--c); padding-left: 12px; }
+  .prova { display: flex; align-items: center; gap: 14px; padding: 10px 4px; margin-top: 12px; text-decoration: none; color: inherit; min-height: 64px; }
+  .num { font-size: 2.2rem; font-weight: 300; letter-spacing: -.04em; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; color: var(--ac); }
+  .emb { margin-left: auto; color: var(--tx2); flex: none; display: grid; opacity: .8; }
+  .lbl { display: grid; font-size: .85rem; color: var(--tx2); border-left: 2px solid var(--c); padding-left: 12px; }
   .lbl strong { color: var(--tx); font-size: .95rem; font-weight: 600; }
-  .prog { padding: 20px 4px 8px; }
-  .topo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; color: var(--tx2); font-size: .85rem; font-variant-numeric: tabular-nums; }
-  .topo strong { color: var(--ac); font-size: 1.4rem; font-weight: 600; }
+  .prog { padding: 20px 4px 4px; }
+  .topo { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; color: var(--tx2); font-size: .85rem; font-variant-numeric: tabular-nums; }
+  .topo strong { color: var(--tx); font-size: 1.5rem; font-weight: 600; }
   .bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
-  .bar i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); box-shadow: 0 0 10px var(--brilho); }
+  .bar i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
   .dif { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: .85rem; color: var(--warn); }
-  .dif-bt { margin-top: 6px; min-height: 44px; font-size: .85rem; }
+  .dif-bt { margin-top: 4px; min-height: 44px; font-size: .85rem; }
   .lk { color: var(--ac); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; }
-  .nota { display: block; margin-top: 12px; padding: 12px 16px; border-radius: 14px; background: var(--warn-bg); color: var(--warn); font-size: .9rem; text-decoration: none; font-weight: 500; }
-  .nota.alerta { background: var(--al-bg); color: var(--al); box-shadow: inset 3px 0 0 var(--al); }
+  .nota { display: block; margin-top: 12px; padding: 4px 0 4px 14px; border-left: 2px solid var(--warn); color: var(--warn); font-size: .9rem; text-decoration: none; font-weight: 500; }
+  .nota.alerta { border-left-color: var(--al); color: var(--al); }
   .nota :global(svg), summary :global(svg) { vertical-align: -3px; margin-right: 8px; }
   .nota summary { cursor: pointer; font-weight: 600; min-height: 24px; }
   .nota p, .nota ol { margin: 8px 0 0; color: var(--tx); } .nota ol { padding-left: 20px; }
   .backup p { margin: 0; color: var(--warn); }
   .bk { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
   .bk .pri { flex: 1; }
-  .carta { margin: 12px 0 0; padding: 16px; border-left: 3px solid var(--ac); background: var(--ac-bg); border-radius: 0 14px 14px 0; display: grid; gap: 6px; }
+  .carta { margin: 16px 0 0; padding: 4px 0 4px 14px; border-left: 2px solid var(--ac); display: grid; gap: 6px; }
   .carta p:last-child { font-style: italic; white-space: pre-line; }
-  h2 { margin-top: 28px; }
-  .lista { list-style: none; padding: 0; overflow: hidden; }
-  .lista li + li { border-top: 1px solid var(--line); }
-  .lista li { padding: 2px 8px 2px 4px; }
-  .linha { display: flex; align-items: center; gap: 4px; }
-  .txt { flex: 1; text-align: left; display: grid; padding: 8px 4px; min-height: 52px; align-content: center; }
-  .tit { font-weight: 600; transition: color .18s; }
+  .gr::before { display: none !important; }
+  .gr { display: flex; justify-content: space-between; align-items: baseline; margin: 32px 4px 4px; color: var(--tx2); text-align: left; letter-spacing: .14em; }
+  .gr .n { font-weight: 500; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+  .lista { list-style: none; padding: 0; }
+  .lista > :global(li:last-child) { border-bottom: 1px solid var(--line); }
+  .lista > li { border-top: 1px solid var(--line); }
+  .linha { display: flex; align-items: center; gap: 2px; }
+  .txt { flex: 1; text-align: left; display: grid; padding: 8px 4px; min-height: 56px; align-content: center; }
+  .tit { font-weight: 600; }
   .sub { color: var(--tx2); font-size: .85rem; }
   .feito .tit { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--tx2); font-weight: 500; }
   .play { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; color: var(--ac); border: 1.5px solid var(--ac); }
@@ -319,24 +352,22 @@
   .play.rodando { background: var(--ac); }
   .onda { width: 12px; height: 12px; border-radius: 50%; background: var(--ac-tx); animation: pisca 1.2s ease-in-out infinite; }
   @keyframes pisca { 50% { opacity: .3; transform: scale(.7); } }
-  .seta { color: var(--tx2); display: grid; width: 28px; place-items: center; transition: transform .22s ease; pointer-events: none; } .seta.aberta { transform: rotate(180deg); }
-  .det { padding: 4px 8px 16px 48px; display: grid; gap: 8px; font-size: .9rem; overflow: hidden; }
-  .det ul { padding-left: 18px; display: grid; gap: 4px; color: var(--tx2); } .det strong { font-size: .8125rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ac); }
-  .dica { background: var(--ac-bg); padding: 10px 12px; border-radius: 12px; display: flex; gap: 10px; align-items: flex-start; } .dica :global(svg) { flex: none; margin-top: 3px; color: var(--ac); }
-  .det label { color: var(--tx2); font-size: .85rem; }
+  .det ul { padding-left: 18px; display: grid; gap: 4px; color: var(--tx2); } .det strong, :global(.det) strong { font-size: .8125rem; text-transform: uppercase; letter-spacing: .06em; color: var(--tx2); }
+  .dica { padding: 0; display: flex; gap: 10px; align-items: flex-start; color: var(--tx2); } .dica :global(svg) { flex: none; margin-top: 3px; color: var(--ac); }
+  label { color: var(--tx2); font-size: .85rem; }
   .link { display: flex; gap: 8px; }
   input { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); }
   .acoes { display: grid; gap: 8px; margin-top: 4px; }
   .pri, .sec { min-height: 48px; border-radius: 14px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; padding: 0 14px; }
   .pri { background: var(--ac); color: var(--ac-tx); } .sec { border: 1px solid var(--line); color: var(--tx); }
   .mini { min-height: 44px; flex: none; font-size: .85rem; }
-  .notas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 4px 10px 48px; }
+  .notas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0 4px 10px 46px; }
   .nt { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); font-size: .85rem; font-weight: 600; }
   .nt.dificil { color: var(--al); border-color: color-mix(in srgb, var(--al) 45%, var(--line)); }
   .nt.facil { color: var(--ac); border-color: color-mix(in srgb, var(--ac) 45%, var(--line)); }
   .mini-foto { width: 44px; height: 44px; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
   .mini-foto img { width: 100%; height: 100%; object-fit: cover; }
-  .foto { display: block; width: calc(100% - 48px); margin: 0 0 12px 48px; border-radius: 12px; }
-  .foco-sem { margin-top: 12px; padding: 12px 16px; border-left: 3px solid var(--ac2); background: var(--ac-bg); border-radius: 0 14px 14px 0; display: grid; gap: 2px; font-weight: 600; }
-  .lembrete { display: flex; gap: 8px; justify-content: center; align-items: center; color: var(--tx2); font-size: .85rem; margin: 20px 0 0; text-align: center; }
+  .foto { display: block; width: calc(100% - 46px); margin: 0 0 12px 46px; border-radius: 12px; }
+  .foco-sem { margin-top: 12px; padding: 4px 0 4px 14px; border-left: 2px solid var(--ac); display: grid; gap: 2px; font-weight: 600; }
+  .lembrete { display: flex; gap: 8px; justify-content: center; align-items: center; color: var(--tx2); font-size: .85rem; margin: 24px 0 0; text-align: center; }
 </style>

@@ -14,11 +14,12 @@ import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas } from '../lib/trilha.js';
 import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
 import { faseDoDia, maxExtraZero } from '../lib/phases.js';
+import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { base: 1, dias: {}, proxima: 1 } };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -26,7 +27,7 @@ export const app = $state({
   ultimoBackup: null, lembreteAdiado: null, persistente: null, registroAberto: null,
 });
 export const fases = () => gerarFases(app.cfg);
-export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis, exams: app.exams });
+export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis, exams: app.exams, reservas: (seg) => reservasDaSemana(app.cfg, app.oracoes, seg) });
 export const pf = () => prefs(app.cfg);
 const snap = (v) => $state.snapshot(v);
 
@@ -124,6 +125,36 @@ export async function salvarRevisao(seg, dados) {
   checarConquistas();
 }
 export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
+
+// ---------- oração ----------
+/** Marca (ou desmarca) um item de oração do dia. O Catecismo avança 3 perguntas no marcador, uma vez por dia. */
+export async function marcarOracao(dia, id, feito) {
+  const m = { ...(app.oracoes[dia] ?? {}) };
+  if (feito) m[id] = true; else delete m[id];
+  app.oracoes[dia] = m; await salvarKV('oracoes');
+  if (id === 'catecismo') {
+    const c = app.catecismo, dias = { ...(c.dias ?? {}) };
+    if (feito) dias[dia] = true; else delete dias[dia];
+    const base = c.base ?? (c.dias ? 1 : c.proxima ?? 1); // formato antigo: { proxima }
+    app.catecismo = { base, dias, proxima: proximaPergunta({ base, dias }) };
+    await salvarKV('catecismo');
+  }
+  if (feito) vibrar(pf(), 'toque');
+}
+export async function marcadorCatecismo(n) {
+  const dias = app.catecismo.dias ?? {}, alvo = Math.max(1, Math.round(n) || 1);
+  app.catecismo = { base: alvo - 3 * Object.keys(dias).length, dias, proxima: alvo }; await salvarKV('catecismo');
+}
+
+// ---------- treino de corrida ----------
+/** Registro do treino do dia (feito, km real, dor no joelho/tornozelo 0–10, inchaço, mínimo de 20 min de caminhada). */
+export async function registrarTreino(dia, dados) {
+  app.treinos[dia] = { ...(app.treinos[dia] ?? {}), ...dados }; await salvarKV('treinos');
+  const r = app.treinos[dia];
+  if (dados.feito || dados.minimo) { vibrar(pf(), 'ok'); avisar(dados.minimo ? 'Mínimo do treino feito' : 'Treino feito', null, r.km && !dados.minimo ? `${String(r.km).replace('.', ',')} km. A sequência agradece.` : 'A sequência agradece.'); }
+}
+/** Km diários da semana (fases 2 a 5), editados no domingo. */
+export async function salvarSemanaTreino(seg, dias) { app.treinoSemanas[seg] = { dias }; await salvarKV('treinoSemanas'); }
 
 export async function marcarCumprido(dia) {
   if (app.cumpridos[dia]) return;

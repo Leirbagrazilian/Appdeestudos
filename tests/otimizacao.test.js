@@ -9,7 +9,7 @@ import { addDays } from '../src/lib/dates.js';
 
 const cfg = () => structuredClone(seed);
 const fases = gerarFases(cfg());
-const DIA = '2026-11-17'; // terça-feira da semana 1 da Fase 0
+const DIA = '2026-11-18'; // quarta-feira da semana 1 da Fase 0 (tem Matemática e Física)
 const urlOk = (u) => /^https:\/\/\S+$/.test(u) && !!new URL(u).hostname.includes('.');
 
 describe('integridade do seed: links e ids', () => {
