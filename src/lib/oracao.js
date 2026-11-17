@@ -34,9 +34,11 @@ export function chaveEvangelho(dia) {
   if (dp === 60) return 'corpus';
   const dom = addDays(dia, -weekday(dia));
   // Advento e Natal
+  // tempo do Natal: 26 a 31/12 e 2 a 5/1 (o domingo anterior pode cair no ano anterior)
+  if (md >= '12-26') return dom >= `${ano}-12-26` ? 'oitavaNatal' : 'natal';
+  if (md >= '01-02' && md <= '01-05') return dom >= `${ano}-01-02` ? 'santoNome' : 'circuncisao';
   const a1 = advento1(ano);
-  if (dom >= a1) { const n = diffDays(a1, dom) / 7 + 1; return dom >= `${ano}-12-26` ? 'oitavaNatal' : `advento${Math.min(4, n)}`; }
-  if (dom >= `${ano}-01-01` && dom <= `${ano}-01-05`) return 'santoNome';
+  if (dom >= a1) return `advento${Math.min(4, diffDays(a1, dom) / 7 + 1)}`;
   // último domingo de outubro: Cristo Rei
   const ultOut = addDays(`${ano}-10-31`, -weekday(`${ano}-10-31`));
   if (dom === ultOut) return 'cristoRei';
@@ -44,8 +46,14 @@ export function chaveEvangelho(dia) {
   const temp = { '-63': 'septuagesima', '-56': 'sexagesima', '-49': 'quinquagesima', '-42': 'quaresma1', '-35': 'quaresma2', '-28': 'quaresma3', '-21': 'quaresma4', '-14': 'paixao', '-7': 'ramos', 0: 'pascoa', 7: 'pascoela', 14: 'pascoa2', 21: 'pascoa3', 28: 'pascoa4', 35: 'pascoa5', 42: 'posAscensao', 49: 'pentecostes', 56: 'trindade' };
   if (temp[dd]) return temp[dd];
   if (dd > 56) {
-    if (addDays(dom, 7) >= advento1(ano)) return 'pent24'; // último domingo depois de Pentecostes
-    return `pent${Math.min(23, (dd - 49) / 7 + 1)}`;
+    // a Trindade é o 1º domingo depois de Pentecostes; o último é sempre o 24º
+    const ultimo = addDays(advento1(ano), -7);
+    if (dom >= ultimo) return 'pent24';
+    const n = (dd - 49) / 7;
+    if (n <= 23) return `pent${n}`;
+    // entre o 23º e o último entram os domingos que sobraram depois da Epifania (os últimos deles, em ordem)
+    const sobra = diffDays(addDays(p, 49 + 7 * 23), ultimo) / 7 - 1, j = n - 23;
+    return `epifania${Math.min(6, Math.max(3, 6 - sobra + j))}`;
   }
   // depois da Epifania até a Septuagésima
   const ep = `${ano}-01-06`, domEp = addDays(ep, 7 - weekday(ep) || 7);
@@ -145,6 +153,20 @@ export function oracoesDoDia(cfg, dia, ctx = {}) {
   return lista.map((x) => ({ ...x, partes: x.partes ?? [] }))
     .sort((a, b) => (a.hora ? toMin(a.hora) : 9999) - (b.hora ? toMin(b.hora) : 9999));
 }
+
+/**
+ * Reservas da semana que começa em `seg`: o nível é o da segunda-feira (fica fixo a semana toda, para os blocos e seus ids não
+ * mudarem no meio da semana) e nada é reservado antes do início da oração.
+ */
+export function reservasDaSemana(cfg, oracoes, seg) {
+  const ini = P(cfg).inicio; if (!ini) return {};
+  const n = nivelOracao(cfg, oracoes, seg < ini ? ini : seg), r = reservasOracao(cfg, n), out = {};
+  for (let i = 0; i < 7; i++) { const d = addDays(seg, i); out[weekday(d)] = d < ini ? [] : r[weekday(d)]; }
+  return out;
+}
+
+/** Catecismo: a próxima pergunta é a base + 3 por dia marcado (desmarcar um dia volta 3; corrigir o marcador muda a base). */
+export const proximaPergunta = (c) => Math.max(1, (c?.base ?? c?.proxima ?? 1) + 3 * Object.keys(c?.dias ?? {}).length);
 
 /** Intervalos de oração que saem das janelas de estudo, por dia da semana (0 = dom): { wd: [{ ini, fim }] em minutos }. */
 export function reservasOracao(cfg, nivel) {

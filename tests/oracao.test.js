@@ -104,3 +104,42 @@ describe('oração, estudo e sequência', () => {
     expect(sequencia(cfg(), { cumpridos, treinos, oracoes: { '2026-11-17': { manha: true, noite: true } } }, '2026-11-17')).toBe(1);
   });
 });
+
+import { reservasDaSemana, proximaPergunta } from '../src/lib/oracao.js';
+describe('revisão da etapa 2', () => {
+  it('domingos depois de Pentecostes: Trindade é o 1º; 2º = Lc 14; o último é o 24º; sobras da Epifania entram antes dele', () => {
+    expect(chaveEvangelho('2027-05-30')).toBe('pent2');
+    expect(evangelhoDoDia(cfg(), '2027-05-30').ref).toBe('Lc 14,16-24');
+    expect(chaveEvangelho('2027-11-21')).toBe('pent24');
+    expect(chaveEvangelho('2027-11-14')).toMatch(/^epifania[3-6]$/);
+    expect(chaveEvangelho('2026-11-01')).toBe('pent23'); expect(chaveEvangelho('2026-11-08')).toBe('epifania5'); expect(chaveEvangelho('2026-11-15')).toBe('epifania6');
+  });
+  it('2 a 5/1 vindo de dezembro e 26 a 31/12', () => {
+    expect(chaveEvangelho('2027-01-02')).toBe('circuncisao');
+    expect(chaveEvangelho('2027-01-03')).toBe('santoNome');
+    expect(chaveEvangelho('2026-12-26')).toBe('natal');
+    expect(chaveEvangelho('2026-12-27')).toBe('oitavaNatal');
+    expect(chaveEvangelho('2027-01-07')).toBe('epifania');
+  });
+  it('reservas: nível da segunda vale a semana toda e nada antes do início', () => {
+    const r = reservasDaSemana(cfg(), {}, '2026-11-16');
+    expect(r[1]).toEqual([]); // segunda 16/11, antes do início
+    expect(r[2].length).toBeGreaterThan(0);
+  });
+  it('sábado com prova: a reserva do Ângelus não parte a prova cronometrada', () => {
+    const c = cfg(), r = reservasDaSemana(c, {}, '2027-08-02');
+    const nivel3 = (seg) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, v]));
+    const dias = planoSemana(c, gerarFases(c), '2027-08-02', { reservas: nivel3 });
+    const prova = dias[5].blocos.filter((b) => b.cat === 'prova' && !b.sessoes);
+    expect(prova).toHaveLength(1); expect(prova[0].ini).toBe(8 * 60);
+  });
+  it('sobras do recorte não viram bloco curto de Matemática', () => {
+    const c = cfg(); const res = { 1: [{ ini: 12 * 60 + 55, fim: 13 * 60 + 15 }] };
+    const dias = planoSemana(c, gerarFases(c), '2026-11-23', { reservas: res });
+    expect(dias[0].blocos.filter((b) => b.curta)).toHaveLength(1); // só a de 6h40
+  });
+  it('catecismo: base + 3 por dia marcado', () => {
+    expect(proximaPergunta({ base: 1, dias: { a: true, b: true } })).toBe(7);
+    expect(proximaPergunta({ proxima: 10 })).toBe(10);
+  });
+});
