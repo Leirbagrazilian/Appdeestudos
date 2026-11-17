@@ -152,6 +152,14 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   // segunda a sexta: o tipo não importa, então janelas que se sobrepõem viram uma só
   for (let i = 0; i < 5; i++) for (const j of janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined })))) janelasLivres.push({ i, ini: j.ini, fim: j.fim });
   janelasLivres.sort((a, b) => a.i - b.i || a.ini - b.ini);
+  // janela curta (30 a 49 min, ex.: segunda 6h30–7h10 depois da corrida): uma sessão curta de Matemática, descontada do orçamento
+  for (let k = janelasLivres.length - 1; k >= 0; k--) {
+    const j = janelasLivres[k], dur = j.fim - j.ini;
+    if (dur >= 30 && dur < s) {
+      dias[j.i].blocos.push({ cat: 'mat', ini: j.ini, fim: j.fim, min: dur, bruto: dur, sessoes: 1, curta: true });
+      min.mat = Math.max(0, min.mat - dur); janelasLivres.splice(k, 1);
+    }
+  }
 
   // Orçamento em sessões inteiras, limitado pela capacidade das janelas.
   const demanda = {};

@@ -210,8 +210,8 @@
     "janelas": {
       "1": [
         {
-          "ini": "06:00",
-          "fim": "07:00"
+          "ini": "06:30",
+          "fim": "07:10"
         },
         {
           "ini": "12:30",
@@ -1797,7 +1797,7 @@
       }
     ]
   },
-  "versaoSeed": 9,
+  "versaoSeed": 10,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -3278,5 +3278,152 @@
     "video": 20,
     "teoria": 10,
     "questoes": 70
+  },
+  "treinoPlano": {
+    "inicio": "2026-11-17",
+    "meta": {
+      "nome": "100 km",
+      "data": "2027-11-25"
+    },
+    "provas": [
+      {
+        "data": "2027-10-07",
+        "nome": "Maratona preparatória"
+      },
+      {
+        "data": "2027-11-25",
+        "nome": "100 km"
+      }
+    ],
+    "fases": [
+      {
+        "n": 1,
+        "nome": "Retomada diária",
+        "inicio": "2026-11-17",
+        "fim": "2027-01-10",
+        "kmIni": 20,
+        "kmFim": 33
+      },
+      {
+        "n": 2,
+        "nome": "Base ampliada",
+        "inicio": "2027-01-11",
+        "fim": "2027-04-18",
+        "kmIni": 33,
+        "kmFim": 50
+      },
+      {
+        "n": 3,
+        "nome": "Construção",
+        "inicio": "2027-04-19",
+        "fim": "2027-07-25",
+        "kmIni": 50,
+        "kmFim": 65
+      },
+      {
+        "n": 4,
+        "nome": "Específica + maratona",
+        "inicio": "2027-07-26",
+        "fim": "2027-10-07",
+        "kmIni": 65,
+        "kmFim": 72
+      },
+      {
+        "n": 5,
+        "nome": "Bloco final e polimento",
+        "inicio": "2027-10-08",
+        "fim": "2027-11-25",
+        "kmIni": 72,
+        "kmFim": 40
+      }
+    ],
+    "fase1": {
+      "km": [
+        20,
+        22,
+        25,
+        20,
+        27,
+        30,
+        33,
+        26
+      ],
+      "longao": [
+        5,
+        6,
+        7,
+        5,
+        8,
+        9,
+        10,
+        8
+      ]
+    },
+    "semana1": {
+      "1": 2,
+      "2": 3,
+      "3": 2,
+      "4": 4,
+      "5": 2,
+      "6": 2
+    },
+    "proporcao": [
+      2,
+      3,
+      2,
+      4,
+      2,
+      2
+    ],
+    "tipos": {
+      "1": "leve",
+      "2": "strides",
+      "3": "leve",
+      "4": "qualidade",
+      "5": "leve",
+      "6": "bem leve",
+      "0": "longao"
+    },
+    "fortalecimento": [
+      "Agachamento unilateral",
+      "Panturrilha",
+      "Ponte",
+      "Abdução",
+      "Prancha",
+      "Copenhagen"
+    ],
+    "caminhadaMin": 20
+  },
+  "treino": {
+    "corrida": "05:30",
+    "corridaMin": 45,
+    "longao": "06:00",
+    "musculacao": {
+      "1": {
+        "ini": "18:30",
+        "tipo": "upper"
+      },
+      "2": {
+        "ini": "15:00",
+        "tipo": "lower"
+      },
+      "4": {
+        "ini": "17:00",
+        "tipo": "upper"
+      },
+      "5": {
+        "ini": "17:00",
+        "tipo": "lower"
+      }
+    },
+    "fortalecimentoDias": [
+      3,
+      6
+    ],
+    "tenis": {
+      "principal": "X-Step",
+      "rapido": "Metaspeed"
+    },
+    "liberadoFisio": false
   }
 }
