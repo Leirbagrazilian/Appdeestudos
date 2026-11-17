@@ -124,5 +124,26 @@ export function sequencia(cfg, { cumpridos = {}, treinos = {} }, hoje) {
 /** Km feitos na semana (registros) e a meta. */
 export function kmDaSemana(cfg, seg, treinos = {}, editadas = {}) {
   const feitos = Array.from({ length: 7 }, (_, i) => addDays(seg, i)).reduce((a, d) => a + (+treinos[d]?.km || 0), 0);
-  return { feitos: r05(feitos), meta: planoSemanaCorrida(cfg, seg, editadas)?.km ?? 0 };
+  return { feitos: Math.round(feitos * 10) / 10, meta: planoSemanaCorrida(cfg, seg, editadas)?.km ?? 0 };
+}
+
+/** Texto da revisão de domingo para colar na conversa do plano de corrida. */
+export function textoResumoCorrida(cfg, seg, treinos = {}, c = {}, editadas = {}) {
+  const p = planoSemanaCorrida(cfg, seg, editadas), k = kmDaSemana(cfg, seg, treinos, editadas);
+  const nomes = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  const fmt = (x) => String(x).replace('.', ',');
+  const dias = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(seg, i), r = treinos[d] ?? {}, plan = p?.dias?.[(i + 1) % 7] ?? 0;
+    const feito = r.feito ? `${fmt(r.km ?? plan)} km` : r.minimo ? 'caminhada 20 min' : 'não fez';
+    const dor = r.dor || r.tornozelo || r.inchaco ? ` (dor joelho ${r.dor ?? 0}, tornozelo ${r.tornozelo ?? 0}${r.inchaco ? ', inchaço' : ''})` : '';
+    return `${nomes[i]}: ${feito} de ${fmt(plan)} km${dor}`;
+  });
+  return [
+    `Resumo da semana de corrida (${seg.split('-').reverse().join('/')})${p ? ` · Fase ${p.fase.n} ${p.fase.nome}, semana ${p.semana + 1}${p.leve ? ' (leve)' : ''}` : ''}`,
+    `Km: ${fmt(c.km ?? k.feitos)} de ${fmt(k.meta)}`,
+    ...dias,
+    `Dor no joelho (0–10): ${c.joelho ?? '-'} · tornozelo: ${c.tornozelo ?? '-'}`,
+    `Sono: ${c.sono || '-'} · Cansaço (0–10): ${c.cansaco ?? '-'}`,
+    `Temperos: ${c.temperos || '-'}`,
+  ].join('\n');
 }

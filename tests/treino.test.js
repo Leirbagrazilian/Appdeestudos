@@ -80,7 +80,7 @@ describe('treino de corrida: dia e regras', () => {
     expect(sequencia(cfg(), { cumpridos: { '2026-11-18': true, '2026-11-19': true }, treinos }, '2026-11-19')).toBe(2);
   });
   it('km da semana: soma o registrado e mostra a meta', () => {
-    expect(kmDaSemana(cfg(), '2026-11-16', { '2026-11-17': { km: 3.2 }, '2026-11-18': { km: 2 } })).toEqual({ feitos: 5, meta: 20 });
+    expect(kmDaSemana(cfg(), '2026-11-16', { '2026-11-17': { km: 3.2 }, '2026-11-18': { km: 2 } })).toEqual({ feitos: 5.2, meta: 20 });
   });
 });
 
@@ -105,5 +105,20 @@ describe('treino e planner', () => {
     const m = migrarCfg(v, seed);
     expect(m.rotina.janelas[1][0]).toEqual({ ini: '06:30', fim: '07:10' });
     expect(m.treinoPlano.inicio).toBe('2026-11-17'); expect(m.treino.corrida).toBe('05:30');
+  });
+});
+
+import { textoResumoCorrida } from '../src/lib/treino.js';
+describe('revisão de domingo: resumo da corrida', () => {
+  it('texto para colar: km, dias, dor, sono, cansaço e temperos', () => {
+    const tr = { '2026-11-17': { feito: true, km: 3.2 }, '2026-11-19': { dor: 4 }, '2026-11-20': { minimo: true } };
+    const t = textoResumoCorrida(seed, '2026-11-16', tr, { joelho: 4, sono: '7 h', cansaco: 5, temperos: 'ok' });
+    expect(t).toMatch(/Fase 1 Retomada diária, semana 1/);
+    expect(t).toMatch(/Km: 3,2 de 20/);
+    expect(t).toMatch(/Ter: 3,2 km de 3 km/);
+    expect(t).toMatch(/Qui: não fez de 4 km \(dor joelho 4/);
+    expect(t).toMatch(/Sex: caminhada 20 min/);
+    expect(t).toMatch(/Sono: 7 h · Cansaço \(0–10\): 5/);
+    expect(t).toMatch(/Temperos: ok/);
   });
 });

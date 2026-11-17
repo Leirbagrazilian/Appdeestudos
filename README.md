@@ -88,6 +88,14 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - **Bloco da Fase 0:** vídeo curto (até 20 min), exercícios (Khan/OBMEP) e livro, com no mínimo 10 exercícios.
 - **Progresso** (QG): checkpoint mensal (10 questões de Matemática da EFOMM em 30 min, aviso no primeiro sábado do mês), gráfico e o **portão da Fase 0**: teste de saída do Khan com 80% ou mais e checkpoint com pelo menos 5 acertos (e melhor que o diagnóstico). Se falhar, prorroga 2 semanas só com os tópicos fracos.
 
+## Treino de corrida (SPEC v3 §13)
+- **Plano:** meta 100 km em 25/11/2027 (maratona preparatória em 07/10/2027). Fases: Retomada (17/11–10/01), Base ampliada, Construção, Específica + maratona, Bloco final. Na Fase 1 os km de cada dia vêm do plano (semana modelo e depois 2:3:2:4:2:2); nas outras, a meta semanal e os km que você ajusta no domingo (Revisão da semana).
+- **Hoje:** card de treino no topo (corrida 5h30, longão domingo 6h, intensidade, tênis, musculação, fortalecimento). Marque feito e o km real; dor no joelho/tornozelo > 3/10 ou inchaço transforma o dia em caminhada, com alerta. Dia corrido: 20 min de caminhada.
+- **Sequência:** um só contador, que conta o dia quando estudo E treino foram feitos.
+- **Semana:** horas de estudo e km lado a lado. **Segunda:** o 1º bloco de estudo vira uma sessão curta de 40 min (6h30–7h10).
+- **Domingo:** a revisão ganha km, dor, sono, cansaço e temperos, e o botão "Copiar resumo da corrida".
+- **Ajustes:** horários da corrida, do longão e da musculação, avisos (lower na véspera do longão, jiu-jitsu no dia forte) e a liberação do fisio antes da Fase 2.
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

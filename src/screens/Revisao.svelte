@@ -5,15 +5,37 @@
   import { PERGUNTAS, resumoSemana, historico, semanaDe } from '../lib/revisao.js';
   import { addDays, fmtCurta, fmtMin } from '../lib/dates.js';
   import { dur } from '../lib/prefs.js';
+  import { kmDaSemana, planoSemanaCorrida, textoResumoCorrida } from '../lib/treino.js';
+  import { avisar, salvarSemanaTreino } from '../stores/app.svelte.js';
 
   const atual = semanaDe(app.dia);
   let qual = $state('atual'); // 'atual' | 'passada'
   const seg = $derived(qual === 'atual' ? atual : addDays(atual, -7));
   const existente = $derived(app.revisoes[seg]);
   let resp = $state({ bem: '', faltou: '', foco: '' }), aberto = $state(null), falta = $state('');
+  let corrida = $state({});
+  const temCorrida = $derived(!!planoSemanaCorrida(app.cfg, seg, app.treinoSemanas));
+  const kmSem = $derived(kmDaSemana(app.cfg, seg, app.treinos, app.treinoSemanas));
 
   // carrega as respostas salvas da semana escolhida
-  $effect(() => { resp = { bem: existente?.bem ?? '', faltou: existente?.faltou ?? '', foco: existente?.foco ?? '' }; falta = ''; });
+  $effect(() => { resp = { bem: existente?.bem ?? '', faltou: existente?.faltou ?? '', foco: existente?.foco ?? '' }; corrida = { ...(existente?.corrida ?? {}) }; falta = ''; });
+  // treino: dor máxima registrada na semana entra como sugestão
+  const dorMax = (campo) => Math.max(0, ...Array.from({ length: 7 }, (_, i) => +app.treinos[addDays(seg, i)]?.[campo] || 0));
+  async function copiar() {
+    const txt = textoResumoCorrida(app.cfg, seg, app.treinos, { ...corrida, joelho: corrida.joelho ?? dorMax('dor'), tornozelo: corrida.tornozelo ?? dorMax('tornozelo') }, app.treinoSemanas);
+    try { await navigator.clipboard.writeText(txt); avisar('Resumo copiado', null, 'Cole na conversa do plano de corrida.'); }
+    catch { avisar('Não consegui copiar', null, 'Selecione o texto abaixo e copie à mão.'); textoManual = txt; }
+  }
+  let textoManual = $state('');
+  // km de cada dia da semana seguinte (nas fases 2 a 5 você define aos domingos; na fase 1 já vêm do plano)
+  const prox = $derived(addDays(seg, 7));
+  const planoProx = $derived(planoSemanaCorrida(app.cfg, prox, app.treinoSemanas));
+  const DIAS_KM = [[1, 'Seg'], [2, 'Ter'], [3, 'Qua'], [4, 'Qui'], [5, 'Sex'], [6, 'Sáb'], [0, 'Dom']];
+  function kmDia(wd, v) {
+    const dias = { ...(app.treinoSemanas[prox]?.dias ?? {}) };
+    if (v === '') delete dias[wd]; else dias[wd] = Math.max(0, +v);
+    salvarSemanaTreino(prox, dias);
+  }
 
   const r = $derived(resumoSemana(app.cfg, fases(), { done: app.done, errors: app.errors, reviews: app.reviews, cumpridos: app.cumpridos, adiados: app.adiados, exams: app.exams }, seg));
   const hist = $derived(historico(app.revisoes));
@@ -22,8 +44,8 @@
 
   async function salvar(ev) {
     ev.preventDefault();
-    if (!resp.bem.trim() && !resp.faltou.trim() && !resp.foco.trim()) { falta = 'Responda pelo menos uma das três perguntas.'; return; }
-    await salvarRevisao(seg, { ...resp, resumo: { pct: r.pct, feitoMin: r.feitoMin, planMin: r.planMin, questoes: r.questoes, erros: r.erros, diasCumpridos: r.diasCumpridos } });
+    if (!resp.bem.trim() && !resp.faltou.trim() && !resp.foco.trim() && !Object.values(corrida).some((v) => v !== '' && v != null)) { falta = 'Responda pelo menos uma das perguntas.'; return; }
+    await salvarRevisao(seg, { ...resp, corrida: { ...corrida }, resumo: { pct: r.pct, feitoMin: r.feitoMin, planMin: r.planMin, questoes: r.questoes, erros: r.erros, diasCumpridos: r.diasCumpridos } });
   }
 </script>
 
@@ -47,6 +69,30 @@
   {#each PERGUNTAS as [campo, pergunta, ex]}
     <label>{pergunta}<textarea rows="2" placeholder={ex} bind:value={resp[campo]}></textarea></label>
   {/each}
+  {#if temCorrida}
+    <fieldset class="cor">
+      <legend>Corrida da semana</legend>
+      <div class="g2">
+        <label>Km da semana<input type="number" inputmode="decimal" step="0.1" min="0" placeholder={String(kmSem.feitos).replace('.', ',')} bind:value={corrida.km} /></label>
+        <label>Cansaço (0–10)<input type="number" inputmode="numeric" min="0" max="10" bind:value={corrida.cansaco} /></label>
+        <label>Dor no joelho (0–10)<input type="number" inputmode="numeric" min="0" max="10" placeholder={String(dorMax('dor'))} bind:value={corrida.joelho} /></label>
+        <label>Dor no tornozelo (0–10)<input type="number" inputmode="numeric" min="0" max="10" placeholder={String(dorMax('tornozelo'))} bind:value={corrida.tornozelo} /></label>
+      </div>
+      <label>Sono<input placeholder="ex.: 7 h por noite, acordei bem" bind:value={corrida.sono} /></label>
+      <label>Como foram os temperos<textarea rows="2" bind:value={corrida.temperos}></textarea></label>
+      <p class="sub">Meta: {String(kmSem.meta).replace('.', ',')} km · registrados: {String(kmSem.feitos).replace('.', ',')} km</p>
+      <button type="button" class="sec" onclick={copiar}>Copiar resumo da corrida</button>
+      {#if planoProx}
+        <p class="sub">Km de cada dia da próxima semana (meta {String(planoProx.km).replace('.', ',')} km{planoProx.leve ? ', semana leve' : ''}). Deixe vazio para usar o plano.</p>
+        <div class="g7">
+          {#each DIAS_KM as [wd, nome]}
+            <label>{nome}<input type="number" inputmode="decimal" step="0.5" min="0" placeholder={String(planoProx.dias[wd] ?? 0).replace('.', ',')} value={app.treinoSemanas[prox]?.dias?.[wd] ?? ''} onchange={(e) => kmDia(wd, e.currentTarget.value)} /></label>
+          {/each}
+        </div>
+      {/if}
+      {#if textoManual}<textarea rows="8" readonly aria-label="Resumo da corrida">{textoManual}</textarea>{/if}
+    </fieldset>
+  {/if}
   {#if falta}<p class="falta" role="alert">{falta}</p>{/if}
   <button class="pri">{existente ? 'Atualizar a revisão' : 'Salvar a revisão'}</button>
   {#if existente}<p class="sub">Salva em {fmtCurta(existente.feita)}.</p>{/if}
@@ -72,6 +118,11 @@
 {:else}<p class="card vazio sub">Nenhuma revisão ainda. A primeira é a de domingo.</p>{/if}
 
 <style>
+  .g7 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; } .g7 label { font-size: .8rem; } .g7 input { padding: 8px 6px; text-align: center; }
+  .cor { border: 0; padding: 0; margin: 0; display: grid; gap: 10px; } .cor legend { font-weight: 700; margin-bottom: 6px; color: var(--ac2); }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cor input, .cor textarea { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
+  .sec { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 600; }
   .per { margin: 8px 4px 0; }
   .res { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 10px; padding: 16px; margin-top: 12px; }
   .res div { display: grid; }
