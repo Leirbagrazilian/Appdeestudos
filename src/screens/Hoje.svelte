@@ -304,7 +304,7 @@
   .data { color: var(--tx2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
   h1 { margin-top: 4px; font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em; max-width: calc(100% - 60px); }
   .frase { margin-top: 8px; color: var(--tx2); font-size: .95rem; line-height: 1.45; max-width: 36ch; text-wrap: pretty; }
-  .fase { margin-top: 12px; font-size: .8125rem; font-weight: 600; color: var(--ac); }
+  .fase { margin-top: 12px; display: block; font-size: .8125rem; font-weight: 600; color: var(--ac); }
   .fase span { color: var(--tx2); font-weight: 400; }
   .luzes { margin-top: 6px; display: flex; align-items: center; gap: 8px; font-size: .8125rem; color: var(--tx2); }
   .luzes strong { color: var(--tx); font-variant-numeric: tabular-nums; }
@@ -336,7 +336,8 @@
   .bk .pri { flex: 1; }
   .carta { margin: 16px 0 0; padding: 4px 0 4px 14px; border-left: 2px solid var(--ac); display: grid; gap: 6px; }
   .carta p:last-child { font-style: italic; white-space: pre-line; }
-  .gr { display: flex; justify-content: space-between; align-items: baseline; margin: 32px 4px 4px; color: var(--tx2); letter-spacing: .14em; }
+  .gr::before { display: none !important; }
+  .gr { display: flex; justify-content: space-between; align-items: baseline; margin: 32px 4px 4px; color: var(--tx2); text-align: left; letter-spacing: .14em; }
   .gr .n { font-weight: 500; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
   .lista { list-style: none; padding: 0; }
   .lista > :global(li:last-child) { border-bottom: 1px solid var(--line); }

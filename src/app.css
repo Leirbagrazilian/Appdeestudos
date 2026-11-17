@@ -80,3 +80,6 @@ main > h2::before { content: ''; flex: none; width: 14px; height: 2px; border-ra
 .pg .sub { margin-top: 4px; }
 .grupo { list-style: none; padding: 0; overflow: hidden; }
 .grupo > li + li { border-top: 1px solid var(--line); }
+
+/* enxame de fundo: bem discreto, longe do texto */
+.esquadrilha:not(.festa) { opacity: .3; }
