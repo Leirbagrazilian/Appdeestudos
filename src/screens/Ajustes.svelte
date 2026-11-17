@@ -123,6 +123,16 @@
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>
 
+<h2>Oração</h2>
+<section class="card bloco">
+  <p class="muted">Horários (o tempo dos terços, do Ângelus e da lectio sai das janelas de estudo). O 2º terço é depois do almoço e o 3º depois da corrida.</p>
+  <div class="duas">
+    {#each [['manha', 'Manhã'], ['terco3', '3º terço'], ['angelus', 'Ângelus'], ['terco2', '2º terço'], ['terco1', 'Terço'], ['noite', 'Noite'], ['lectio', 'Lectio divina']] as [k, nome]}
+      <label>{nome}<input type="time" bind:value={app.cfg.oracao[k]} onchange={salvar} /></label>
+    {/each}
+  </div>
+</section>
+
 <h2>Treino</h2>
 <section class="card bloco">
   <div class="duas">

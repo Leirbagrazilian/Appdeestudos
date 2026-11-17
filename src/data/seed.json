@@ -210,7 +210,7 @@
     "janelas": {
       "1": [
         {
-          "ini": "06:30",
+          "ini": "06:40",
           "fim": "07:10"
         },
         {
@@ -1797,7 +1797,7 @@
       }
     ]
   },
-  "versaoSeed": 10,
+  "versaoSeed": 11,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -3429,5 +3429,338 @@
     },
     "liberadoFisio": false,
     "ritmoMinKm": 7
+  },
+  "oracaoPlano": {
+    "inicio": "2026-11-17",
+    "diasMes": 30,
+    "diasMeta": 27,
+    "niveis": [
+      {
+        "n": 1,
+        "nome": "Fundamentos",
+        "itens": [
+          "manha",
+          "terco1",
+          "noite"
+        ]
+      },
+      {
+        "n": 2,
+        "nome": "Dois terços e o Evangelho",
+        "itens": [
+          "manha",
+          "angelus",
+          "terco2",
+          "evangelho",
+          "terco1",
+          "noite"
+        ]
+      },
+      {
+        "n": 3,
+        "nome": "Rosário completo e lectio",
+        "itens": [
+          "manha",
+          "terco3",
+          "angelus",
+          "terco2",
+          "evangelho",
+          "lectio",
+          "terco1",
+          "noite"
+        ]
+      },
+      {
+        "n": 4,
+        "nome": "Santo do dia e Catecismo",
+        "itens": [
+          "manha",
+          "terco3",
+          "angelus",
+          "terco2",
+          "evangelho",
+          "lectio",
+          "santo",
+          "catecismo",
+          "terco1",
+          "noite"
+        ]
+      }
+    ],
+    "misterios": {
+      "gozosos": [
+        "A Anunciação do Anjo a Nossa Senhora",
+        "A Visitação de Nossa Senhora a Santa Isabel",
+        "O Nascimento de Jesus em Belém",
+        "A Apresentação do Menino Jesus no Templo",
+        "O Encontro do Menino Jesus no Templo"
+      ],
+      "dolorosos": [
+        "A Agonia de Jesus no Horto",
+        "A Flagelação de Jesus",
+        "A Coroação de espinhos",
+        "Jesus carrega a Cruz",
+        "A Crucifixão e morte de Jesus"
+      ],
+      "gloriosos": [
+        "A Ressurreição de Jesus",
+        "A Ascensão de Jesus ao céu",
+        "A Vinda do Espírito Santo",
+        "A Assunção de Nossa Senhora",
+        "A Coroação de Nossa Senhora no céu"
+      ]
+    },
+    "misteriosDoDia": {
+      "1": "gozosos",
+      "4": "gozosos",
+      "2": "dolorosos",
+      "5": "dolorosos",
+      "3": "gloriosos",
+      "6": "gloriosos",
+      "0": "gloriosos"
+    },
+    "textos": {
+      "sinal": {
+        "nome": "Sinal da cruz",
+        "texto": "Pelo sinal da Santa Cruz, livrai-nos, Deus, Nosso Senhor, dos nossos inimigos. Em nome do Pai, e do Filho, e do Espírito Santo. Amém."
+      },
+      "coracao": {
+        "nome": "Entrega",
+        "texto": "Meu Deus, eu vos dou o meu coração e a minha alma."
+      },
+      "oferecimento": {
+        "nome": "Oferecimento do dia",
+        "texto": "Ó meu Deus, eu vos ofereço todas as orações, obras, estudos, treinos e sofrimentos deste dia, em união com o Sagrado Coração de Jesus, pelas intenções pelas quais Ele se oferece continuamente no altar. Amém.",
+        "conferir": true
+      },
+      "paiNosso": {
+        "nome": "Pai-Nosso",
+        "texto": "Pai Nosso, que estais no céu, santificado seja o vosso nome; venha a nós o vosso reino; seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje; perdoai-nos as nossas ofensas, assim como nós perdoamos a quem nos tem ofendido; e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém."
+      },
+      "aveMaria": {
+        "nome": "Ave-Maria",
+        "texto": "Ave Maria, cheia de graça, o Senhor é convosco; bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós, pecadores, agora e na hora da nossa morte. Amém."
+      },
+      "credo": {
+        "nome": "Credo",
+        "texto": "Creio em Deus Pai todo-poderoso, Criador do céu e da terra; e em Jesus Cristo, seu único Filho, Nosso Senhor, que foi concebido pelo poder do Espírito Santo; nasceu da Virgem Maria; padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; desceu aos infernos; ao terceiro dia ressuscitou dos mortos; subiu aos céus, está sentado à direita de Deus Pai todo-poderoso, donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo, na Santa Igreja Católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne, na vida eterna. Amém."
+      },
+      "gloria": {
+        "nome": "Glória",
+        "texto": "Glória ao Pai, e ao Filho, e ao Espírito Santo. Assim como era no princípio, agora e sempre, e por todos os séculos dos séculos. Amém."
+      },
+      "fatima": {
+        "nome": "Ó meu Jesus",
+        "texto": "Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas para o céu e socorrei principalmente as que mais precisarem."
+      },
+      "salve": {
+        "nome": "Salve Rainha",
+        "texto": "Salve, Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva; a vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei; e, depois deste desterro, mostrai-nos Jesus, bendito fruto do vosso ventre, ó clemente, ó piedosa, ó doce sempre Virgem Maria. V. Rogai por nós, santa Mãe de Deus. R. Para que sejamos dignos das promessas de Cristo."
+      },
+      "terco": {
+        "nome": "Como rezar o terço",
+        "texto": "Credo, Pai-Nosso, 3 Ave-Marias e Glória. Depois, em cada um dos 5 mistérios: anuncie o mistério, 1 Pai-Nosso, 10 Ave-Marias, Glória e \"Ó meu Jesus\". No fim, Salve Rainha."
+      },
+      "exame": {
+        "nome": "Exame de consciência",
+        "texto": "Em silêncio, alguns minutos:\n• Agradeci a Deus pelo dia?\n• Rezei com atenção ou com pressa?\n• Cumpri meu dever de estado hoje (estudo, treino, família, trabalho)?\n• Como tratei minha família e os outros?\n• Faltei com a verdade, a pureza, a caridade ou a temperança?\n• O que faço amanhã para ser melhor?"
+      },
+      "contricao": {
+        "nome": "Ato de contrição",
+        "texto": "Meu Deus, porque sois infinitamente bom e digno de ser amado sobre todas as coisas, arrependo-me de todo o coração de vos ter ofendido e proponho firmemente, com o auxílio da vossa graça, nunca mais pecar e fugir das ocasiões de pecado. Senhor, misericórdia.",
+        "conferir": true
+      },
+      "noite": {
+        "nome": "Oração da noite",
+        "texto": "Em vossas mãos, Senhor, entrego o meu espírito. Guardai-me esta noite, livrai-me de todo mal e dai-me um sono tranquilo, para amanhã vos servir com mais fidelidade. Amém.",
+        "conferir": true
+      },
+      "anjo": {
+        "nome": "Santo Anjo",
+        "texto": "Santo Anjo do Senhor, meu zeloso guardador, se a ti me confiou a piedade divina, sempre me rege, me guarda, me governa e me ilumina. Amém."
+      },
+      "angelus": {
+        "nome": "Ângelus",
+        "texto": "V. O Anjo do Senhor anunciou a Maria. R. E ela concebeu do Espírito Santo. Ave Maria...\nV. Eis aqui a serva do Senhor. R. Faça-se em mim segundo a vossa palavra. Ave Maria...\nV. E o Verbo se fez carne. R. E habitou entre nós. Ave Maria...\nV. Rogai por nós, santa Mãe de Deus. R. Para que sejamos dignos das promessas de Cristo.\nOremos: Infundi, Senhor, nós vos pedimos, a vossa graça em nossas almas, para que nós, que pela anunciação do Anjo conhecemos a encarnação de Jesus Cristo, vosso Filho, por sua paixão e cruz sejamos conduzidos à glória da ressurreição. Pelo mesmo Cristo, Senhor nosso. Amém."
+      },
+      "reginaCaeli": {
+        "nome": "Regina Caeli",
+        "texto": "Rainha do céu, alegrai-vos, aleluia. Porque Aquele que merecestes trazer em vosso seio, aleluia, ressuscitou como disse, aleluia. Rogai a Deus por nós, aleluia.\nV. Alegrai-vos e exultai, ó Virgem Maria, aleluia. R. Porque o Senhor ressuscitou verdadeiramente, aleluia.\nOremos: Ó Deus, que vos dignastes alegrar o mundo com a ressurreição do vosso Filho, Nosso Senhor Jesus Cristo, concedei-nos que, por sua Mãe, a Virgem Maria, alcancemos as alegrias da vida eterna. Pelo mesmo Cristo, Senhor nosso. Amém."
+      },
+      "vinde": {
+        "nome": "Vinde, Espírito Santo",
+        "texto": "Vinde, Espírito Santo, enchei os corações dos vossos fiéis e acendei neles o fogo do vosso amor.\nV. Enviai o vosso Espírito e tudo será criado. R. E renovareis a face da terra.\nOremos: Ó Deus, que instruístes os corações dos vossos fiéis com a luz do Espírito Santo, concedei-nos que no mesmo Espírito saibamos o que é reto e gozemos sempre da sua consolação. Por Cristo, Senhor nosso. Amém."
+      },
+      "tomas": {
+        "nome": "Oração antes do estudo (São Tomás de Aquino)",
+        "texto": "Criador inefável, verdadeira fonte de luz e de sabedoria, dignai-vos derramar sobre as trevas da minha inteligência um raio da vossa claridade, afastando de mim a dupla escuridão em que nasci: o pecado e a ignorância. Dai-me agudeza para entender, capacidade para reter, método e facilidade para aprender, sutileza para interpretar e graça abundante para me expressar. Ordenai o começo, dirigi o progresso e completai o fim. Por Cristo, Senhor nosso. Amém.",
+        "conferir": true
+      },
+      "cupertino": {
+        "nome": "Oração a São José de Cupertino",
+        "texto": "Ó São José de Cupertino, que por vossa oração alcançastes de Deus ser interrogado no vosso exame somente sobre o que sabíeis, alcançai-me também a graça de ir bem nas provas que vou fazer, depois de ter feito a minha parte no estudo. São José de Cupertino, rogai por mim. Por Cristo, Senhor nosso. Amém.",
+        "conferir": true
+      },
+      "lectio": {
+        "nome": "Lectio divina (15 min)",
+        "texto": "Com o Evangelho do dia:\n1. Ler: devagar, duas vezes.\n2. Meditar: o que este texto diz para mim hoje?\n3. Rezar: responda a Deus com suas palavras.\n4. Contemplar: fique em silêncio na presença dEle."
+      }
+    },
+    "links": {
+      "evangelho": "https://www.divinumofficium.com/cgi-bin/missa/missa.pl",
+      "santo": "https://www.divinumofficium.com/cgi-bin/missa/missa.pl",
+      "catecismo": "https://www.google.com/search?q=Catecismo+Maior+de+S%C3%A3o+Pio+X"
+    },
+    "festas": {
+      "03-07": "São Tomás de Aquino (calendário de 1962)",
+      "09-18": "São José de Cupertino"
+    },
+    "santos": {
+      "01-01": "Oitava do Natal (Circuncisão do Senhor)",
+      "01-06": "Epifania do Senhor",
+      "01-13": "Batismo do Senhor",
+      "01-17": "Santo Antão",
+      "01-20": "Santos Fabião e Sebastião",
+      "01-21": "Santa Inês",
+      "01-25": "Conversão de São Paulo",
+      "01-29": "São Francisco de Sales",
+      "01-31": "São João Bosco",
+      "02-02": "Purificação de Nossa Senhora",
+      "02-03": "São Brás",
+      "02-05": "Santa Águeda",
+      "02-11": "Aparição de Nossa Senhora de Lourdes",
+      "02-22": "Cátedra de São Pedro",
+      "02-24": "São Matias",
+      "03-07": "São Tomás de Aquino",
+      "03-19": "São José",
+      "03-25": "Anunciação do Senhor",
+      "04-25": "São Marcos",
+      "05-01": "São José Operário",
+      "05-11": "Santos Filipe e Tiago",
+      "05-31": "Nossa Senhora Rainha",
+      "06-24": "Natividade de São João Batista",
+      "06-29": "Santos Pedro e Paulo",
+      "07-02": "Visitação de Nossa Senhora",
+      "07-16": "Nossa Senhora do Carmo",
+      "07-22": "Santa Maria Madalena",
+      "07-25": "São Tiago",
+      "07-26": "Sant'Ana",
+      "07-31": "Santo Inácio de Loyola",
+      "08-04": "São Domingos",
+      "08-06": "Transfiguração do Senhor",
+      "08-10": "São Lourenço",
+      "08-15": "Assunção de Nossa Senhora",
+      "08-22": "Imaculado Coração de Maria",
+      "08-24": "São Bartolomeu",
+      "08-28": "Santo Agostinho",
+      "09-08": "Natividade de Nossa Senhora",
+      "09-14": "Exaltação da Santa Cruz",
+      "09-15": "Sete Dores de Nossa Senhora",
+      "09-18": "São José de Cupertino",
+      "09-21": "São Mateus",
+      "09-29": "São Miguel Arcanjo",
+      "10-02": "Santos Anjos da Guarda",
+      "10-04": "São Francisco de Assis",
+      "10-07": "Nossa Senhora do Rosário",
+      "10-11": "Maternidade de Nossa Senhora",
+      "10-18": "São Lucas",
+      "10-28": "Santos Simão e Judas",
+      "11-01": "Todos os Santos",
+      "11-02": "Fiéis Defuntos",
+      "11-11": "São Martinho de Tours",
+      "11-21": "Apresentação de Nossa Senhora",
+      "11-22": "Santa Cecília",
+      "11-30": "Santo André",
+      "12-03": "São Francisco Xavier",
+      "12-06": "São Nicolau",
+      "12-08": "Imaculada Conceição",
+      "12-13": "Santa Luzia",
+      "12-21": "São Tomé",
+      "12-25": "Natal do Senhor",
+      "12-26": "Santo Estêvão",
+      "12-27": "São João Evangelista",
+      "12-28": "Santos Inocentes"
+    },
+    "evangelhos": {
+      "advento1": "Lc 21,25-33",
+      "advento2": "Mt 11,2-10",
+      "advento3": "Jo 1,19-28",
+      "advento4": "Lc 3,1-6",
+      "natal": "Jo 1,1-14",
+      "oitavaNatal": "Lc 2,33-40",
+      "circuncisao": "Lc 2,21",
+      "santoNome": "Lc 2,21",
+      "epifania": "Mt 2,1-12",
+      "sagradaFamilia": "Lc 2,42-52",
+      "epifania2": "Jo 2,1-11",
+      "epifania3": "Mt 8,1-13",
+      "epifania4": "Mt 8,23-27",
+      "epifania5": "Mt 13,24-30",
+      "epifania6": "Mt 13,31-35",
+      "septuagesima": "Mt 20,1-16",
+      "sexagesima": "Lc 8,4-15",
+      "quinquagesima": "Lc 18,31-43",
+      "cinzas": "Mt 6,16-21",
+      "quaresma1": "Mt 4,1-11",
+      "quaresma2": "Mt 17,1-9",
+      "quaresma3": "Lc 11,14-28",
+      "quaresma4": "Jo 6,1-15",
+      "paixao": "Jo 8,46-59",
+      "ramos": "Mt 26,36–27,54",
+      "pascoa": "Mc 16,1-7",
+      "pascoela": "Jo 20,19-31",
+      "pascoa2": "Jo 10,11-16",
+      "pascoa3": "Jo 16,16-22",
+      "pascoa4": "Jo 16,5-14",
+      "pascoa5": "Jo 16,23-30",
+      "ascensao": "Mc 16,14-20",
+      "posAscensao": "Jo 15,26–16,4",
+      "pentecostes": "Jo 14,23-31",
+      "trindade": "Mt 28,18-20",
+      "corpus": "Jo 6,56-59",
+      "cristoRei": "Jo 18,33-37",
+      "pent": {
+        "2": "Lc 14,16-24",
+        "3": "Lc 15,1-10",
+        "4": "Lc 5,1-11",
+        "5": "Mt 5,20-24",
+        "6": "Mc 8,1-9",
+        "7": "Mt 7,15-21",
+        "8": "Lc 16,1-9",
+        "9": "Lc 19,41-47",
+        "10": "Lc 18,9-14",
+        "11": "Mc 7,31-37",
+        "12": "Lc 10,23-37",
+        "13": "Lc 17,11-19",
+        "14": "Mt 6,24-33",
+        "15": "Lc 7,11-16",
+        "16": "Lc 14,1-11",
+        "17": "Mt 22,34-46",
+        "18": "Mt 9,1-8",
+        "19": "Mt 22,1-14",
+        "20": "Jo 4,46-53",
+        "21": "Mt 18,23-35",
+        "22": "Mt 22,15-21",
+        "23": "Mt 9,18-26",
+        "24": "Mt 24,15-35"
+      }
+    }
+  },
+  "oracao": {
+    "manha": "05:10",
+    "terco3": "06:15",
+    "angelus": "12:00",
+    "terco2": "13:00",
+    "terco1": "21:00",
+    "noite": "21:20",
+    "lectio": "21:40",
+    "duracoes": {
+      "manha": 10,
+      "terco": 20,
+      "angelus": 5,
+      "noite": 15,
+      "lectio": 15,
+      "estudo": 5
+    }
   }
 }

@@ -96,6 +96,18 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - **Domingo:** a revisão ganha km, dor, sono, cansaço e temperos, e o botão "Copiar resumo da corrida".
 - **Ajustes:** horários da corrida, do longão e da musculação, avisos (lower na véspera do longão, jiu-jitsu no dia forte) e a liberação do fisio antes da Fase 2.
 
+## Oração (liturgia tradicional, Missal de 1962)
+- **Na Hoje:** itens de oração com o texto dentro (toque para abrir). O que não tem fonte segura aparece com a marca "conferir". Evangelho, santo do dia e Catecismo trazem a referência e um link.
+- **Progressão mensal** desde 17/11/2026, de 30 em 30 dias. Com 27 dias completos (todos os itens do nível), o nível sobe; senão o mês se repete, sem voltar de nível.
+  1. Manhã, 1 terço e noite.
+  2. + 2º terço, Ângelus (Regina Caeli no tempo pascal) e Evangelho do dia.
+  3. Rosário completo (3 terços) e lectio divina.
+  4. + santo do dia e 3 perguntas do Catecismo de São Pio X, com marcador.
+- **Mistérios do dia:** gozosos seg/qui, dolorosos ter/sex, gloriosos qua/sáb/dom.
+- **Horários** editáveis em Ajustes. O tempo dos terços, do Ângelus e da lectio sai das janelas de estudo.
+- **Com o estudo:** "Vinde, Espírito Santo" e a oração de São Tomás antes do 1º bloco; "Sedes Sapientiae, rogai por nós" nos blocos; São José de Cupertino antes de prova antiga, simulado e checkpoint; novena a ele nos 9 dias antes de cada prova do Calendário; festas em 7/3 e 18/9.
+- **Sequência:** o dia conta com estudo, treino (mínimo 20 min de caminhada) e oração (mínimo manhã + noite).
+
 ## Notas
 - Notificações locais só disparam quando o app é aberto (limitação de PWA sem servidor). Pelo mesmo motivo, o cronômetro não consegue tocar um alarme com outro app em primeiro plano: no Android há um botão experimental que tenta abrir o timer do relógio do sistema. Os alertas garantidos de inscrição (14, 7 e 1 dia) vão no arquivo `.ics` para a Google Agenda.
 - As datas de 2027 são estimativas (ciclo 2026 + 1 ano). Edite em Ajustes quando os editais saírem.

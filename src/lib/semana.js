@@ -91,6 +91,15 @@ function foraDe(lista, esp) {
   return out.filter((j) => j.fim > j.ini);
 }
 
+/** Tira das janelas os intervalos reservados (ex.: terço, Ângelus), partindo a janela quando precisa. */
+export function recortar(lista, reservas = []) {
+  let out = lista.map((j) => ({ ...j }));
+  for (const r of reservas) {
+    out = out.flatMap((j) => (r.fim <= j.ini || r.ini >= j.fim ? [j] : [{ ...j, fim: r.ini }, { ...j, ini: r.fim }].filter((x) => x.fim > x.ini)));
+  }
+  return out;
+}
+
 /** Como `repartir`, mas cada posição tem um teto; o que passa do teto vai para as outras, na mesma proporção dos pesos. */
 export function repartirComTeto(pesos, tetos, total) {
   const res = pesos.map(() => 0);
@@ -117,7 +126,8 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   const fase = faseDoDia(fases, addDays(segunda, 3));
   const min = orcamentoSemana(cfg, fase.id, segunda, ctx);
   const dias = Array.from({ length: 7 }, (_, i) => ({ dia: addDays(segunda, i), wd: (i + 1) % 7, blocos: [] }));
-  const janelas = (wd) => janelasValidas(cfg.rotina?.janelas?.[wd]);
+  const reservas = ctx.reservas ?? {}; // oração: esse tempo sai das janelas de estudo
+  const janelas = (wd) => recortar(janelasValidas(cfg.rotina?.janelas?.[wd]), reservas[wd]);
   const bloco = (cat, ini, dur, sessoes = 1) => ({ cat, ini, fim: ini + dur, min: sessoes ? sessoes * s : dur, bruto: dur, sessoes });
   const excedente = { prova: 0, red: 0 };
   const janelasLivres = []; // janelas de estudo em ordem cronológica
@@ -150,7 +160,7 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   }
   // Segunda a sexta.
   // segunda a sexta: o tipo não importa, então janelas que se sobrepõem viram uma só
-  for (let i = 0; i < 5; i++) for (const j of janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined })))) janelasLivres.push({ i, ini: j.ini, fim: j.fim });
+  for (let i = 0; i < 5; i++) for (const j of recortar(janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined }))), reservas[i + 1])) janelasLivres.push({ i, ini: j.ini, fim: j.fim });
   janelasLivres.sort((a, b) => a.i - b.i || a.ini - b.ini);
   // janela curta (30 a 49 min, ex.: segunda 6h30–7h10 depois da corrida): uma sessão curta de Matemática, descontada do orçamento
   for (let k = janelasLivres.length - 1; k >= 0; k--) {

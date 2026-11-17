@@ -14,11 +14,12 @@ import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas } from '../lib/trilha.js';
 import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
 import { faseDoDia, maxExtraZero } from '../lib/phases.js';
+import { reservasOracao, nivelOracao } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { proxima: 1, ultimoDia: null } };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -26,7 +27,7 @@ export const app = $state({
   ultimoBackup: null, lembreteAdiado: null, persistente: null, registroAberto: null,
 });
 export const fases = () => gerarFases(app.cfg);
-export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis, exams: app.exams });
+export const ajustes = () => ({ adiados: app.adiados, dificeis: app.dificeis, exams: app.exams, reservas: reservasOracao(app.cfg, nivelOracao(app.cfg, app.oracoes, app.dia)) });
 export const pf = () => prefs(app.cfg);
 const snap = (v) => $state.snapshot(v);
 
@@ -124,6 +125,22 @@ export async function salvarRevisao(seg, dados) {
   checarConquistas();
 }
 export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
+
+// ---------- oração ----------
+/** Marca (ou desmarca) um item de oração do dia. O Catecismo avança 3 perguntas no marcador, uma vez por dia. */
+export async function marcarOracao(dia, id, feito) {
+  const m = { ...(app.oracoes[dia] ?? {}) };
+  if (feito) m[id] = true; else delete m[id];
+  app.oracoes[dia] = m; await salvarKV('oracoes');
+  if (id === 'catecismo') {
+    const c = app.catecismo;
+    if (feito && c.ultimoDia !== dia) app.catecismo = { proxima: c.proxima + 3, ultimoDia: dia, anterior: c.proxima };
+    else if (!feito && c.ultimoDia === dia) app.catecismo = { proxima: c.anterior ?? Math.max(1, c.proxima - 3), ultimoDia: null };
+    await salvarKV('catecismo');
+  }
+  if (feito) vibrar(pf(), 'toque');
+}
+export async function marcadorCatecismo(n) { app.catecismo = { ...app.catecismo, proxima: Math.max(1, Math.round(n) || 1) }; await salvarKV('catecismo'); }
 
 // ---------- treino de corrida ----------
 /** Registro do treino do dia (feito, km real, dor no joelho/tornozelo 0–10, inchaço, mínimo de 20 min de caminhada). */

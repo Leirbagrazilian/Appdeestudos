@@ -2,7 +2,7 @@ import { mesclarBiblioteca } from './livros.js';
 // Atualiza a configuração salva no aparelho quando o seed ganha conteúdo novo,
 // sem perder o que você editou (datas, status, metas, carta, links, preferências...).
 // Conteúdo que você não edita no app (fases, tópicos, textos) é sempre trazido do seed.
-const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'pausasAtivas', 'questoes', 'materias', 'tiposErro', 'materiasInfo', 'regras', 'horasFase', 'categorias', 'ritmos', 'temasRedacao', 'divisaoBloco', 'divisaoBlocoZero', 'sitesQuestoes', 'fase0', 'treinoPlano', 'frases'];
+const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'pausasAtivas', 'questoes', 'materias', 'tiposErro', 'materiasInfo', 'regras', 'horasFase', 'categorias', 'ritmos', 'temasRedacao', 'divisaoBloco', 'divisaoBlocoZero', 'sitesQuestoes', 'fase0', 'treinoPlano', 'oracaoPlano', 'frases'];
 const CAMPOS_CONCURSO = ['nome', 'sigla', 'cor', 'prioridade', 'idade', 'link', 'plano'];
 const mesmoEvento = (a, b) => a.tipo === b.tipo && (a.nome ?? '') === (b.nome ?? '');
 
@@ -10,6 +10,7 @@ const AULAS_V1 = JSON.stringify([{ dia: 1, inicio: '07:30', fim: '11:10', nome: 
 
 // janelas de fim de semana do seed v7: se você não mexeu nelas, passam para as da v8 (sábado e domingo mais cheios)
 const SEG_V9 = JSON.stringify([{ ini: '06:00', fim: '07:00' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }]);
+const SEG_V10 = JSON.stringify([{ ini: '06:30', fim: '07:10' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }]);
 const SAB_V7 = JSON.stringify([{ ini: '08:00', fim: '15:00', tipo: 'prova' }]);
 const DOM_V7 = JSON.stringify([{ ini: '09:00', fim: '12:00', tipo: 'domingo' }]);
 
@@ -33,6 +34,8 @@ export function migrarCfg(salvo, seed) {
   delete cfg.modeloSemana;
   // v10: corrida às 5h30; o 1º bloco de segunda vira 6h30–7h10 (se você não mexeu na segunda)
   if ((salvo.versaoSeed ?? 1) < 10 && JSON.stringify(salvo.rotina?.janelas?.[1] ?? null) === SEG_V9) cfg.rotina.janelas = { ...cfg.rotina.janelas, 1: structuredClone(seed.rotina.janelas[1]) };
+  // v11: o 3º terço vem depois da corrida; o 1º bloco de segunda vira 6h40–7h10 (se você não mexeu)
+  if ((salvo.versaoSeed ?? 1) < 11 && [SEG_V9, SEG_V10].includes(JSON.stringify(salvo.rotina?.janelas?.[1] ?? null))) cfg.rotina.janelas = { ...cfg.rotina.janelas, 1: structuredClone(seed.rotina.janelas[1]) };
   cfg.biblioteca = mesclarBiblioteca(salvo.biblioteca, seed.biblioteca); // o que você cadastrou fica; recursos novos do seed entram
 
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));

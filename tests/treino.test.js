@@ -74,10 +74,11 @@ describe('treino de corrida: dia e regras', () => {
   it('sequência única: o dia conta com estudo E treino (o mínimo de 20 min de caminhada vale)', () => {
     const cumpridos = { '2026-11-17': true, '2026-11-18': true, '2026-11-19': true };
     const treinos = { '2026-11-17': { feito: true }, '2026-11-18': { minimo: true }, '2026-11-19': {} };
-    expect(sequencia(cfg(), { cumpridos, treinos }, '2026-11-19')).toBe(2); // hoje ainda sem treino: vale até ontem
+    const oracoes = Object.fromEntries(['2026-11-17', '2026-11-18', '2026-11-19'].map((d) => [d, { manha: true, noite: true }]));
+    expect(sequencia(cfg(), { cumpridos, treinos, oracoes }, '2026-11-19')).toBe(2); // hoje ainda sem treino: vale até ontem
     treinos['2026-11-19'].feito = true;
-    expect(sequencia(cfg(), { cumpridos, treinos }, '2026-11-19')).toBe(3);
-    expect(sequencia(cfg(), { cumpridos: { '2026-11-18': true, '2026-11-19': true }, treinos }, '2026-11-19')).toBe(2);
+    expect(sequencia(cfg(), { cumpridos, treinos, oracoes }, '2026-11-19')).toBe(3);
+    expect(sequencia(cfg(), { cumpridos: { '2026-11-18': true, '2026-11-19': true }, treinos, oracoes }, '2026-11-19')).toBe(2);
   });
   it('km da semana: soma o registrado e mostra a meta', () => {
     expect(kmDaSemana(cfg(), '2026-11-16', { '2026-11-17': { km: 3.2 }, '2026-11-18': { km: 2 } })).toEqual({ feitos: 5.2, meta: 18 });
@@ -85,10 +86,10 @@ describe('treino de corrida: dia e regras', () => {
 });
 
 describe('treino e planner', () => {
-  it('segunda: 1º bloco de estudo é uma sessão curta de Matemática 6h30–7h10', () => {
+  it('segunda: 1º bloco de estudo é uma sessão curta de Matemática 6h40–7h10', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
     const b = dias[0].blocos[0];
-    expect(b).toMatchObject({ cat: 'mat', ini: 390, fim: 430, min: 40, sessoes: 1 });
+    expect(b).toMatchObject({ cat: 'mat', ini: 400, fim: 430, min: 30, sessoes: 1 });
   });
   it('nenhum bloco de estudo começa antes das 6h30 nem cruza a corrida de 5h30 a 6h15', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
@@ -103,7 +104,7 @@ describe('treino e planner', () => {
     const v = cfg(); v.versaoSeed = 9; delete v.treinoPlano; delete v.treino;
     v.rotina.janelas[1] = [{ ini: '06:00', fim: '07:00' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }];
     const m = migrarCfg(v, seed);
-    expect(m.rotina.janelas[1][0]).toEqual({ ini: '06:30', fim: '07:10' });
+    expect(m.rotina.janelas[1][0]).toEqual({ ini: '06:40', fim: '07:10' });
     expect(m.treinoPlano.inicio).toBe('2026-11-17'); expect(m.treino.corrida).toBe('05:30');
   });
 });

@@ -10,6 +10,7 @@
   import { tarefasDoDia } from '../lib/tarefas.js';
   import Registro from '../components/Registro.svelte';
   import Treino from '../components/Treino.svelte';
+  import Oracao from '../components/Oracao.svelte';
   import { sequencia, alertasTreino } from '../lib/treino.js';
   import Tarefa from '../components/Tarefa.svelte';
   import { dur } from '../lib/prefs.js';
@@ -51,7 +52,7 @@
   const conflito = $derived(conflitosProvas(app.cfg).find((c) => diffDays(app.dia, c.de) >= 0 && diffDays(app.dia, c.de) <= 120));
   const diag = $derived(blocos.some((b) => b.diagnostico));
   // sequência única: dias seguidos com estudo E treino feitos
-  const seq = $derived(sequencia(app.cfg, { cumpridos: app.cumpridos, treinos: app.treinos }, app.dia));
+  const seq = $derived(sequencia(app.cfg, { cumpridos: app.cumpridos, treinos: app.treinos, oracoes: app.oracoes }, app.dia));
   const avisosTreino = $derived(alertasTreino(app.cfg, app.dia));
   // modo domínio (Fase 0): tópicos travados, checkpoint do mês e o portão da última semana
   const travados = $derived(listaTravados(app.dominio, app.lacunas));
@@ -111,10 +112,11 @@
   <p class="fase">Fase {fase.numero} · {fase.nome}<span> · semana {semanaDaFase(fase, app.dia)}/{totalSemanas(fase)}</span></p>
   <Base total={base.total} acesas={base.acesas} {noite} />
   <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
-  <p class="luzes seq">Sequência: <strong>{seq}</strong> {seq === 1 ? 'dia' : 'dias'} com estudo e treino</p>
+  <p class="luzes seq">Sequência: <strong>{seq}</strong> {seq === 1 ? 'dia' : 'dias'} com estudo, treino e oração</p>
 </header>
 
 <Treino dia={app.dia} />
+<Oracao dia={app.dia} temProva={blocos.some((b) => ['prova', 'diag'].includes(b.cat)) || cpPendente} />
 {#each avisosTreino as a}<p class="nota" role="status">{a}</p>{/each}
 
 {#if capitulo}
@@ -200,6 +202,7 @@
         <Check {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onclick={() => alternarBloco(b, assuntos[b.id] ?? '', tarefas[b.id])} />
         <button class="txt" aria-expanded={aberto === b.id} onclick={() => (aberto = aberto === b.id ? null : b.id)}>
           <span class="tit">{tituloDe(b)}</span>
+          {#if ['mat', 'fis', 'qui', 'por', 'ing', 'hg', 'red', 'prova', 'diag', 'minimo'].includes(b.cat)}<span class="sedes">Sedes Sapientiae, rogai por nós</span>{/if}
           <span class="sub">{b.ini ? `${b.ini}–${b.fim} · ` : ''}{feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}{app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}{app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}{b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}</span>
         </button>
         {#if !feito}
@@ -276,6 +279,7 @@
 </p>
 
 <style>
+  .sedes { display: block; font-size: .75rem; font-style: italic; color: var(--tx2); }
   header { padding: 20px 4px 18px; position: relative; }
   header > :global(*:not(.farol):not(.esquadrilha)) { position: relative; }
   .data { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }

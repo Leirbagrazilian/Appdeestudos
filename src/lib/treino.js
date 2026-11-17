@@ -4,6 +4,7 @@
 // Semanas editadas por você aos domingos (kv 'treinoSemanas'): { [segunda]: { dias: { wd: km } } }.
 import { addDays, diffDays, startOfWeek, weekday } from './dates.js';
 import { toMin, toHHMM, janelasValidas } from './semana.js';
+import { minimoOracao } from './oracao.js';
 
 export const r05 = (x) => Math.round(x * 2) / 2;
 const plano = (cfg) => cfg.treinoPlano ?? {};
@@ -147,9 +148,10 @@ export function alertasTreino(cfg, dia) {
  * Hoje só entra quando já está completo; se ainda não, a sequência vale até ontem.
  * Antes do início do treino, basta o estudo.
  */
-export function sequencia(cfg, { cumpridos = {}, treinos = {} }, hoje) {
-  const inicio = plano(cfg).inicio;
-  const ok = (d) => !!cumpridos[d] && (!inicio || d < inicio || treinoFeito(treinos[d]));
+export function sequencia(cfg, { cumpridos = {}, treinos = {}, oracoes = {} }, hoje) {
+  const inicio = plano(cfg).inicio, iniOr = cfg.oracaoPlano?.inicio;
+  // estudo + treino (mínimo: 20 min de caminhada) + oração (mínimo: manhã e noite)
+  const ok = (d) => !!cumpridos[d] && (!inicio || d < inicio || treinoFeito(treinos[d])) && (!iniOr || d < iniOr || minimoOracao(oracoes[d]));
   let d = ok(hoje) ? hoje : addDays(hoje, -1), n = 0;
   while (ok(d) && n < 4000) { n++; d = addDays(d, -1); }
   return n;
