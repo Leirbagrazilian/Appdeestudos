@@ -9,6 +9,8 @@
   import { planoDoBloco } from '../lib/foco.js';
   import { tarefasDoDia } from '../lib/tarefas.js';
   import Registro from '../components/Registro.svelte';
+  import Treino from '../components/Treino.svelte';
+  import { sequencia, alertasTreino } from '../lib/treino.js';
   import Tarefa from '../components/Tarefa.svelte';
   import { dur } from '../lib/prefs.js';
   import { precisaBackup } from '../lib/erros.js';
@@ -48,6 +50,9 @@
   const alertas = $derived(alertasInscricao(app.cfg, app.dia));
   const conflito = $derived(conflitosProvas(app.cfg).find((c) => diffDays(app.dia, c.de) >= 0 && diffDays(app.dia, c.de) <= 120));
   const diag = $derived(blocos.some((b) => b.diagnostico));
+  // sequência única: dias seguidos com estudo E treino feitos
+  const seq = $derived(sequencia(app.cfg, { cumpridos: app.cumpridos, treinos: app.treinos }, app.dia));
+  const avisosTreino = $derived(alertasTreino(app.cfg, app.dia));
   // modo domínio (Fase 0): tópicos travados, checkpoint do mês e o portão da última semana
   const travados = $derived(listaTravados(app.dominio, app.lacunas));
   const cpPendente = $derived(!diag && checkpointPendente(app.cfg, app.checkpoints, app.dia));
@@ -106,7 +111,11 @@
   <p class="fase">Fase {fase.numero} · {fase.nome}<span> · semana {semanaDaFase(fase, app.dia)}/{totalSemanas(fase)}</span></p>
   <Base total={base.total} acesas={base.acesas} {noite} />
   <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
+  <p class="luzes seq">Sequência: <strong>{seq}</strong> {seq === 1 ? 'dia' : 'dias'} com estudo e treino</p>
 </header>
+
+<Treino dia={app.dia} />
+{#each avisosTreino as a}<p class="nota" role="status">{a}</p>{/each}
 
 {#if capitulo}
   <section class="card cap entra" aria-label="Campanha concluída">

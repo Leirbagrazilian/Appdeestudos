@@ -18,7 +18,7 @@ import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -124,6 +124,16 @@ export async function salvarRevisao(seg, dados) {
   checarConquistas();
 }
 export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
+
+// ---------- treino de corrida ----------
+/** Registro do treino do dia (feito, km real, dor no joelho/tornozelo 0–10, inchaço, mínimo de 20 min de caminhada). */
+export async function registrarTreino(dia, dados) {
+  app.treinos[dia] = { ...(app.treinos[dia] ?? {}), ...dados }; await salvarKV('treinos');
+  const r = app.treinos[dia];
+  if (dados.feito || dados.minimo) { vibrar(pf(), 'ok'); avisar(dados.minimo ? 'Mínimo do treino feito' : 'Treino feito', null, r.km && !dados.minimo ? `${String(r.km).replace('.', ',')} km. A sequência agradece.` : 'A sequência agradece.'); }
+}
+/** Km diários da semana (fases 2 a 5), editados no domingo. */
+export async function salvarSemanaTreino(seg, dias) { app.treinoSemanas[seg] = { dias }; await salvarKV('treinoSemanas'); }
 
 export async function marcarCumprido(dia) {
   if (app.cumpridos[dia]) return;
