@@ -23,7 +23,7 @@ export function gerarFases(cfg) {
   const enem = get('enem');
   const zIni = p.inicioZero ?? '2026-11-16';
   const prev = p.fimZero ?? PREV_ZERO;
-  let zFim = addDays(prev, 7 * (p.extraZero ?? 0));
+  let zFim = addDays(prev, 7 * Math.min(p.extraZero ?? 0, maxExtraZero()));
   if (p.portaoEm && p.portaoEm >= zIni && p.portaoEm < zFim) zFim = p.portaoEm;
   const delta = diffDays(prev, zFim); // negativo = adiantou
   const a3Fim = p.ano3Fim ?? D.ano3Fim;

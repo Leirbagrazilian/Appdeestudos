@@ -36,7 +36,8 @@ describe('revisão da etapa 1 (v3): achados do revisor', () => {
     }
   });
   it('janelas de tipos diferentes que se sobrepõem não geram blocos sobrepostos nem perdem horas', () => {
-    const c = cfg();
+    const c = cfg(); delete c.rotina.metaDia;
+    c.rotina.janelas = {};
     c.rotina.janelas[0] = [{ ini: '08:00', fim: '14:00' }, { ini: '13:00', fim: '17:00', tipo: 'domingo' }];
     c.rotina.janelas[1] = [{ ini: '08:00', fim: '12:00' }, { ini: '10:00', fim: '14:00', tipo: 'x' }];
     const dias = sem(c, '2026-11-23');
