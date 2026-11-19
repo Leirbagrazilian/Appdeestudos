@@ -259,7 +259,7 @@ describe('revisão: carga da semana', () => {
       for (const i of [0, 2]) { const h = dias[i].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(h, `${seg} dia ${i}`).toBeGreaterThanOrEqual(9.5); expect(h, `${seg} dia ${i}`).toBeLessThanOrEqual(10); }
       for (const i of [3, 4]) { const h = dias[i].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(h, `${seg} dia ${i}`).toBeGreaterThanOrEqual(7.5); expect(h, `${seg} dia ${i}`).toBeLessThanOrEqual(8.6); }
       const ter = dias[1].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(ter).toBeGreaterThanOrEqual(7.5); expect(ter).toBeLessThanOrEqual(8.5);
-      const tot = dias.reduce((a, d) => a + d.blocos.reduce((x, b) => x + b.min, 0), 0) / 60; expect(tot).toBeGreaterThan(51); expect(tot).toBeLessThan(59);
+      const tot = dias.reduce((a, d) => a + d.blocos.reduce((x, b) => x + b.min, 0), 0) / 60; expect(tot).toBeGreaterThan(52); expect(tot).toBeLessThan(59);
     }
   });
   it('a semana leve (23–29/08) tem carga reduzida (~60%) no checklist do dia', () => {

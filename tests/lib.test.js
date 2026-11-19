@@ -388,7 +388,7 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     const a1 = orcamentoSemana(cfg(), 'ano1', '2027-01-18');
     expect(a1).toMatchObject({ mat: 1186, fis: 998, qui: 468, por: 187, red: 156, ing: 125, hg: 0 }); // 38/32/15/6/5/4 % de 3120
     const dias = semana('2026-11-23');
-    expect(liquido(dias)).toBeGreaterThan(49 * 60); expect(liquido(dias)).toBeLessThan(59 * 60);
+    expect(liquido(dias)).toBeGreaterThan(49.5 * 60); expect(liquido(dias)).toBeLessThan(59 * 60);
     const mat = dias.flatMap((d) => d.blocos).filter((b) => b.cat === 'mat').reduce((a, b) => a + b.min, 0);
     expect(Math.abs(mat - 1716)).toBeLessThanOrEqual(200);
   });

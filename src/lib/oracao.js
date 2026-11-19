@@ -3,7 +3,7 @@
 // Marcas do dia (kv 'oracoes'): { [dia]: { [itemId]: true } }.
 import { addDays, diffDays, weekday } from './dates.js';
 import { toMin, toHHMM } from './semana.js';
-import { missasDoDia } from './rotina.js';
+import { missasDoDia, fixosDoDia } from './rotina.js';
 import { horariosNoite, horariosPadrao, acordarDe, acordarPadrao, horaManha } from './sono.js';
 
 const P = (cfg) => cfg.oracaoPlano ?? {};
@@ -123,11 +123,13 @@ export function novenaDoDia(cfg, dia) {
 const missaEm = (cfg, wd, ini, dur) => missasDoDia(cfg, wd).find((m) => ini < m.fim && ini + (dur || 1) > m.ini);
 /** Oração da manhã: 10 min depois de acordar; se isso cair na missa (sábado, 04:40), vai para a hora de acordar. */
 const manhaDe = (cfg, wd, acordar, dur) => { const m = horaManha(acordar); return missaEm(cfg, wd, toMin(m), dur) ? acordar : m; };
-/** Itens que cairiam dentro da missa (terços): passam para logo depois dela. O Ângelus de domingo fica dentro da missa. */
-const depoisDaMissa = (cfg, wd, id, hora, dur) => {
-  if (!hora || id === 'manha') return hora;
-  const m = missaEm(cfg, wd, toMin(hora), dur);
-  return m && id !== 'angelus' ? toHHMM(m.fim) : hora;
+/** Terços que cairiam em cima de um fixo do dia (missa, corrida, refeição, musculação) passam para logo depois dele. O Ângelus fica onde está. */
+const depoisDosFixos = (cfg, wd, id, hora, dur) => {
+  if (!hora || id === 'manha' || id === 'angelus') return hora;
+  const fixos = fixosDoDia(cfg, wd);
+  let ini = toMin(hora), f;
+  for (let i = 0; i < 10 && (f = fixos.find((x) => ini < x.fim && ini + (dur || 1) > x.ini)); i++) ini = f.fim;
+  return toHHMM(ini);
 };
 
 const txt = (cfg, ...ks) => ks.map((k) => P(cfg).textos?.[k]).filter(Boolean);
@@ -144,7 +146,7 @@ export function oracoesDoDia(cfg, dia, ctx = {}) {
   const sn = cfg.sono ? horariosNoite(cfg, dia, { noites: ctx.noites, sono: ctx.sono }) : null;
   const h = sn ? { ...h0, terco1: sn.terco, noite: sn.oracao, lectio: sn.lectio, manha: manhaDe(cfg, weekday(dia), acordarDe(cfg, dia, { noites: ctx.noites, sono: ctx.sono }), d.manha) } : { ...h0 };
   const wd = weekday(dia);
-  for (const id of ['terco2', 'terco3']) if (h[id]) h[id] = depoisDaMissa(cfg, wd, id, h[id], d.terco);
+  for (const id of ['terco2', 'terco3']) if (h[id]) h[id] = depoisDosFixos(cfg, wd, id, h[id], d.terco);
   const mis = misteriosDoDia(cfg, dia), outros = ['gozosos', 'dolorosos', 'gloriosos'].filter((x) => x !== mis.tipo);
   const misTxt = (tipo) => ({ nome: `Mistérios ${tipo}`, texto: (p.misterios?.[tipo] ?? []).map((m, i) => `${i + 1}º ${m}`).join('\n') });
   const pascal = tempoPascal(dia), ev = evangelhoDoDia(cfg, dia), santo = santoDoDia(cfg, dia), domingo = weekday(dia) === 0;
@@ -200,7 +202,7 @@ export function reservasOracao(cfg, nivel) {
     const h = sp ? { ...h0, terco1: sp.terco, noite: sp.oracao, lectio: sp.lectio, manha: manhaDe(cfg, wd, acordarPadrao(cfg, wd), d.manha) } : h0;
     // o Ângelus de domingo cai dentro da missa: sem reserva separada; terços que cairiam na missa vão para depois dela
     out[wd] = itens.filter((id) => h[id] && dur[id] && !(id === 'terco3' && wd === 0) && !(id === 'angelus' && missaEm(cfg, wd, toMin(h[id]), dur[id])))
-      .map((id) => { const hh = depoisDaMissa(cfg, wd, id, h[id], dur[id]); return { ini: toMin(hh), fim: toMin(hh) + dur[id] }; }).filter((x) => Number.isFinite(x.ini));
+      .map((id) => { const hh = depoisDosFixos(cfg, wd, id, h[id], dur[id]); return { ini: toMin(hh), fim: toMin(hh) + dur[id] }; }).filter((x) => Number.isFinite(x.ini));
   }
   return out;
 }

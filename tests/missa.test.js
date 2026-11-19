@@ -71,6 +71,24 @@ describe('Santa Missa na rotina', () => {
   });
 });
 
+describe('reservas de oração x fixos', () => {
+  it('nenhuma reserva (níveis 1–4, todos os dias) cai em cima de missa, corrida, refeição ou musculação; Ângelus fora da regra das refeições', () => {
+    const c = cfg();
+    for (const nivel of [1, 2, 3, 4]) {
+      const r = reservasOracao(c, nivel);
+      for (let wd = 0; wd < 7; wd++) for (const x of r[wd]) for (const f of fixosDoDia(c, wd)) {
+        if (f.nome === 'Refeição' && x.fim - x.ini <= 5) continue; // Ângelus (5 min) ao meio-dia
+        expect(bate([x.ini, x.fim], [f.ini, f.fim]), `nível ${nivel} wd ${wd} reserva ${x.ini}-${x.fim} x ${f.nome}`).toBe(false);
+      }
+    }
+  });
+  it('sexta nível 3: 3º terço vai para depois da corrida; domingo nível 2: 2º terço às 14:00', () => {
+    const c = cfg(), r3 = reservasOracao(c, 3), r2 = reservasOracao(c, 2);
+    expect(r3[5].some((x) => x.ini === min(8, 30))).toBe(true);
+    expect(r2[0].some((x) => x.ini === min(14))).toBe(true);
+  });
+});
+
 describe('sono com a missa', () => {
   it('sexta à noite 21:30 → 04:30; avisos de acordar: quinta 05:00, sexta 04:30, sábado 05:15', () => {
     const c = cfg();

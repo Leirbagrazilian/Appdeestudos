@@ -99,7 +99,7 @@ describe('treino e planner', () => {
   it('a semana fica perto de 55 h líquidas (sem as orações)', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
     const t = dias.flatMap((d) => d.blocos).filter((b) => b.sessoes).reduce((a, b) => a + b.min, 0);
-    expect(t).toBeGreaterThanOrEqual(49 * 60); expect(t).toBeLessThanOrEqual(58 * 60);
+    expect(t).toBeGreaterThanOrEqual(49.5 * 60); expect(t).toBeLessThanOrEqual(58 * 60);
   });
   it('migração v9 -> v12: janelas passam a ser calculadas, meta padrão vira 56 h, aulas e treino novos entram e o plano de treino continua', () => {
     const v = cfg(); v.versaoSeed = 9; delete v.treinoPlano; delete v.treino;
