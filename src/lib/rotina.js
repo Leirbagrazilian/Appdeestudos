@@ -15,15 +15,27 @@ export const antesDoInicio = (cfg, dia) => !!cfg.perfil?.inicioReal && dia < cfg
 /** Dia sem estudo: antes do início real ou dia livre fixo (24–25/12 e 31/12–01/01). */
 export const diaLivre = (cfg, dia) => antesDoInicio(cfg, dia) || diaLivreFixo(cfg, dia);
 
+/** Horário da corrida no dia da semana `wd`: `treino.corridaPorDia[wd]`, senão sábado (`corridaSab`), senão o padrão. */
+export const horaCorrida = (cfg, wd) => { const t = cfg.treino ?? {}, d = t.corridaPorDia?.[wd]; return num(d, null) != null ? d : wd === 6 ? t.corridaSab ?? t.corrida : t.corrida; };
+
+/** Santa Missa do dia da semana `wd`, em minutos: [{ ini, fim, nome, trajeto, missa }]. O bloco inclui o trajeto (padrão 20 min) de ida e de volta. */
+export function missasDoDia(cfg, wd) {
+  return (R(cfg).aulas ?? []).filter((a) => a.tipo === 'missa' && a.dia === wd)
+    .map((a) => { const ini = toMin(a.inicio), fim = toMin(a.fim), trajeto = Number.isFinite(+a.trajeto) ? +a.trajeto : 20; return { ini, fim, nome: a.nome, trajeto, missa: ini + trajeto }; })
+    .filter((m) => Number.isFinite(m.ini) && Number.isFinite(m.fim) && m.fim > m.ini);
+}
+
+/** Refeições do dia da semana `wd` (`refeicoesPorDia[wd]` vale no lugar das padrão). */
+const refeicoesDe = (cfg, wd) => R(cfg).refeicoesPorDia?.[wd] ?? R(cfg).refeicoes ?? [];
+
 /** Intervalos fixos do dia da semana `wd` (0 = domingo), em minutos: [{ ini, fim, nome }]. */
 export function fixosDoDia(cfg, wd) {
   const r = R(cfg), t = cfg.treino ?? {}, out = [];
-  const corrida = wd === 6 ? t.corridaSab ?? t.corrida : t.corrida;
-  const cMin = num(corrida, null);
+  const cMin = num(horaCorrida(cfg, wd), null);
   if (wd !== 0 && cMin != null) out.push({ ini: cMin, fim: cMin + 60, nome: 'Corrida' }); // 45 min de corrida + banho
   const mus = t.musculacao?.[wd], mIni = num(mus?.ini, null);
   if (mIni != null) out.push({ ini: mIni, fim: mIni + (t.musculacaoMin ?? 60), nome: 'Musculação' });
-  for (const j of r.refeicoes ?? []) out.push({ ini: toMin(j.ini), fim: toMin(j.fim), nome: 'Refeição' });
+  for (const j of refeicoesDe(cfg, wd)) out.push({ ini: toMin(j.ini), fim: toMin(j.fim), nome: 'Refeição' });
   for (const a of r.aulas ?? []) {
     if (a.dia !== wd) continue;
     if (a.tipo === 'faculdade' && !a.vou) continue; // "não vou" libera a janela
@@ -42,13 +54,18 @@ export function janelasDoDia(cfg, wd) {
   const manual = R(cfg).janelas?.[wd];
   if (manual) return manual;
   const r = R(cfg);
-  if (wd === 0) { const d = r.domingo ?? { ini: '15:00', fim: '17:00' }; return [{ ini: d.ini, fim: d.fim, tipo: 'domingo' }]; }
   const fixos = fixosDoDia(cfg, wd);
+  const tira = (livres) => { for (const f of fixos) livres = livres.flatMap((j) => (f.fim <= j.ini || f.ini >= j.fim ? [j] : [{ ini: j.ini, fim: f.ini }, { ini: f.fim, fim: j.fim }].filter((x) => x.fim - x.ini > 0))); return livres; };
+  if (wd === 0) {
+    // revisão leve + planejamento: a janela do domingo, sem a missa nem o almoço (sem colisão, fica como está)
+    const d = r.domingo ?? { ini: '15:00', fim: '17:00' };
+    const l = tira([{ ini: toMin(d.ini), fim: toMin(d.fim) }]).sort((a, b) => b.fim - b.ini - (a.fim - a.ini))[0];
+    return l ? [{ ini: toHHMM(l.ini), fim: toHHMM(l.fim), tipo: 'domingo' }] : [];
+  }
   let ini = toMin(r.inicioEstudo ?? '06:30');
   if (wd === 6) { const c = fixos.find((f) => f.nome === 'Corrida'); if (c) ini = Math.max(ini, c.fim); }
-  const fim = toMin(r.fimEstudo ?? '21:00');
-  let livres = [{ ini, fim }];
-  for (const f of fixos) livres = livres.flatMap((j) => (f.fim <= j.ini || f.ini >= j.fim ? [j] : [{ ini: j.ini, fim: f.ini }, { ini: f.fim, fim: j.fim }].filter((x) => x.fim - x.ini > 0)));
+  const fim = toMin(r.fimEstudoPorDia?.[wd] ?? r.fimEstudo ?? '21:00'); // quinta: sem estudo depois da missa
+  const livres = tira([{ ini, fim }]);
   livres.sort((a, b) => a.ini - b.ini);
   const out = livres.filter((j) => j.fim - j.ini >= 30).map((j) => ({ ini: toHHMM(j.ini), fim: toHHMM(j.fim) }));
   if (wd === 6 && out[0]) out[0].tipo = 'prova';

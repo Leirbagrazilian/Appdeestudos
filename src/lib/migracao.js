@@ -30,6 +30,16 @@ export function migrarCfg(salvo, seed) {
     cfg.sono = { ...structuredClone(seed.sono), ...(cfg.sono ?? {}) };
   }
   if (v < 14 && seed.perfil?.inicioReal) cfg.perfil.inicioReal = seed.perfil.inicioReal; // v14: tudo começa em 20/11/2026 (treinoPlano e oracaoPlano já vêm do seed)
+  if (v < 15) {
+    // v15: Santa Missa (quinta, sexta, sábado, domingo), corrida de sexta às 07:30 e sono de sexta 21:30 → 04:30; o que você editou fica
+    const aulas = cfg.rotina.aulas ?? (cfg.rotina.aulas = []);
+    for (const m of seed.rotina.aulas.filter((a) => a.tipo === 'missa')) if (!aulas.some((a) => a.tipo === 'missa' && a.dia === m.dia)) aulas.push(structuredClone(m));
+    cfg.rotina.refeicoesPorDia = { ...structuredClone(seed.rotina.refeicoesPorDia), ...(salvo.rotina?.refeicoesPorDia ?? {}) };
+    cfg.rotina.fimEstudoPorDia = { ...structuredClone(seed.rotina.fimEstudoPorDia), ...(salvo.rotina?.fimEstudoPorDia ?? {}) };
+    cfg.treino = { ...(cfg.treino ?? {}), corridaPorDia: { ...structuredClone(seed.treino.corridaPorDia), ...(salvo.treino?.corridaPorDia ?? {}) } };
+    const s5 = salvo.sono?.padrao?.[5], antigo = !s5 || (s5.dormir === '22:00' && s5.acordar === '06:30'); // não editado: troca pelo novo padrão
+    cfg.sono = { ...(cfg.sono ?? {}), padrao: { ...(cfg.sono?.padrao ?? {}), 5: antigo ? structuredClone(seed.sono.padrao[5]) : s5 } };
+  }
   cfg.biblioteca = mesclarBiblioteca(salvo.biblioteca, seed.biblioteca); // o que você cadastrou fica; recursos novos do seed entram
 
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));

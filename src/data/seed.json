@@ -212,6 +212,38 @@
         "fim": "20:00",
         "nome": "Jiu-jitsu",
         "tipo": "fixo"
+      },
+      {
+        "dia": 5,
+        "inicio": "05:40",
+        "fim": "07:20",
+        "nome": "Missa sexta",
+        "tipo": "missa",
+        "trajeto": 20
+      },
+      {
+        "dia": 6,
+        "inicio": "04:40",
+        "fim": "06:20",
+        "nome": "Missa sábado",
+        "tipo": "missa",
+        "trajeto": 20
+      },
+      {
+        "dia": 0,
+        "inicio": "11:40",
+        "fim": "13:20",
+        "nome": "Missa domingo",
+        "tipo": "missa",
+        "trajeto": 20
+      },
+      {
+        "dia": 4,
+        "inicio": "18:40",
+        "fim": "20:20",
+        "nome": "Missa quinta",
+        "tipo": "missa",
+        "trajeto": 20
       }
     ],
     "inicioEstudo": "06:30",
@@ -254,7 +286,28 @@
       "semanas": 2,
       "fator": 0.75
     },
-    "resgateSabadoMin": 120
+    "resgateSabadoMin": 120,
+    "refeicoesPorDia": {
+      "0": [
+        {
+          "ini": "13:20",
+          "fim": "14:00"
+        }
+      ],
+      "4": [
+        {
+          "ini": "12:00",
+          "fim": "13:00"
+        },
+        {
+          "ini": "18:00",
+          "fim": "18:40"
+        }
+      ]
+    },
+    "fimEstudoPorDia": {
+      "4": "18:40"
+    }
   },
   "metodos": {
     "recuperacao": "Prática de recuperação: faça as questões sem consultar nada. Tentar lembrar fixa mais do que reler.",
@@ -2513,7 +2566,7 @@
       }
     ]
   },
-  "versaoSeed": 14,
+  "versaoSeed": 15,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -5539,7 +5592,10 @@
     "liberadoFisio": false,
     "ritmoMinKm": 7,
     "corridaSab": "07:00",
-    "musculacaoMin": 60
+    "musculacaoMin": 60,
+    "corridaPorDia": {
+      "5": "07:30"
+    }
   },
   "oracaoPlano": {
     "inicio": "2026-11-20",
@@ -5897,8 +5953,8 @@
         "acordar": "05:00"
       },
       "5": {
-        "dormir": "22:00",
-        "acordar": "06:30"
+        "dormir": "21:30",
+        "acordar": "04:30"
       },
       "6": {
         "dormir": "21:00",

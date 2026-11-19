@@ -20,7 +20,7 @@ describe('rotina: janelas derivadas', () => {
     const j = (wd) => janelasDoDia(cfg(), wd).map((x) => `${x.ini}-${x.fim}`);
     expect(j(1)).toEqual(['06:30-12:00', '13:00-18:00', '19:30-21:00']);
     expect(j(2)).toEqual(['06:30-12:00', '13:00-15:00', '16:00-18:00', '20:00-21:00']);
-    expect(j(4)).toEqual(['06:30-12:00', '13:00-17:00', '19:00-21:00']);
+    expect(j(4)).toEqual(['06:30-12:00', '13:00-17:00']); // quinta: musculação 17h, jantar 18h–18h40, missa 18h40–20h20, sem estudo à noite
   });
   it('sábado começa 1 h depois da corrida das 7h, com a janela da prova; domingo só tem a janela de 2 h', () => {
     const s = janelasDoDia(cfg(), 6);
@@ -152,10 +152,10 @@ function addD(d, n) { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUT
 
 describe('sono', () => {
   const ctx = (sono = {}, noites = {}) => ({ sono, noites });
-  it('padrão: dom–qui 22h→5h, sex 22h→6h30, sáb 21h→5h15', () => {
+  it('padrão: dom–qui 22h→5h, sex 21h30→4h30, sáb 21h→5h15', () => {
     const c = cfg();
     expect(noiteDe(c, '2027-01-18', ctx())).toMatchObject({ dormir: '22:00', acordar: '05:00', horas: 7 }); // segunda
-    expect(noiteDe(c, '2027-01-22', ctx())).toMatchObject({ dormir: '22:00', acordar: '06:30', horas: 8.5 }); // sexta
+    expect(noiteDe(c, '2027-01-22', ctx())).toMatchObject({ dormir: '21:30', acordar: '04:30', horas: 7 }); // sexta
     expect(noiteDe(c, '2027-01-23', ctx())).toMatchObject({ dormir: '21:00', acordar: '05:15', horas: 8.25 }); // sábado
   });
   it('terço = dormir − 1 h, oração da noite = dormir − 40 min, telas off = dormir − 30 min (22h fica 21h e 21h20)', () => {
@@ -256,9 +256,10 @@ describe('revisão: carga da semana', () => {
     for (const seg of ['2026-11-23', '2027-01-18', '2027-05-10']) {
       const dias = planoSemana(c, f, seg, { reservas: res(c) });
       expect(dias[5].blocos.find((b) => b.cat === 'resg')).toMatchObject({ min: 120, bruto: 120 });
-      for (const i of [0, 2, 3, 4]) { const h = dias[i].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(h, `${seg} dia ${i}`).toBeGreaterThanOrEqual(9.5); expect(h, `${seg} dia ${i}`).toBeLessThanOrEqual(10); }
+      for (const i of [0, 2]) { const h = dias[i].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(h, `${seg} dia ${i}`).toBeGreaterThanOrEqual(9.5); expect(h, `${seg} dia ${i}`).toBeLessThanOrEqual(10); }
+      for (const i of [3, 4]) { const h = dias[i].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(h, `${seg} dia ${i}`).toBeGreaterThanOrEqual(7.5); expect(h, `${seg} dia ${i}`).toBeLessThanOrEqual(8.6); }
       const ter = dias[1].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(ter).toBeGreaterThanOrEqual(7.5); expect(ter).toBeLessThanOrEqual(8.5);
-      const tot = dias.reduce((a, d) => a + d.blocos.reduce((x, b) => x + b.min, 0), 0) / 60; expect(tot).toBeGreaterThan(53); expect(tot).toBeLessThan(59);
+      const tot = dias.reduce((a, d) => a + d.blocos.reduce((x, b) => x + b.min, 0), 0) / 60; expect(tot).toBeGreaterThan(51); expect(tot).toBeLessThan(59);
     }
   });
   it('a semana leve (23–29/08) tem carga reduzida (~60%) no checklist do dia', () => {
