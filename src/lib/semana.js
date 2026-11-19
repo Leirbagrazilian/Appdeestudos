@@ -2,6 +2,7 @@
 // Tudo é função pura: (configuração, fases, segunda-feira, resultados de simulados) -> semana de blocos com horário.
 import { addDays, diffDays, startOfWeek } from './dates.js';
 import { faseDoDia } from './phases.js';
+import { janelasDoDia, diaLivre } from './rotina.js';
 
 export const toMin = (s) => { const [h, m] = String(s).split(':').map(Number); return h * 60 + m; };
 const horaOk = (s) => typeof s === 'string' && /^\d{1,2}:\d{2}$/.test(s) && toMin(s) <= 1440;
@@ -42,19 +43,22 @@ export function repartir(pesos, total) {
   return res;
 }
 
-/** Minutos líquidos de cada matéria na semana que começa em `segunda`. */
+/** Minutos líquidos de cada matéria na semana que começa em `segunda`: meta líquida (55 h) × % da matéria na fase. */
 export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
-  const hf = cfg.horasFase?.[faseId] ?? cfg.horasFase?.base ?? {};
-  const nominal = cfg.rotina?.metaNominal ?? 50, liquida = cfg.rotina?.metaLiquida ?? 43;
+  const hf = cfg.horasFase?.[faseId] ?? cfg.horasFase?.ano1 ?? {};
+  const liquida = cfg.rotina?.metaLiquida ?? 55;
   // a rampa vale nas primeiras semanas do planner, depois da semana diagnóstica (que tem blocos escritos à mão)
   const diag = Object.keys(cfg.diagnostico?.dias ?? {}).sort();
   const primeira = diag.length ? addDays(startOfWeek(diag.at(-1)), 7) : startOfWeek(cfg.perfil.inicioPlano);
   const semIdx = Math.floor(diffDays(primeira, segunda) / 7);
   const r = cfg.rotina?.rampa;
   const rampa = r?.ativa && semIdx >= 0 && semIdx < (r.semanas ?? 2) ? (r.fator ?? 0.75) : 1;
-  const f = (liquida / nominal) * rampa * 60;
+  const total = liquida * 60 * rampa;
   const min = {};
-  for (const c of [...POOL, 'red', 'provas']) min[c] = Math.round((hf[c] ?? 0) * f);
+  for (const c of [...POOL, 'red', 'provas']) min[c] = Math.round((total * (hf[c] ?? 0)) / 100);
+  // sábados de junho a agosto (Ano 2 e Ano 3): 1 prova antiga por semana (EFOMM em jun–jul, Escola Naval em agosto)
+  const mesSab = +addDays(segunda, 5).slice(5, 7);
+  if ((faseId === 'ano2' || faseId === 'ano3') && mesSab >= 6 && mesSab <= 8) min.provas = Math.max(min.provas, cfg.rotina?.provaSabadoMin ?? 240);
 
   const nome = (c) => cfg.categorias?.[c]?.materia;
   const exs = Object.values(ctx.exams ?? {}).filter((e) => e.data < segunda).sort((a, b) => b.data.localeCompare(a.data));
@@ -131,13 +135,15 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   // janela curta de verdade (30 a 49 min, ex.: segunda depois da corrida) é marcada antes do recorte: sobras do recorte não viram bloco curto
   const marcar = (l) => l.map((j) => ({ ...j, curta: j.fim - j.ini >= 30 && j.fim - j.ini < s }));
   const corta = (l, r) => l.flatMap((j) => (j.tipo === 'prova' && min.provas > 0 ? [j] : recortar([j], r))); // prova cronometrada não é partida
-  const janelas = (wd) => corta(marcar(janelasValidas(cfg.rotina?.janelas?.[wd])), reservas[wd]);
+  const janelas = (wd) => corta(marcar(janelasValidas(janelasDoDia(cfg, wd))), reservas[wd]);
+  const livre = dias.map((d) => diaLivre(cfg, d.dia)); // 24–25/12 e 31/12–01/01: sem estudo
   const bloco = (cat, ini, dur, sessoes = 1) => ({ cat, ini, fim: ini + dur, min: sessoes ? sessoes * s : dur, bruto: dur, sessoes });
   const excedente = { prova: 0, red: 0 };
+  const sessoesDe = (j) => slotsDaJanela(j.fim - j.ini, s, p);
   const janelasLivres = []; // janelas de estudo em ordem cronológica
 
   // Sábado: prova antiga cronometrada + correção; o que sobrar da janela vira estudo normal.
-  const sab = janelas(6).find((j) => j.tipo === 'prova') ?? janelas(6)[0];
+  const sab = livre[5] ? null : janelas(6).find((j) => j.tipo === 'prova') ?? janelas(6)[0];
   if (sab) {
     const dur = sab.fim - sab.ini, P = min.provas;
     const reserva = P > 0 ? Math.min(60, Math.floor(dur / 3 / 10) * 10) : 0; // a correção sempre tem lugar na janela
@@ -150,22 +156,44 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
     if (sab.fim - ini >= s) janelasLivres.push({ i: 5, ini, fim: sab.fim });
     for (const j of foraDe(janelas(6), sab)) janelasLivres.push({ i: 5, ini: j.ini, fim: j.fim, curta: j.curta });
   }
-  // Domingo: dia de estudo. Na janela do domingo ficam a redação (no começo) e o planejamento da semana (no fim); o resto é estudo.
-  const dom = janelas(0).find((j) => j.tipo === 'domingo') ?? janelas(0).at(-1);
+  // Domingo: 2 h de revisão leve; o planejamento da semana fica no fim. (A redação semanal vai para um dia útil.)
+  const dom = livre[6] ? null : janelas(0).find((j) => j.tipo === 'domingo') ?? janelas(0).at(-1);
   if (dom) {
     const dur = dom.fim - dom.ini, plano = Math.min(30, dur);
-    const red = Math.max(0, Math.min(r10(min.red), dur - plano));
-    excedente.red = Math.max(0, min.red - red);
-    if (red > 0) dias[6].blocos.push(bloco('red', dom.ini, red, 0));
     if (plano > 0) dias[6].blocos.push(bloco('plan', dom.fim - plano, plano, 0));
-    const ini = dom.ini + red + (red > 0 ? p : 0), fim = dom.fim - plano - (plano > 0 ? p : 0);
-    if (fim - ini >= s) janelasLivres.push({ i: 6, ini, fim });
+    const rev = dom.fim - plano - (plano > 0 ? p : 0) - dom.ini;
+    if (rev >= 20) dias[6].blocos.push(bloco('revl', dom.ini, rev, 0));
     for (const j of foraDe(janelas(0), dom)) janelasLivres.push({ i: 6, ini: j.ini, fim: j.fim, curta: j.curta });
   }
   // Segunda a sexta.
   // segunda a sexta: o tipo não importa, então janelas que se sobrepõem viram uma só
-  for (let i = 0; i < 5; i++) for (const j of corta(marcar(janelasValidas((cfg.rotina?.janelas?.[i + 1] ?? []).map((x) => ({ ...x, tipo: undefined })))), reservas[i + 1])) janelasLivres.push({ i, ini: j.ini, fim: j.fim, curta: j.curta });
+  for (let i = 0; i < 5; i++) if (!livre[i]) for (const j of corta(marcar(janelasValidas(janelasDoDia(cfg, i + 1).map((x) => ({ ...x, tipo: undefined })))), reservas[i + 1])) janelasLivres.push({ i, ini: j.ini, fim: j.fim, curta: j.curta });
   janelasLivres.sort((a, b) => a.i - b.i || a.ini - b.ini);
+  // Resgate do sábado (2 sessões): tópicos da semana que não foram "matados"; sem pendência, prova antiga ou questões.
+  const nResg = Math.round(Number(cfg.rotina?.resgateSabado ?? 0));
+  if (nResg > 0) {
+    const k = janelasLivres.findIndex((j) => j.i === 5 && sessoesDe(j) >= nResg);
+    if (k >= 0) {
+      const j = janelasLivres[k], dur = brutoDeSlots(nResg, s, p);
+      dias[5].blocos.push({ cat: 'resg', ini: j.ini, fim: j.ini + dur, min: nResg * s, bruto: dur, sessoes: nResg });
+      j.ini += dur + p;
+      if (sessoesDe(j) < 1) janelasLivres.splice(k, 1);
+    }
+  }
+  // Redação (1 por semana, a partir do Ano 1): um bloco inteiro num dia útil
+  const nRed = Math.round(min.red / s);
+  if (nRed >= 1) {
+    const di = Math.min(4, Math.max(0, (Number(cfg.rotina?.diaRedacao) || 3) - 1));
+    const cand = janelasLivres.map((j, k) => ({ j, k })).filter((x) => x.j.i === di && !x.j.curta).sort((a, b) => sessoesDe(b.j) - sessoesDe(a.j))[0];
+    let feitas = 0;
+    if (cand && sessoesDe(cand.j) >= 1) {
+      const take = Math.min(nRed, sessoesDe(cand.j)), dur = brutoDeSlots(take, s, p);
+      dias[di].blocos.push(bloco('red', cand.j.ini, dur, take));
+      cand.j.ini += dur + p; feitas = take;
+      if (sessoesDe(cand.j) < 1) janelasLivres.splice(cand.k, 1);
+    }
+    excedente.red = (nRed - feitas) * s;
+  }
   // janela curta (30 a 49 min, ex.: segunda 6h30–7h10 depois da corrida): uma sessão curta de Matemática, descontada do orçamento
   for (let k = janelasLivres.length - 1; k >= 0; k--) {
     const j = janelasLivres[k], dur = j.fim - j.ini;
@@ -180,21 +208,35 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   for (const c of POOL) demanda[c] = min[c] / s;
   if (excedente.prova >= 25) demanda.prova = excedente.prova / s;
   if (excedente.red >= 25) demanda.red = excedente.red / s;
-  const cap = janelasLivres.reduce((a, j) => a + slotsDaJanela(j.fim - j.ini, s, p), 0);
   const D = Object.values(demanda).reduce((a, b) => a + b, 0);
+  const nJan = janelasLivres.map((j) => sessoesDe(j));
+  // teto de cada janela: com `rotina.metaDia` (horas líquidas por dia da semana), o dia não passa da meta dele (descontados os blocos especiais)
+  let teto = nJan;
+  const metaDia = cfg.rotina?.metaDia;
+  if (metaDia) {
+    teto = nJan.map(() => 0);
+    for (let i = 0; i < 7; i++) {
+      const ks = janelasLivres.map((j, k) => (j.i === i ? k : -1)).filter((k) => k >= 0);
+      if (!ks.length) continue;
+      const especial = dias[i].blocos.reduce((a, b) => a + b.min, 0);
+      const allow = Math.max(0, Math.round((Number(metaDia[(i + 1) % 7] ?? 0) * 60 - especial) / s));
+      const caps = ks.map((k) => nJan[k]);
+      const r = repartirComTeto(caps, caps, Math.min(allow, caps.reduce((a, b) => a + b, 0)));
+      ks.forEach((k, n) => { teto[k] = r[n]; });
+    }
+  }
+  const cap = teto.reduce((a, b) => a + b, 0);
   const alvo = Math.min(Math.round(D), cap);
   const aloc = repartir(demanda, alvo);
   // Se sobrar capacidade, as janelas são reduzidas de forma proporcional (os dias não ficam vazios no fim da semana).
-  const nJan = janelasLivres.map((j) => slotsDaJanela(j.fim - j.ini, s, p));
-  // fim de semana pesa mais (rotina.pesoFimDeSemana): sábado e domingo recebem uma fatia maior do que a proporção das janelas
   const peso = Math.max(1, Number(cfg.rotina?.pesoFimDeSemana) || 1);
-  const uso = repartirComTeto(janelasLivres.map((j, k) => nJan[k] * (j.i >= 5 ? peso : 1)), nJan, alvo);
+  const uso = repartirComTeto(janelasLivres.map((j, k) => teto[k] * (j.i >= 5 ? peso : 1)), teto, alvo);
 
   const ordem = [...POOL, 'prova', 'red'];
   const rest = { ...aloc }, cred = Object.fromEntries(ordem.map((c) => [c, 0]));
   let ultimaCat = null, ultimoDia = -1;
   janelasLivres.forEach((j, k) => {
-    let rem = Math.min(uso[k], nJan[k]), ponteiro = j.ini;
+    let rem = Math.min(uso[k], teto[k]), ponteiro = j.ini;
     while (rem > 0) {
       const ativos = ordem.filter((c) => (rest[c] ?? 0) > 0);
       if (!ativos.length) return;

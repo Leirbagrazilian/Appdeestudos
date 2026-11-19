@@ -3,6 +3,7 @@
   import { blocosDaSemana } from '../lib/planner.js';
   import { addDays, startOfWeek, diaNome, fmtMin, parse } from '../lib/dates.js';
   import Ring from '../components/Ring.svelte';
+  import SonoSemana from '../components/SonoSemana.svelte';
   import { planoSemanaCorrida, kmDaSemana } from '../lib/treino.js';
   import { fmtCurta } from '../lib/dates.js';
 
@@ -74,6 +75,9 @@
     </div>
   {/each}
 </section>
+
+<h2>Sono</h2>
+<SonoSemana seg={ini} />
 
 <h2>Constância</h2>
 <section class="card cons">

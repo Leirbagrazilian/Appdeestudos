@@ -1,5 +1,5 @@
 <script>
-  import { app, salvarCfg, importar, restaurarSeed, pf, fazerBackup } from '../stores/app.svelte.js';
+  import { app, salvarCfg, importar, restaurarSeed, pf, fazerBackup, definirVou } from '../stores/app.svelte.js';
   import { vibrar } from '../lib/prefs.js';
   import { sino } from '../lib/audio.js';
   import { gerarICS } from '../lib/ics.js';
@@ -7,6 +7,8 @@
   import { pedir, suportado } from '../lib/notify.js';
   import { fmtBR } from '../lib/dates.js';
   import { slotsDaJanela, janelasValidas, toHHMM } from '../lib/semana.js';
+  import { janelasDoDia, presencaPorAula } from '../lib/rotina.js';
+  import { horasEntre, fmtH } from '../lib/sono.js';
   import { series, principalDe } from '../lib/livros.js';
   import { alertasTreino } from '../lib/treino.js';
 
@@ -34,7 +36,7 @@
   };
   const materiasLivro = $derived(app.cfg.materias.map((nome) => ({ nome, series: series(app.cfg, nome) })).filter((m) => m.series.length));
   const capacidade = (d) => {
-    const bruto = app.cfg.rotina.janelas[d] ?? [];
+    const bruto = janelasDoDia(app.cfg, d);
     const js = janelasValidas(bruto);
     if (!bruto.length) return 'sem estudo';
     const ignoradas = bruto.length - js.length;
@@ -42,10 +44,10 @@
     const nome = (j) => `${toHHMM(j.ini)}–${toHHMM(j.fim)}${j.tipo === 'prova' ? ' (prova antiga e correção)' : j.tipo === 'domingo' ? ' (redação e planejamento)' : ''}`;
     return `${js.map(nome).join(' · ') || 'nenhuma janela válida'}${n ? ` · ${n} sessões` : ''}${ignoradas > 0 ? ` · ${ignoradas} ignorada(s): horário vazio, inválido ou sobreposto` : ''}`;
   };
-  const addJanela = (d) => { (app.cfg.rotina.janelas[d] ??= []).push({ ini: '19:00', fim: '20:00' }); salvar(); };
-  const delJanela = (d, i) => { app.cfg.rotina.janelas[d].splice(i, 1); salvar(); };
-  
-  const addAula = () => { app.cfg.rotina.aulas.push({ dia: 1, inicio: '08:00', fim: '10:00', nome: 'Compromisso' }); salvar(); };
+  const presenca = $derived(presencaPorAula(app.cfg, app.presenca));
+  const ajusteMeta = (wd, v) => { app.cfg.rotina.metaDia = { ...(app.cfg.rotina.metaDia ?? {}), [wd]: Math.max(0, +v || 0) }; salvar(); };
+
+  const addAula = () => { app.cfg.rotina.aulas.push({ dia: 1, inicio: '08:00', fim: '10:00', nome: 'Compromisso', tipo: 'fixo' }); salvar(); };
   const delAula = (i) => { app.cfg.rotina.aulas.splice(i, 1); salvar(); };
 </script>
 
@@ -108,35 +110,51 @@
 {/each}
 <section class="card bloco">
   <label>Data de nascimento<input type="date" bind:value={app.cfg.perfil.nascimento} onchange={salvar} /></label>
-  <label>Semanas da fase específica (6 a 8)<input type="number" min="6" max="8" bind:value={app.cfg.perfil.semanasEspecifica} onchange={salvar} /></label>
+  <label>Previsão do portão da Fase 0 (o Ano 1 começa no dia seguinte)<input type="date" bind:value={app.cfg.perfil.fimZero} onchange={salvar} /></label>
 </section>
 
 <h2>Rotina de estudo</h2>
 <section class="card bloco">
   <label>Meta líquida por semana (horas de foco, sem as pausas)
     <input type="number" min="10" max="60" step="1" bind:value={app.cfg.rotina.metaLiquida} onchange={salvar} /></label>
-  <p class="muted">As horas de cada matéria vêm da tabela da fase (43 h líquidas), escaladas para essa meta. Hoje: fator {(app.cfg.rotina.metaLiquida / app.cfg.rotina.metaNominal).toFixed(2).replace('.', ',')}. Quer mais volume? Suba a meta; as janelas precisam comportar.</p>
-  <label>Peso do fim de semana (1 = igual aos outros dias)
-    <input type="number" min="1" max="2" step="0.1" bind:value={app.cfg.rotina.pesoFimDeSemana} onchange={salvar} /></label>
-  <p class="muted">Acima de 1, sábado e domingo recebem uma fatia maior das horas da semana.</p>
+  <p class="muted">Cada matéria recebe a sua % da semana na fase (Fase 0: Mat 55, Fís 25, Quím 12, Port 6, Ing 2; Anos 1 a 3: Mat 38, Fís 32, Quím 15, Port 6, Red 5, Ing 4). Pausa de 10 min a cada 50 de foco. Quer mais volume? Suba a meta; as janelas precisam comportar.</p>
+  <p class="rot">Meta líquida por dia (horas)</p>
+  <div class="metas duas7">
+    {#each ordem as d}<label>{DIAS[d].slice(0, 3)}<input type="number" min="0" max="12" step="0.25" inputmode="decimal" value={app.cfg.rotina.metaDia?.[d] ?? 0} onchange={(e) => ajusteMeta(d, e.currentTarget.value)} /></label>{/each}
+  </div>
+  <p class="muted">Padrão: segunda, quarta, quinta e sexta ~9,5–10 h; terça ~8 h; sábado 8 h (2 h de resgate); domingo 2 h de revisão leve. 24–25/12 e 31/12–01/01 são livres.</p>
   <div class="tg"><span><strong>Rampa de 75%</strong><span class="muted">Nas {app.cfg.rotina.rampa.semanas} primeiras semanas do plano, 75% das horas.</span></span>
     <button role="switch" aria-checked={app.cfg.rotina.rampa.ativa} aria-label="Rampa de 75%" class="sw" class:on={app.cfg.rotina.rampa.ativa} onclick={() => { app.cfg.rotina.rampa.ativa = !app.cfg.rotina.rampa.ativa; salvar(); }}><i></i></button></div>
 </section>
 
 <h2>Oração</h2>
 <section class="card bloco">
-  <p class="muted">Horários (o tempo dos terços, do Ângelus e da lectio sai das janelas de estudo). O 2º terço é depois do almoço e o 3º depois da corrida.</p>
+  <p class="muted">Horários (o tempo dos terços, do Ângelus e da lectio sai das janelas de estudo). O 2º terço é depois do almoço e o 3º depois da corrida. A manhã sai da hora de acordar (+10 min); o terço, a oração da noite e a lectio saem da hora de dormir (veja Sono).</p>
   <div class="duas">
-    {#each [['manha', 'Manhã'], ['terco3', '3º terço'], ['angelus', 'Ângelus'], ['terco2', '2º terço'], ['terco1', 'Terço'], ['noite', 'Noite'], ['lectio', 'Lectio divina']] as [k, nome]}
+    {#each [['terco3', '3º terço'], ['angelus', 'Ângelus'], ['terco2', '2º terço']] as [k, nome]}
       <label>{nome}<input type="time" bind:value={app.cfg.oracao[k]} onchange={salvar} /></label>
     {/each}
   </div>
 </section>
 
+<h2>Sono</h2>
+<section class="card bloco">
+  <p class="muted">Padrão de cada noite (a noite que começa naquele dia). Terço = dormir − 1 h, oração da noite = dormir − 40 min, telas desligadas = dormir − 30 min. Em Hoje você planeja uma noite diferente (noite curta de 6 a 7 h, no máximo 1 por semana).</p>
+  {#each ordem as d}
+    {@const p = app.cfg.sono.padrao[d]}
+    <div class="duas">
+      <label>{DIAS[d]}: dormir<input type="time" bind:value={p.dormir} onchange={salvar} /></label>
+      <label>acordar<input type="time" bind:value={p.acordar} onchange={salvar} /></label>
+      <span class="muted cheia">{fmtH(horasEntre(p.dormir, p.acordar))} de sono</span>
+    </div>
+  {/each}
+</section>
+
 <h2>Treino</h2>
 <section class="card bloco">
   <div class="duas">
-    <label>Corrida (seg a sáb)<input type="time" bind:value={app.cfg.treino.corrida} onchange={salvar} /></label>
+    <label>Corrida (seg a sex)<input type="time" bind:value={app.cfg.treino.corrida} onchange={salvar} /></label>
+    <label>Corrida (sábado)<input type="time" bind:value={app.cfg.treino.corridaSab} onchange={salvar} /></label>
     <label>Longão (domingo)<input type="time" bind:value={app.cfg.treino.longao} onchange={salvar} /></label>
   </div>
   <p class="muted">Musculação (~1 h). Deixe o horário vazio para tirar o dia.</p>
@@ -172,20 +190,28 @@
 </section>
 
 <h2>Janelas de estudo</h2>
-<p class="muted">Os blocos do dia são encaixados nestas janelas, com 50 min de foco e 10 de pausa. Sábado e domingo têm janela própria: prova antiga e correção no sábado, redação e planejamento no domingo.</p>
+<p class="muted">Calculadas sozinhas: 6h30 às 21h menos a corrida, a musculação, o jiu-jitsu, as refeições (12–13 h e 18–19 h) e as aulas que você marcou "vou". O tempo de oração sai depois. Blocos de 50 min de foco e 10 de pausa. No sábado, a primeira janela é da prova antiga e o resgate; no domingo, revisão leve e planejamento.</p>
 {#each ordem as d}
   <section class="card bloco">
     <div class="cj"><strong>{DIAS[d]}</strong><span class="muted">{capacidade(d)}</span></div>
-    {#each app.cfg.rotina.janelas[d] ?? [] as j, i}
-      <div class="jan">
-        <input type="time" aria-label="Início da janela {i + 1} de {DIAS[d]}" bind:value={j.ini} onchange={salvar} />
-        <input type="time" aria-label="Fim da janela {i + 1} de {DIAS[d]}" bind:value={j.fim} onchange={salvar} />
-        <button class="x" aria-label="Remover janela {i + 1} de {DIAS[d]}" onclick={() => delJanela(d, i)}>✕</button>
-      </div>
-    {/each}
-    <button class="sec" onclick={() => addJanela(d)}>＋ Adicionar janela</button>
   </section>
 {/each}
+
+<h2>Faculdade: vou / não vou</h2>
+<section class="card bloco">
+  <p class="muted">A faculdade é opcional. Marque "vou" nas aulas que você vai assistir: elas saem da janela de estudo. "Não vou" libera o horário. Em Hoje você marca "Fui" ou "Faltei" em cada aula. Alerta abaixo de {app.cfg.rotina.presencaMin ?? 75}% de presença.</p>
+  {#each presenca as x (x.nome)}
+    <div class="vou">
+      <span class="vt"><strong>{x.nome}</strong>
+        <span class="muted">{DIAS[x.aula.dia]} · {x.aula.inicio}–{x.aula.fim} · {x.total ? `presença ${Math.round(x.pct * 100)}% (${x.presentes} de ${x.total})` : 'sem registro de presença'}</span>
+        {#if x.alerta}<span class="aviso-t" role="alert">Presença abaixo de {app.cfg.rotina.presencaMin ?? 75}%.</span>{/if}</span>
+      <span class="vv" role="radiogroup" aria-label="Vou ou não vou: {x.nome}">
+        <button role="radio" aria-checked={!!x.aula.vou} class:on={!!x.aula.vou} onclick={() => definirVou(x.aula.i, true)}>Vou</button>
+        <button role="radio" aria-checked={!x.aula.vou} class:on={!x.aula.vou} onclick={() => definirVou(x.aula.i, false)}>Não vou</button>
+      </span>
+    </div>
+  {/each}
+</section>
 
 <h2>Aulas e compromissos fixos</h2>
 <section class="card bloco">
@@ -239,7 +265,10 @@
   input, select { width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
   .metas { grid-template-columns: repeat(7, 1fr); gap: 4px; } .metas input { padding: 8px 2px; text-align: center; }
   .aula { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 6px; align-items: center; padding-top: 8px; border-top: 1px solid var(--line); } .aula select, .aula .nome { grid-column: 1 / -1; }
-  .cj { display: grid; gap: 2px; } .jan { display: grid; grid-template-columns: 1fr 1fr 44px; gap: 6px; align-items: center; }
+  .cj { display: grid; gap: 2px; }
+  .duas7 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; } .duas7 input { padding: 8px 2px; text-align: center; }
+  .vou { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); } .vt { display: grid; gap: 2px; }
+  .vv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .vv button { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); font-weight: 700; color: var(--tx); } .vv .on { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
   .x { width: 44px; height: 44px; color: var(--tx2); }
   .pri, .sec { min-height: 48px; border-radius: 14px; font-weight: 600; display: grid; place-items: center; cursor: pointer; }
   .pri { background: var(--ac); color: var(--ac-tx); } .sec { border: 1px solid var(--line); color: var(--tx); font-size: 1rem; }

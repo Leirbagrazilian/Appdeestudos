@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, fases, ajustes, fazerBackup, adiarLembreteBackup, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, verCapitulo } from '../stores/app.svelte.js';
+  import { app, fases, prazos, ajustes, registrarPresenca, fazerBackup, adiarLembreteBackup, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, verCapitulo } from '../stores/app.svelte.js';
   import { blocosDaSemana } from '../lib/planner.js';
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
@@ -27,8 +27,13 @@
   import Esquadrilha from '../components/Esquadrilha.svelte';
   import Emblema from '../components/Emblema.svelte';
   import { fraseDoDia } from '../lib/frases.js';
+  import Sono from '../components/Sono.svelte';
+  import { horariosNoite, estadoDoDia, alertaSono, noiteDe } from '../lib/sono.js';
+  import { presencaPorAula, aulasDoDia } from '../lib/rotina.js';
+  import { ritmo as ritmoPrazos, contarBlocos, dividasAtuais } from '../lib/prazos.js';
 
   const REV_MIN = 10;
+  const diaCurto = (d) => `${diaNome(d).slice(0, 3)} ${fmtBR(d).slice(0, 5)}`;
   let aberto = $state(null), assuntos = $state({}), verCarta = $state(false), fotoAberta = $state(null);
   let hora = $state(new Date().getHours());
   $effect(() => { const i = setInterval(() => (hora = new Date().getHours()), 60000); return () => clearInterval(i); });
@@ -36,11 +41,12 @@
   const EMB = { en: 'en', efomm: 'efomm', esa: 'esa', ita: 'ita', ime: 'ime' }; // emblema do concurso na contagem regressiva
   const fs = $derived(fases());
   const fase = $derived(faseDoDia(fs, app.dia));
+  const plano = $derived(prazos());
   // a semana é montada uma vez (e não a cada bloco marcado): serve à lista de hoje e à cidade
   const semana = $derived(blocosDaSemana(app.cfg, fs, startOfWeek(app.dia), ajustes()));
   const blocos = $derived(semana[diffDays(startOfWeek(app.dia), app.dia)]);
   // tarefa exata de cada bloco de estudo: tópico da Trilha, vídeo, páginas, exercícios e questões
-  const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id, dominio: app.dominio }));
+  const tarefas = $derived(tarefasDoDia(app.cfg, blocos, { lacunas: app.lacunas, leitura: app.leitura, done: app.done, cotasDia: app.cotas[app.dia] ?? {}, faseId: fase.id, dominio: app.dominio, plano: plano, dia: app.dia, dividas: app.dividas }));
   const bRegistro = $derived(app.registroAberto ? blocos.find((x) => x.id === app.registroAberto.id) : null);
   const tituloDe = (b) => {
     const topico = tarefas[b.id]?.topico ?? app.done[b.id]?.topico;
@@ -60,6 +66,18 @@
   const cpPendente = $derived(!diag && checkpointPendente(app.cfg, app.checkpoints, app.dia));
   const portaoAberto = $derived(fase.id === 'zero' && semanaZero(fs, app.dia) >= 8 && !portaoZero(app.cfg, app.portao, app.checkpoints, app.lacunas).ok);
   const dificil = $derived(!!app.dificeis[app.dia]);
+  // sono, faculdade e prazos
+  const sonoCtx = $derived({ noites: app.sonoNoites, sono: app.sono });
+  const estadoSono = $derived(estadoDoDia(app.cfg, app.dia, sonoCtx)); // 'minimo' | 'curta' | null
+  const curta = $derived(estadoSono === 'curta' || estadoSono === 'minimo');
+  const noiteHoje = $derived(horariosNoite(app.cfg, app.dia, sonoCtx));
+  const noiteAnterior = $derived(noiteDe(app.cfg, addDays(app.dia, -1), sonoCtx));
+  const alertaDeSono = $derived(alertaSono(app.cfg, app.sono, app.dia));
+  const aulas = $derived(aulasDoDia(app.cfg, app.dia));
+  const presenca = $derived(presencaPorAula(app.cfg, app.presenca));
+  const presencaBaixa = $derived(presenca.filter((x) => x.alerta));
+  const ritmoGeral = $derived(ritmoPrazos(plano, app.lacunas, app.dia));
+  const dividasN = $derived(dividasAtuais(plano, { lacunas: app.lacunas, feitos: contarBlocos(app.done), dividas: app.dividas }, app.dia).length);
   // Progresso pelo tempo planejado de cada bloco concluído (os minutos reais aparecem no bloco).
   const totalMin = $derived(blocos.reduce((s, b) => s + b.min, 0) + revs.length * REV_MIN);
   const feitoMin = $derived(blocos.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) + revs.filter((r) => r.feita).length * REV_MIN);
@@ -106,11 +124,17 @@
 
   // Linha do tempo única: estudo + treino + oração, em Manhã · Tarde · Noite.
   const temProva = $derived(blocos.some((b) => ['prova', 'diag'].includes(b.cat)) || cpPendente);
-  const trn = $derived(treinoDoDia(app.cfg, app.dia, { treinos: app.treinos, editadas: app.treinoSemanas }));
-  const orac = $derived(oracoesDoDia(app.cfg, app.dia, { oracoes: app.oracoes, temProva }));
+  const trn = $derived(treinoDoDia(app.cfg, app.dia, { treinos: app.treinos, editadas: app.treinoSemanas, noiteCurta: curta }));
+  const orac = $derived(oracoesDoDia(app.cfg, app.dia, { oracoes: app.oracoes, temProva, noites: app.sonoNoites, sono: app.sono }));
   const emMin = (h) => { const m = /^(\d{1,2}):(\d{2})/.exec(h ?? ''); return m ? +m[1] * 60 + +m[2] : null; };
+  const DEPOIS_ALMOCO = 13 * 60 + 30;
+  // noite curta: o bloco MATAR HOJE vai para depois do almoço
+  const matarDepois = (b) => curta && tarefas[b.id]?.matar && (emMin(b.ini) ?? 0) < DEPOIS_ALMOCO;
   const itens = $derived([
-    ...blocos.map((b) => ({ k: 'e', id: 'e' + b.id, b, m: emMin(b.ini), feito: !!app.done[b.id] })),
+    ...blocos.map((b) => ({ k: 'e', id: 'e' + b.id, b, m: matarDepois(b) ? DEPOIS_ALMOCO : emMin(b.ini), feito: !!app.done[b.id], depois: matarDepois(b) })),
+    { k: 's', id: 'sono-manha', tipo: 'manha', m: emMin(noiteAnterior.acordar), feito: !!app.sono[app.dia] },
+    { k: 's', id: 'sono-noite', tipo: 'noite', m: emMin(noiteHoje.terco), feito: false },
+    ...(curta ? [{ k: 's', id: 'sono-cochilo', tipo: 'cochilo', m: 13 * 60 + 20, feito: false }] : []),
     ...(trn ? [{ k: 't', id: 't', m: emMin(trn.hora), feito: treinoFeito(app.treinos[app.dia] ?? {}) }] : []),
     ...orac.map((o) => ({ k: 'o', id: 'o' + o.id, o, m: emMin(o.hora), feito: !!app.oracoes[app.dia]?.[o.id] })),
   ]);
@@ -180,6 +204,18 @@
 {#if portaoAberto}
   <a class="nota" href="#/progresso"><Icon nome="clock" />Última semana da Fase 0: faça o teste de saída do Khan e o checkpoint para abrir o portão.</a>
 {/if}
+{#if alertaDeSono.alerta}
+  <a class="nota alerta" href="#/semana"><Icon nome="moon" />{alertaDeSono.texto}</a>
+{/if}
+{#each presencaBaixa as x (x.nome)}
+  <a class="nota alerta" href="#/ajustes"><Icon nome="clock" />Presença em {x.nome}: {Math.round(x.pct * 100)}% ({x.presentes} de {x.total}), abaixo de {app.cfg.rotina.presencaMin ?? 75}%.</a>
+{/each}
+{#if ritmoGeral.alerta}
+  <a class="nota alerta" href="#/trilha"><Icon nome="clock" />Prazos atrasados em {ritmoGeral.atraso} dias. Veja a aba Prazos na Trilha: sábado inteiro de recuperação ou baixar o peso de um tópico leve.</a>
+{/if}
+{#if dividasN}
+  <a class="nota" href="#/erros"><Icon nome="clock" />{dividasN} {dividasN === 1 ? 'dívida' : 'dívidas'} de tópico no caderno de erros (revisões 1, 7 e 30 dias). O resgate de sábado ajuda a pagar.</a>
+{/if}
 {#if lembrarBackup}
   <div class="nota backup entra">
     <p><Icon nome="clock" />{app.ultimoBackup ? 'Faz uma semana do último backup.' : 'Você ainda não fez nenhum backup.'} Guarde seu progresso fora do tablet.</p>
@@ -206,29 +242,51 @@
   <blockquote class="carta entra"><p class="data">Sua carta</p><p>{app.cfg.carta}</p></blockquote>
 {/if}
 
+{#if aulas.length}
+  <h2 class="gr">Faculdade<span class="n">{aulas.length}</span></h2>
+  <ul class="lista">
+    {#each aulas as a (a.nome)}
+      {@const p = presenca.find((x) => x.nome === a.nome)}
+      <li class="aula">
+        <span class="txt"><span class="tit">{a.nome} · {a.inicio}–{a.fim}</span>
+          <span class="sub">{a.vou ? 'Você marcou "vou"' : 'Você marcou "não vou": a janela está liberada para estudo'}{p?.total ? ` · presença ${Math.round(p.pct * 100)}% (${p.presentes} de ${p.total})` : ''}</span></span>
+        <span class="pres" role="group" aria-label="Presença em {a.nome}">
+          <button class:on={app.presenca[a.nome]?.[app.dia] === 'p'} aria-pressed={app.presenca[a.nome]?.[app.dia] === 'p'} onclick={() => registrarPresenca(a.nome, app.dia, 'p')}>Fui</button>
+          <button class:on={app.presenca[a.nome]?.[app.dia] === 'f'} aria-pressed={app.presenca[a.nome]?.[app.dia] === 'f'} onclick={() => registrarPresenca(a.nome, app.dia, 'f')}>Faltei</button>
+        </span>
+      </li>
+    {/each}
+  </ul>
+{/if}
+
 {#each grupos as g (g.nome)}
-  <h2 class="gr">{g.nome}<span class="n">{g.lista.filter((i) => i.feito).length}/{g.lista.length}</span></h2>
+  <h2 class="gr">{g.nome}<span class="n">{g.lista.filter((i) => i.k !== 's' && i.feito).length}/{g.lista.filter((i) => i.k !== 's').length}</span></h2>
   <ul class="lista">
     {#each g.lista as it (it.id)}
       {#if it.k === 't'}
-        <Treino dia={app.dia} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
+        <Treino dia={app.dia} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} {curta} />
+      {:else if it.k === 's'}
+        <Sono dia={app.dia} tipo={it.tipo} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
       {:else if it.k === 'o'}
         <Oracao dia={app.dia} it={it.o} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
       {:else}
-        {@render estudo(it.b, it.id)}
+        {@render estudo(it.b, it.id, it.depois)}
       {/if}
     {/each}
   </ul>
 {/each}
 
-{#snippet estudo(b, id)}
+{#snippet estudo(b, id, depois = false)}
   {@const feito = !!app.done[b.id]}
   {@const rodando = app.timer?.id === b.id}
   {@const tarefa = tarefas[b.id]}
   <Linha {feito} label={`${b.titulo}, ${fmtMin(b.min)}`} onToggle={() => alternarBloco(b, assuntos[b.id] ?? '', tarefas[b.id])}
-    aberto={aberto === id} onAbrir={() => abrir(id)} icone="livro" hora={b.ini ? `${b.ini}–${b.fim}` : ''} titulo={tituloDe(b)}
+    aberto={aberto === id} onAbrir={() => abrir(id)} icone="livro" hora={depois ? 'depois do almoço' : b.ini ? `${b.ini}–${b.fim}` : ''} titulo={tituloDe(b)}
     sub={`${feito ? `${fmtMin(app.done[b.id].min)} feitos` : descSessoes(b)}${app.done[b.id]?.questoes ? ` · ${app.done[b.id].questoes.acertos}/${app.done[b.id].questoes.feitas} questões` : ''}${app.done[b.id]?.assunto ? ` · ${app.done[b.id].assunto}` : ''}${b.adiadoDe ? ` · veio de ${diaNome(b.adiadoDe)}` : ''}`}>
-    {#snippet extra()}{#if SEDES.includes(b.cat)}<span class="sedes">Sedes Sapientiae, rogai por nós</span>{/if}{/snippet}
+    {#snippet extra()}
+      {#if tarefa?.prazo}<span class="pz">{#if tarefa.matar}<span class="matar">MATAR HOJE</span>{/if}{tarefa.prazo.resgate ? 'Resgate' : tarefa.prazo.pagandoDivida ? 'Pagando dívida' : tarefa.prazo.reforco ? 'Reforço' : `bloco ${tarefa.prazo.k} de ${tarefa.prazo.de}`} · prazo {diaCurto(tarefa.prazo.data)}{tarefa.prazo.atrasado && !tarefa.prazo.resgate ? ' (atrasado)' : ''}</span>{/if}
+      {#if SEDES.includes(b.cat)}<span class="sedes">Sedes Sapientiae, rogai por nós</span>{/if}
+    {/snippet}
     {#snippet acao()}
       {#if !feito}
         <button class="play" class:rodando aria-label={rodando ? `Abrir cronômetro de ${b.titulo}` : `Começar cronômetro de ${b.titulo}`} onclick={() => comecar(b)}>
@@ -298,6 +356,12 @@
 </p>
 
 <style>
+  .pz { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .85rem; color: var(--tx2); font-weight: 600; }
+  .matar { font-size: .8125rem; font-weight: 800; letter-spacing: .06em; color: var(--al); background: var(--al-bg); border: 1px solid var(--al); border-radius: 8px; padding: 2px 10px; }
+  .aula { display: grid; gap: 6px; padding: 8px 4px; }
+  .pres { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .pres button { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); font-weight: 700; color: var(--tx); }
+  .pres button.on { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
   .sedes { display: block; font-size: .75rem; font-style: italic; color: var(--tx2); }
   header { padding: 20px 4px 4px; position: relative; }
   .mini-farol { position: absolute; right: 0; top: 0; width: 62px; height: 48px; transform: scale(.5); transform-origin: right top; opacity: .7; pointer-events: none; }

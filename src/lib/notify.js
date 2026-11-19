@@ -1,6 +1,7 @@
 import * as db from './db.js';
 import { alertasInscricao } from './alerts.js';
 import { vencidas } from './spaced.js';
+import { horariosNoite } from './sono.js';
 
 export const suportado = () => typeof Notification !== 'undefined';
 export async function pedir() { return suportado() ? Notification.requestPermission() : 'denied'; }
@@ -21,4 +22,15 @@ export async function verificar(cfg, reviews, dia) {
   }
   const v = vencidas(Object.values(reviews), dia);
   if (v.length && (await novo(`${dia}:rev`))) await mostrar('Revisões de hoje', `${v.length} revisão(ões) esperando no checklist.`, 'rev');
+}
+
+let timerTelas;
+/** Telas desligadas (30 min antes de dormir): notificação enquanto o app está aberto (sem backend, não há como avisar com o app fechado). */
+export function agendarTelas(cfg, dia, ctx = {}) {
+  clearTimeout(timerTelas);
+  if (!suportado() || Notification.permission !== 'granted' || !cfg.notificacoes || !cfg.sono) return;
+  const h = horariosNoite(cfg, dia, ctx), [hh, mm] = h.telas.split(':').map(Number);
+  const alvo = new Date(); alvo.setHours(hh, mm, 0, 0);
+  const falta = alvo.getTime() - Date.now();
+  if (falta > 0 && falta < 20 * 3600e3) timerTelas = setTimeout(() => mostrar('Telas desligadas', `Dormir às ${h.dormir}. Terço às ${h.terco}.`, 'telas'), falta);
 }

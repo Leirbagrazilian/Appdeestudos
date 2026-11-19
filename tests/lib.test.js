@@ -11,32 +11,37 @@ const cfg = () => structuredClone(seed);
 const dominarFase0 = (c) => Object.fromEntries(c.materias.filter((m) => c.topicos?.[m]).map((m) => [m, Object.fromEntries(c.topicos[m].filter((t) => t.fase === 0).map((t) => [t.nome, 3]))]));
 
 describe('fases', () => {
-  it('geram 6 fases contíguas sem sobreposição', () => {
+  it('geram 8 fases contíguas sem sobreposição: Fase 0, Ano 1, 2, 3, semana leve, reta final ITA, discursivas e ENEM', () => {
     const f = gerarFases(cfg());
-    expect(f.map((x) => x.id)).toEqual(['zero', 'base', 'efomm', 'en', 'ita', 'enem']);
+    expect(f.map((x) => x.id)).toEqual(['zero', 'ano1', 'ano2', 'ano3', 'leve', 'ita', 'disc', 'enem']);
     for (let i = 1; i < f.length; i++) expect(f[i].inicio).toBe(addDays(f[i - 1].fim, 1));
     expect(f[0].inicio).toBe('2026-11-16');
-    expect(f.map((x) => x.numero)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(f.map((x) => x.numero)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
   });
-  it('a fase específica EFOMM/ESA começa em perfil.inicioFase2 e a Base termina na véspera', () => {
-    const f = gerarFases(cfg());
-    expect(f.find((x) => x.id === 'efomm').inicio).toBe('2027-05-01');
-    expect(f.find((x) => x.id === 'base').fim).toBe('2027-04-30');
+  it('datas do plano: Fase 0 até 10/01, Ano 1 11/01–14/03, Ano 2 15/03–13/06, Ano 3 14/06–22/08, leve 23–29/08, ITA 30/08–26/09, discursivas até 22/10', () => {
+    const f = Object.fromEntries(gerarFases(cfg()).map((x) => [x.id, x]));
+    expect([f.zero.fim, f.ano1.inicio, f.ano1.fim]).toEqual(['2027-01-10', '2027-01-11', '2027-03-14']);
+    expect([f.ano2.inicio, f.ano2.fim, f.ano3.inicio, f.ano3.fim]).toEqual(['2027-03-15', '2027-06-13', '2027-06-14', '2027-08-22']);
+    expect([f.leve.inicio, f.leve.fim, f.ita.inicio, f.ita.fim, f.disc.fim, f.enem.inicio]).toEqual(['2027-08-23', '2027-08-29', '2027-08-30', '2027-09-26', '2027-10-22', '2027-10-23']);
   });
-  it('mudar a data da prova reajusta as fases', () => {
-    const c = cfg();
-    c.concursos.find((x) => x.id === 'efomm').eventos.find((e) => e.tipo === 'prova').inicio = '2027-08-01';
-    c.concursos.find((x) => x.id === 'efomm').eventos.find((e) => e.tipo === 'prova').fim = '2027-08-02';
-    // a fase 3 serve EFOMM e ESA: termina na última das duas provas (EFOMM, agora 02/08) e a seguinte começa no dia depois
-    const f = gerarFases(c);
-    expect(f.find((x) => x.id === 'efomm').fim).toBe('2027-08-02');
-    expect(f.find((x) => x.id === 'en').inicio).toBe('2027-08-03');
+  it('se o portão passa antes da previsão, o Ano 1 e o Ano 2 se adiantam; o Ano 3 continua terminando em 22/08', () => {
+    const c = cfg(); c.perfil.portaoEm = '2026-12-27';
+    const f = Object.fromEntries(gerarFases(c).map((x) => [x.id, x]));
+    expect(f.zero.fim).toBe('2026-12-27'); expect(f.ano1.inicio).toBe('2026-12-28');
+    expect(f.ano1.fim).toBe('2027-02-28'); expect(f.ano2.fim).toBe('2027-05-30'); expect(f.ano3.fim).toBe('2027-08-22');
   });
-  it('antes do início vale a primeira fase (Zero); depois da Zero vem a Base', () => {
+  it('prorrogar a Fase 0 empurra o Ano 1 e o Ano 2 no mesmo tanto (sem passar do Ano 3)', () => {
+    const c = cfg(); c.perfil.extraZero = 2;
+    const f = Object.fromEntries(gerarFases(c).map((x) => [x.id, x]));
+    expect(f.zero.fim).toBe('2027-01-24'); expect(f.ano1.fim).toBe('2027-03-28'); expect(f.ano2.fim).toBe('2027-06-27');
+    expect(f.ano3.inicio).toBe('2027-06-28');
+  });
+  it('antes do início vale a primeira fase (Zero); depois da Zero vem o Ano 1', () => {
     const f = gerarFases(cfg());
     expect(faseDoDia(f, '2026-11-10').id).toBe('zero');
     expect(faseDoDia(f, '2026-11-16').id).toBe('zero');
-    expect(faseDoDia(f, '2027-01-11').id).toBe('base');
+    expect(faseDoDia(f, '2027-01-11').id).toBe('ano1');
+    expect(faseDoDia(f, '2027-08-25').id).toBe('leve');
   });
   it('semana antes da prova é revisão leve', () => {
     expect(revisaoLeve(cfg(), '2027-07-20')?.id).toBe('efomm');
@@ -99,7 +104,7 @@ describe('planner', () => {
   it('depois da semana diagnóstica vale o planner: blocos com horário e id por matéria', () => {
     const f = gerarFases(cfg());
     const b = blocosDoDia(cfg(), f, '2026-11-23');
-    expect(b[0]).toMatchObject({ ini: '06:40', fim: '07:10', min: 30, bruto: 30 });
+    expect(b[0]).toMatchObject({ ini: '06:30', fim: '07:50', min: 100, bruto: 110 }); // 2 sessões de 50 min com 10 de pausa
     expect(b.every((x) => /^2026-11-23:[a-z]+(@\d{4})?$/.test(x.id))).toBe(true);
     expect(new Set(b.map((x) => x.id)).size).toBe(b.length);
     expect(b.at(-1).cat).toBe('erros'); // caderno de erros: 10 min, sem horário fixo
@@ -273,17 +278,17 @@ describe('conflito de provas e migração', () => {
     const en2 = novo.concursos.find((c) => c.id === 'en');
     expect(en2.idade.ref).toBe('06-30');
     expect(en2.eventos.find((e) => e.tipo === 'prova')).toMatchObject({ inicio: '2027-08-22', status: 'confirmada' });
-    expect(Object.keys(novo.fases)).toHaveLength(6);
+    expect(Object.keys(novo.fases)).toHaveLength(8);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(11);
+    expect(novo.versaoSeed).toBe(12);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
-  it('as 6 fases seguem a ordem e a Fase 6 vai do fim do ITA até o ENEM', () => {
+  it('as 8 fases seguem a ordem e o ENEM vai do fim das discursivas até a prova', () => {
     const f = gerarFases(cfg());
-    expect(f[4]).toMatchObject({ id: 'ita', fim: '2027-10-23' });
-    expect(f[5]).toMatchObject({ id: 'enem', inicio: '2027-10-24', fim: '2027-11-15' });
-    expect(f[2]).toMatchObject({ inicio: '2027-05-01', fim: '2027-07-26' });
+    expect(f[6]).toMatchObject({ id: 'disc', fim: '2027-10-22' });
+    expect(f[7]).toMatchObject({ id: 'enem', inicio: '2027-10-23', fim: '2027-11-15' });
+    expect(f[3]).toMatchObject({ id: 'ano3', inicio: '2027-06-14', fim: '2027-08-22' });
   });
 });
 
@@ -305,7 +310,7 @@ describe('backup antigo importado', () => {
     const c = cfg();
     c.concursos = c.concursos.filter((x) => x.id !== 'esa');
     const f = gerarFases(c);
-    expect(f.find((x) => x.id === 'efomm')).toMatchObject({ inicio: '2027-05-01', fim: '2027-07-26' });
+    expect(f.find((x) => x.id === 'ano2')).toMatchObject({ inicio: '2027-03-15', fim: '2027-06-13' });
   });
 });
 
@@ -664,7 +669,7 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(11); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(12); expect(novo.ritmos.teoria).toBe(10);
   });
 });
 

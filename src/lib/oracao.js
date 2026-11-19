@@ -3,6 +3,7 @@
 // Marcas do dia (kv 'oracoes'): { [dia]: { [itemId]: true } }.
 import { addDays, diffDays, weekday } from './dates.js';
 import { toMin } from './semana.js';
+import { horariosNoite, horariosPadrao, acordarDe, acordarPadrao, horaManha } from './sono.js';
 
 const P = (cfg) => cfg.oracaoPlano ?? {};
 const T = (cfg) => cfg.oracao ?? {};
@@ -126,7 +127,10 @@ const TERCO = ['terco', 'credo', 'paiNosso', 'aveMaria', 'gloria', 'fatima', 'sa
  */
 export function oracoesDoDia(cfg, dia, ctx = {}) {
   const p = P(cfg); if (!p.inicio || dia < p.inicio) return [];
-  const h = T(cfg), d = h.duracoes ?? {}, n = nivelOracao(cfg, ctx.oracoes ?? {}, dia);
+  const h0 = T(cfg), d = h0.duracoes ?? {}, n = nivelOracao(cfg, ctx.oracoes ?? {}, dia);
+  // terço, oração da noite e lectio saem da hora de dormir (terço −1 h, oração −40 min, lectio −20 min)
+  const sn = cfg.sono ? horariosNoite(cfg, dia, { noites: ctx.noites, sono: ctx.sono }) : null;
+  const h = sn ? { ...h0, terco1: sn.terco, noite: sn.oracao, lectio: sn.lectio, manha: horaManha(acordarDe(cfg, dia, { noites: ctx.noites, sono: ctx.sono })) } : h0;
   const mis = misteriosDoDia(cfg, dia), outros = ['gozosos', 'dolorosos', 'gloriosos'].filter((x) => x !== mis.tipo);
   const misTxt = (tipo) => ({ nome: `Mistérios ${tipo}`, texto: (p.misterios?.[tipo] ?? []).map((m, i) => `${i + 1}º ${m}`).join('\n') });
   const pascal = tempoPascal(dia), ev = evangelhoDoDia(cfg, dia), santo = santoDoDia(cfg, dia), domingo = weekday(dia) === 0;
@@ -170,9 +174,11 @@ export const proximaPergunta = (c) => Math.max(1, (c?.base ?? c?.proxima ?? 1) +
 
 /** Intervalos de oração que saem das janelas de estudo, por dia da semana (0 = dom): { wd: [{ ini, fim }] em minutos }. */
 export function reservasOracao(cfg, nivel) {
-  const h = T(cfg), d = h.duracoes ?? {}, itens = itensDoNivel(cfg, nivel), out = {};
+  const h0 = T(cfg), d = h0.duracoes ?? {}, itens = itensDoNivel(cfg, nivel), out = {};
   const dur = { manha: d.manha, terco1: d.terco, terco2: d.terco, terco3: d.terco, angelus: d.angelus, lectio: d.lectio, noite: d.noite };
   for (let wd = 0; wd < 7; wd++) {
+    const sp = cfg.sono ? horariosPadrao(cfg, wd) : null;
+    const h = sp ? { ...h0, terco1: sp.terco, noite: sp.oracao, lectio: sp.lectio, manha: horaManha(acordarPadrao(cfg, wd)) } : h0;
     out[wd] = itens.filter((id) => h[id] && dur[id] && !(id === 'terco3' && wd === 0)).map((id) => ({ ini: toMin(h[id]), fim: toMin(h[id]) + dur[id] })).filter((x) => Number.isFinite(x.ini));
   }
   return out;

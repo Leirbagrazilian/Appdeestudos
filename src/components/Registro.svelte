@@ -15,6 +15,9 @@
   const temPaginas = !!vinculoId || (feito.paginasPlan ?? tarefa?.paginas?.n ?? 0) > 0;
   const errosJa = res?.errosRegistrados ?? 0;
   const zero = faseDoDia(fases(), app.dia).id === 'zero' && !!topico; // Fase 0: exercícios (Khan/OBMEP) e modo domínio
+  const matar = tarefa?.matar ?? feito.matar; // true: MATAR HOJE (tentativa que conta); false: bloco antes do prazo
+  const dominio = !!topico && (zero || matar != null); // modo domínio: 8 em 10 domina o tópico
+  const materiaReg = b.cat === 'resg' ? tarefa?.materia ?? feito.materia : tarefa?.materia;
   let khan = $state(res?.khan ?? false);
 
   let feitas = $state(res?.feitas ?? feito.questoesPlan ?? tarefa?.questoes?.n ?? 0);
@@ -50,7 +53,7 @@
     }
     await registrarResultado(b, {
       feitas, acertos: acertos ?? 0, khan: zero && khan, site: feitas ? site : null, paginas: temPaginas ? +paginas || 0 : 0,
-      erros: linhas.slice(0, visiveis), topico, vinculoId, minutosLeitura: feito.minLeitura ?? tarefa?.paginas?.min ?? 0,
+      erros: linhas.slice(0, visiveis), topico, vinculoId, matar, materia: materiaReg, minutosLeitura: feito.minLeitura ?? tarefa?.paginas?.min ?? 0,
     });
   }
   const tecla = (e) => { if (e.key === 'Escape') fecharRegistro(); };
@@ -75,7 +78,7 @@
         <div class="lin"><span>Acertei</span>
           <span class="step"><button type="button" aria-label="Menos um acerto" onclick={() => mexer('acertos', -1)}>−</button><strong>{acertos ?? '–'}</strong><button type="button" aria-label="Mais um acerto" onclick={() => mexer('acertos', 1)}>+</button></span></div>
         <button type="button" class="todas" onclick={() => { acertos = feitas; vibrar(pf(), 'ok'); }}>Acertei todas</button>
-        {#if zero}<p class="sub meta">{feitas < 10 ? 'Faça pelo menos 10 para o tópico ser avaliado.' : acertos != null && acertos / feitas >= 0.8 ? 'Passou: 8 em 10 ou mais.' : acertos != null ? 'Abaixo de 8 em 10: o tópico se repete.' : 'Meta: 8 em 10.'}</p>{/if}
+        {#if dominio}<p class="sub meta">{feitas < 10 ? 'Faça pelo menos 10 para o tópico ser avaliado.' : acertos != null && acertos / feitas >= 0.8 ? 'Passou: 8 em 10 ou mais. O tópico está dominado.' : acertos != null ? (matar === false ? 'Abaixo de 8 em 10: segue nos próximos blocos, até o prazo.' : 'Abaixo de 8 em 10: o tópico vai para o resgate do sábado.') : 'Meta: 8 em 10.'}</p>{/if}
         <p class="sub rot">Onde você fez</p>
         <Chips opcoes={opcoesSite} bind:valor={site} rotulo="Onde você fez as questões" />
         {#if naCota}<p class="sub cota" class:fim={usadas + delta >= lim[site]}>{opcoesSite.find((o) => o.id === site)?.nome} hoje: {usadas + delta} de {lim[site]} da cota grátis{usadas + delta >= lim[site] ? '. Acabou: use o PDF da prova ou os exercícios do livro.' : '.'}</p>{/if}
