@@ -321,31 +321,30 @@ describe('trilha', () => {
     expect(topicosDe(c, 'Química')[0].concursos).toEqual(['ita']);
     expect(topicosDe(c, 'Hist/Geo')[0].concursos).toEqual(['esa']);
     const calc = topicosDe(c, 'Matemática').at(-1);
-    expect(calc.nome).toMatch(/Cálculo/); expect(calc.concursos).toEqual(['en']);
+    expect(calc.nome).toMatch(/Integrais/); expect(calc.concursos).toEqual(['en']);
     expect(topicosDe(c, 'Matemática')[0].concursos).toEqual(['en', 'efomm', 'ita', 'esa']);
     expect(topicosDe(c, 'Física')[0].concursos).toEqual(['en', 'efomm', 'ita']);
   });
-  it('trilha de Matemática segue a ordem do SPEC', () => {
+  it('trilha de Matemática segue a ordem do plano: Fase 0 e depois Anos 1, 2 e 3 (códigos da §5)', () => {
     const todos = topicosDe(c, 'Matemática');
-    const n = todos.filter((t) => t.fase !== 0).map((t) => t.nome);
-    expect(n[0]).toBe('Conjuntos, lógica e funções'); expect(n[1]).toBe('Trigonometria'); expect(n.at(-1)).toMatch(/Cálculo/);
-    expect(n.indexOf('Geometria plana')).toBeLessThan(n.indexOf('Geometria espacial'));
-    // a Fase 0 vem inteira antes dos tópicos do ensino médio
-    const ultimoZero = todos.findLastIndex((t) => t.fase === 0), primeiroMedio = todos.findIndex((t) => t.fase !== 0);
-    expect(ultimoZero).toBeGreaterThanOrEqual(0); expect(ultimoZero).toBeLessThan(primeiroMedio);
-    expect(todos[0].nome).toBe('Números inteiros: adição e subtração');
+    expect(todos.map((t) => t.codigo).slice(0, 4)).toEqual(['TN01', 'MB01', 'MB03', 'MB04']);
+    expect(todos.filter((t) => t.ano === 0)).toHaveLength(11);
+    const anos = todos.map((t) => t.ano);
+    expect([...anos].sort((x, y) => x - y)).toEqual(anos); // fixa: 0, 1, 2, 3
+    expect(todos.at(-1).codigo).toBe('CL04');
+    expect(topicosDe(c, 'Física')[0].codigo).toBe('F-MD01'); expect(topicosDe(c, 'Química')[0].codigo).toBe('Q-IN01');
+    // os pré-requisitos da §4
+    const f = (cod) => topicosDe(c, 'Física').find((t) => t.codigo === cod);
+    expect(f('F-CN02').prereq).toEqual(['MB02']); expect(f('F-OD03').prereq).toEqual(['TG03', 'LOG02']);
+    expect(topicosDe(c, 'Química').find((t) => t.codigo === 'Q-RA01').prereq).toEqual(['LOG01']);
   });
   it('próximo tópico: respeita a ordem e prefere o que serve a mais concursos dentro da janela', () => {
     expect(proximoTopico(c, {}, 'Matemática').ordem).toBe(0);
-    // a Fase 0 e os 7 primeiros do ensino médio dominados: sobram complexos (4 concursos) e cálculo (1): vem complexos
-    const medio = topicosDe(c, 'Matemática').filter((t) => t.fase !== 0);
-    const todos = { ...dominarFase0(c).Matemática, ...Object.fromEntries(medio.slice(0, 7).map((t) => [t.nome, 3])) };
-    expect(proximoTopico(c, { Matemática: todos }, 'Matemática').nome).toMatch(/complexos/);
-    // tópico de 1 concurso não passa na frente de um de 3 que está na janela
-    const cc = cfg(); const fis = cc.topicos['Física'];
-    const primeiroMedio = fis.findIndex((t) => t.fase !== 0);
-    fis[primeiroMedio].concursos = ['en']; // o primeiro do ensino médio só serve ao EN
-    expect(proximoTopico(cc, dominarFase0(cc), 'Física').ordem).toBe(primeiroMedio + 1); // o seguinte serve a 3
+    const todos = topicosDe(c, 'Matemática');
+    // tudo dominado menos os 5 últimos (só Escola Naval: 1 concurso) e GP06 (4 concursos): GP06 vem antes
+    const lac = Object.fromEntries(todos.map((t) => [t.nome, 3]));
+    delete lac['Triângulos e pontos notáveis']; delete lac.Limites; delete lac.Derivadas;
+    expect(proximoTopico(c, { Matemática: lac }, 'Matemática').codigo).toBe('GP06');
     expect(proximoTopico(c, { 'Hist/Geo': Object.fromEntries(topicosDe(c, 'Hist/Geo').map((t) => [t.nome, 3])) }, 'Hist/Geo')).toBeNull();
   });
   it('cobertura e domínio', () => {
@@ -354,17 +353,19 @@ describe('trilha', () => {
     expect(cobertura(c, {}, 'Física')).toBe(0);
     expect(dominio({}, 'Física', 'x')).toBe(0);
   });
-  it('notas do mapa de lacunas antigo são aproveitadas (menor nota entre os tópicos antigos)', () => {
-    const velho = { Matemática: { Funções: 3, 'Logaritmos e exponenciais': 1, 'PA e PG': 2, 'Matrizes e sistemas': 3 }, Física: { Hidrostática: 2 } };
+  it('notas dos tópicos antigos passam para os novos pelo campo `antigos` (menor nota); o resto começa sem nota', () => {
+    const velho = { Matemática: { 'Conjuntos, lógica e funções': 2, MMC: 3, MDC: 1, 'Teorema de Pitágoras': 3 }, Física: { Fluidos: 2 } };
     const novo = migrarLacunas(velho, c.topicos);
-    expect(novo.Matemática['Conjuntos, lógica e funções']).toBe(1);
-    expect(novo.Matemática['PA, PG, matrizes e sistemas']).toBe(2);
-    expect(novo.Física.Fluidos).toBe(2);
-    expect(novo.Matemática.Trigonometria).toBeUndefined();
+    expect(novo.Matemática['Divisibilidade, MMC e MDC']).toBe(1); // MMC 3, MDC 1: vale a menor
+    expect(novo.Matemática['Triângulo retângulo']).toBe(3);
+    expect(novo.Matemática['Função: definições']).toBe(2);
+    expect(novo.Matemática['Frações e equações']).toBeUndefined();
+    expect(novo.Física['Hidrodinâmica']).toBe(2);
     expect(migrarLacunas(novo, c.topicos)).toEqual(novo); // idempotente
   });
 });
 
+import { janelasDaSemana, janelasDoDia } from '../src/lib/rotina.js';
 import { planoSemana, orcamentoSemana, slotsDaJanela, brutoDeSlots, toMin, repartir, repartirComTeto, janelasValidas } from '../src/lib/semana.js';
 import { planoDoBloco, iniciar as foco_iniciar } from '../src/lib/foco.js';
 describe('planner v2: janelas, horas por fase e regras', () => {
@@ -380,30 +381,37 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     const r = repartir({ a: 17.2, b: 12.1, c: 2.6 }, 32);
     expect(Object.values(r).reduce((x, y) => x + y, 0)).toBe(32);
   });
-  it('as horas por matéria seguem a tabela da fase (já líquida, 43h) e a semana fecha perto de 43h líquidas', () => {
+  it('as horas por matéria seguem a % da fase sobre 55 h e a semana fecha perto de 55 h líquidas', () => {
     const o = orcamentoSemana(cfg(), 'zero', '2026-11-23');
-    expect(o).toMatchObject({ mat: 1440, fis: 600, qui: 300, por: 180, red: 0, ing: 60, hg: 0, provas: 0 });
+    expect(o).toMatchObject({ mat: 1815, fis: 825, qui: 396, por: 198, red: 0, ing: 66, hg: 0, provas: 0 }); // 55/25/12/6/2 % de 3300 min
+    const a1 = orcamentoSemana(cfg(), 'ano1', '2027-01-18');
+    expect(a1).toMatchObject({ mat: 1254, fis: 1056, qui: 495, por: 198, red: 165, ing: 132, hg: 0 }); // 38/32/15/6/5/4 %
     const dias = semana('2026-11-23');
-    expect(liquido(dias)).toBeGreaterThan(2480); expect(liquido(dias)).toBeLessThan(2620);
+    expect(liquido(dias)).toBeGreaterThan(54 * 60); expect(liquido(dias)).toBeLessThan(58 * 60);
     const mat = dias.flatMap((d) => d.blocos).filter((b) => b.cat === 'mat').reduce((a, b) => a + b.min, 0);
-    expect(Math.abs(mat - 1440)).toBeLessThanOrEqual(100);
+    expect(Math.abs(mat - 1815)).toBeLessThanOrEqual(200);
   });
-  it('fase 2 inclui Hist/Geo (ESA); na fase 3 o excedente de provas vira estudo na semana', () => {
+  it('sem horas de Hist/Geo (a ESA fica só no calendário); sábados de jun a ago têm prova antiga e correção, e o resgate de 2 h', () => {
     const por = (dias, cat) => dias.flatMap((d) => d.blocos).filter((b) => b.cat === cat).reduce((a, b) => a + b.min, 0);
-    const dias = semana('2027-06-07'); // fase efomm: 2027-05-01 a 2027-07-26 (provas 6h: cabem no sábado)
-    expect(por(dias, 'hg')).toBeGreaterThanOrEqual(200);
-    expect(dias[5].blocos.find((b) => b.cat === 'prova').sessoes).toBe(0); // a prova do sábado é um bloco contínuo
-    const en = semana('2027-08-09'); // fase en: provas 9h, mais do que a janela de sábado comporta
-    const sab = en[5].blocos.find((b) => b.cat === 'prova');
-    expect(sab.sessoes).toBe(0);
-    expect(en.some((d) => d.blocos.some((b) => b.cat === 'prova' && b.sessoes))).toBe(true); // excedente em sessões de estudo
-    expect(por(en, 'prova')).toBeGreaterThanOrEqual(sab.min + 50); // sábado + excedente
+    for (const seg of ['2026-11-23', '2027-02-08', '2027-06-07', '2027-08-09']) expect(por(semana(seg), 'hg')).toBe(0);
+    for (const seg of ['2027-06-07', '2027-07-12', '2027-08-09']) {
+      const dias = semana(seg);
+      expect(dias[5].blocos.slice(0, 2).map((b) => b.cat)).toEqual(['prova', 'corr']);
+      expect(dias[5].blocos.find((b) => b.cat === 'prova').sessoes).toBe(0); // contínua
+      expect(dias[5].blocos.find((b) => b.cat === 'resg')).toMatchObject({ sessoes: 2, min: 100 });
+    }
+    expect(semana('2027-02-08')[5].blocos.some((b) => b.cat === 'prova')).toBe(false); // fora de jun a ago: sem prova
+    expect(semana('2027-02-08')[5].blocos.find((b) => b.cat === 'resg')).toBeTruthy();
+    // a prova é da EFOMM em junho/julho e da Escola Naval em agosto
+    const g = gerarFases(cfg());
+    const titulo = (d) => blocosDoDia(cfg(), g, d).find((b) => b.cat === 'prova' && !b.sessoes).titulo;
+    expect(titulo('2027-07-10')).toMatch(/EFOMM/); expect(titulo('2027-08-14')).toMatch(/Escola Naval/);
   });
   it('encaixe nas janelas: todo bloco cabe numa janela do dia, sem sobreposição e com pausa de 10 min', () => {
     const c = cfg();
     for (const seg of ['2026-11-23', '2027-03-08', '2027-06-07', '2027-09-13']) {
       for (const d of semana(seg, c)) {
-        const janelas = (c.rotina.janelas[d.wd] ?? []).map((j) => [toMin(j.ini), toMin(j.fim)]);
+        const janelas = janelasDoDia(c, d.wd).map((j) => [toMin(j.ini), toMin(j.fim)]);
         const bl = d.blocos;
         for (const b of bl) {
           expect(janelas.some(([a, z]) => b.ini >= a && b.fim <= z)).toBe(true);
@@ -417,15 +425,36 @@ describe('planner v2: janelas, horas por fase e regras', () => {
       }
     }
   });
-  it('sábado: prova antiga cronometrada e correção; domingo: redação no começo, estudo e planejamento no fim', () => {
+  it('sábado: prova antiga cronometrada e correção; domingo: revisão leve no começo e planejamento no fim (2 h)', () => {
     const dias = semana('2027-06-07'); // fase com provas > 0
     expect(dias[5].blocos.slice(0, 2).map((b) => b.cat)).toEqual(['prova', 'corr']);
     expect(dias[5].blocos[0].ini).toBe(toMin('08:00'));
-    const dom = dias[6].blocos.filter((b) => b.ini >= toMin('13:00')); // janela 'domingo' (13h às 17h)
-    expect(dom[0].cat).toBe('red');
-    expect(dom[0].ini).toBe(toMin('13:00'));
+    const dom = dias[6].blocos;
+    expect(dom[0]).toMatchObject({ cat: 'revl', ini: toMin('15:00'), sessoes: 0 });
     expect(dom.at(-1)).toMatchObject({ cat: 'plan', fim: toMin('17:00') });
-    expect(dias[6].blocos.some((b) => b.sessoes)).toBe(true); // domingo também tem estudo
+    expect(dom.reduce((a, b) => a + b.bruto, 0)).toBeLessThanOrEqual(120);
+    expect(dias[6].blocos.some((b) => b.cat === 'red')).toBe(false); // a redação vai para um dia útil
+  });
+  it('redação: 1 bloco por semana, numa quarta, a partir do Ano 1 (e nenhum na Fase 0)', () => {
+    const dias = semana('2027-01-18');
+    const reds = dias.flatMap((d) => d.blocos.filter((b) => b.cat === 'red').map((b) => ({ wd: d.wd, b })));
+    expect(reds).toHaveLength(1); expect(reds[0].wd).toBe(3); expect(reds[0].b.sessoes).toBeGreaterThanOrEqual(2);
+    expect(semana('2026-11-23').flatMap((d) => d.blocos).some((b) => b.cat === 'red')).toBe(false);
+  });
+  it('24–25/12 e 31/12–01/01 são livres (sem blocos de estudo)', () => {
+    const dias = semana('2026-12-21');
+    expect(dias[3].blocos).toEqual([]); expect(dias[4].blocos).toEqual([]); // 24 e 25
+    expect(dias[2].blocos.length).toBeGreaterThan(0);
+    const fim = semana('2026-12-28');
+    expect(fim[3].blocos).toEqual([]); expect(fim[4].blocos).toEqual([]); // 31 e 01
+  });
+  it('cada dia respeita a meta do dia (seg/qua/qui/sex ~9,5–10 h, ter ~8 h, sáb 8 h, dom 2 h)', () => {
+    const dias = semana('2026-11-23');
+    const h = (d) => d.blocos.reduce((a, b) => a + b.min, 0) / 60;
+    [0, 2, 3, 4].forEach((i) => { expect(h(dias[i])).toBeGreaterThanOrEqual(9); expect(h(dias[i])).toBeLessThanOrEqual(10.3); });
+    expect(h(dias[1])).toBeGreaterThanOrEqual(7.5); expect(h(dias[1])).toBeLessThanOrEqual(8.4);
+    expect(h(dias[5])).toBeGreaterThanOrEqual(7.5); expect(h(dias[5])).toBeLessThanOrEqual(8.4);
+    expect(h(dias[6])).toBeLessThanOrEqual(2);
   });
   it('fases sem provas (zero e base): sábado não tem bloco de prova nem de correção', () => {
     for (const seg of ['2026-11-23', '2027-03-08']) {
@@ -436,26 +465,26 @@ describe('planner v2: janelas, horas por fase e regras', () => {
   });
   it('rampa de 75% nas 2 primeiras semanas do planner (depois da semana diagnóstica), quando ligada', () => {
     const c = cfg(); c.rotina.rampa.ativa = true;
-    const cheio = 18 * 60, rampa = Math.round(18 * 60 * 0.75); // tabela da Base: 18h de Matemática (já líquida)
-    expect(orcamentoSemana(c, 'base', '2026-11-16').mat).toBe(rampa); // 1ª semana do planner
-    expect(orcamentoSemana(c, 'base', '2026-11-23').mat).toBe(rampa); // 2ª
-    expect(orcamentoSemana(c, 'base', '2026-11-30').mat).toBe(cheio); // a partir da 3ª, cheio
-    expect(orcamentoSemana(c, 'base', '2026-11-09').mat).toBe(cheio); // semana diagnóstica não entra
-    expect(orcamentoSemana(cfg(), 'base', '2026-11-16').mat).toBe(cheio); // desligada
+    const cheio = Math.round(55 * 60 * 0.38), rampa = Math.round(55 * 60 * 0.75 * 0.38);
+    expect(orcamentoSemana(c, 'ano1', '2026-11-16').mat).toBe(rampa); // 1ª semana do planner
+    expect(orcamentoSemana(c, 'ano1', '2026-11-23').mat).toBe(rampa); // 2ª
+    expect(orcamentoSemana(c, 'ano1', '2026-11-30').mat).toBe(cheio); // a partir da 3ª, cheio
+    expect(orcamentoSemana(c, 'ano1', '2026-11-09').mat).toBe(cheio); // semana diagnóstica não entra
+    expect(orcamentoSemana(cfg(), 'ano1', '2026-11-16').mat).toBe(cheio); // desligada
   });
   it('matéria abaixo de 50% no último simulado: +2h na semana seguinte, tiradas da mais forte', () => {
     const exams = { a: { id: 'a', data: '2026-11-21', concurso: 'efomm', notas: { Matemática: 80, Física: 40, Português: 60 } } };
-    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
-    const o = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams });
+    const base = orcamentoSemana(cfg(), 'ano1', '2026-11-23');
+    const o = orcamentoSemana(cfg(), 'ano1', '2026-11-23', { exams });
     expect(o.fis - base.fis).toBe(120);
     expect(base.mat - o.mat).toBe(120); // Matemática (80%) é a mais forte
     // duas semanas depois a regra já não vale
-    expect(orcamentoSemana(cfg(), 'base', '2026-12-07', { exams }).fis).toBe(base.fis);
+    expect(orcamentoSemana(cfg(), 'ano1', '2026-12-07', { exams }).fis).toBe(base.fis);
   });
   it('inglês com 75% ou mais: só manutenção (1h) e o resto vai para a Matemática', () => {
     const exams = { a: { id: 'a', data: '2026-11-14', concurso: 'efomm', notas: { Inglês: 80 } } };
-    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
-    const o = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams });
+    const base = orcamentoSemana(cfg(), 'ano1', '2026-11-23');
+    const o = orcamentoSemana(cfg(), 'ano1', '2026-11-23', { exams });
     expect(o.ing).toBe(60);
     expect(o.mat - base.mat).toBe(base.ing - 60);
   });
@@ -465,30 +494,33 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     const leve = blocosDoDia(c, g, '2027-07-21').filter((b) => b.sessoes).length; // dentro dos 7 dias
     expect(leve).toBeLessThan(cheio);
   });
-  it('configuração antiga é migrada: rotina nova entra e as aulas do primeiro cadastro são atualizadas', () => {
+  it('configuração antiga é migrada: rotina nova entra, janelas passam a ser calculadas e as aulas do seed substituem as antigas', () => {
     const velho = cfg(); delete velho.versaoSeed;
-    velho.rotina = { aulas: [{ dia: 1, inicio: '07:30', fim: '11:10', nome: 'Faculdade' }, { dia: 3, inicio: '09:30', fim: '10:10', nome: 'Faculdade' }, { dia: 4, inicio: '13:00', fim: '18:00', nome: 'Faculdade' }], metaHoras: { 1: 4 } };
-    delete velho.janelas; delete velho.horasFase; delete velho.categorias;
+    velho.rotina = { aulas: [{ dia: 1, inicio: '07:30', fim: '11:10', nome: 'Faculdade' }, { dia: 3, inicio: '09:30', fim: '10:10', nome: 'Faculdade' }], metaHoras: { 1: 4 }, janelas: { 1: [{ ini: '06:00', fim: '07:00' }] } };
+    delete velho.horasFase; delete velho.categorias;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.rotina.janelas[1]).toHaveLength(3);
-    expect(novo.rotina.metaLiquida).toBe(43);
+    expect(novo.rotina.janelas).toBeUndefined();
+    expect(novo.rotina.metaLiquida).toBe(55);
     expect(novo.rotina.metaHoras).toBeUndefined();
-    expect(novo.rotina.aulas.find((a) => a.dia === 4).inicio).toBe('13:30');
-    expect(novo.horasFase.base.mat).toBe(18);
-    // aulas editadas por você são mantidas
+    expect(novo.rotina.aulas.find((a) => a.dia === 4)).toMatchObject({ inicio: '13:30', tipo: 'faculdade', vou: false });
+    expect(novo.horasFase.ano1.mat).toBe(38);
+    // compromissos que você cadastrou são mantidos
     const editado = cfg(); delete editado.versaoSeed; editado.rotina = { aulas: [{ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' }] };
-    expect(migrarCfg(editado, cfg()).rotina.aulas).toEqual([{ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' }]);
+    const m = migrarCfg(editado, cfg()).rotina.aulas;
+    expect(m.find((a) => a.nome === 'Minha aula')).toEqual({ dia: 2, inicio: '08:00', fim: '09:00', nome: 'Minha aula' });
+    expect(m.some((a) => a.tipo === 'faculdade')).toBe(true);
   });
 });
 
 describe('planner v2: casos de borda (revisão)', () => {
   const f = gerarFases(cfg());
+  const fixar = (c) => { c.rotina.janelas = structuredClone(janelasDaSemana(c)); return c; }; // janelas à mão valem no lugar das calculadas
   const sem = (c, seg = '2026-11-23', ctx = {}) => planoSemana(c, f, seg, ctx);
   const sessoes = (dias) => dias.flatMap((d) => d.blocos).reduce((n, b) => n + (b.sessoes || 0), 0); // total de sessões de 50 min
   const semOverlap = (dias) => dias.forEach((d) => { for (let i = 1; i < d.blocos.length; i++) expect(d.blocos[i].ini).toBeGreaterThanOrEqual(d.blocos[i - 1].fim); });
 
   it('hora vazia, inválida ou fim antes do início: a janela é ignorada e a semana não zera', () => {
-    const c = cfg();
+    const c = fixar(cfg());
     const base = sessoes(sem(cfg()));
     c.rotina.janelas[3][1].fim = ''; // apagou o fim da janela de quarta
     c.rotina.janelas[4][0].ini = '25:99';
@@ -500,7 +532,7 @@ describe('planner v2: casos de borda (revisão)', () => {
     expect(janelasValidas([{ ini: '', fim: '10:00' }, { ini: '09:00', fim: '08:00' }, {}, null])).toEqual([]);
   });
   it('janelas que se sobrepõem são juntadas: nenhum bloco sobreposto', () => {
-    const c = cfg();
+    const c = fixar(cfg());
     c.rotina.janelas[2].push({ ini: '10:00', fim: '11:00' }); // dentro da janela 7–12 de terça
     c.rotina.janelas[2].push({ ini: '11:30', fim: '13:30' }); // atravessa o intervalo até 13–15
     const dias = sem(c);
@@ -508,7 +540,7 @@ describe('planner v2: casos de borda (revisão)', () => {
     expect(janelasValidas([{ ini: '07:00', fim: '12:00' }, { ini: '10:00', fim: '11:00' }, { ini: '11:30', fim: '13:30' }])).toEqual([{ ini: 420, fim: 810, tipo: undefined }]);
   });
   it('janelas extras de sábado e domingo viram estudo normal (e sábado tem pausa depois da correção)', () => {
-    const c = cfg();
+    const c = fixar(cfg());
     c.rotina.janelas[6] = [{ ini: '08:00', fim: '15:00', tipo: 'prova' }, { ini: '18:00', fim: '20:00' }]; // sábado com a janela longa da prova, para sobrar estudo logo depois da correção
     c.rotina.janelas[0].push({ ini: '18:00', fim: '20:00' });
     const dias = sem(c, '2027-06-07'); // fase com provas > 0
@@ -519,16 +551,16 @@ describe('planner v2: casos de borda (revisão)', () => {
     semOverlap(dias);
   });
   it('regra dos 50% inclui a Redação e funciona com um simulado de uma matéria só', () => {
-    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
-    const red = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams: { a: { id: 'a', data: '2026-11-21', concurso: 'en', notas: { Redação: 40, Matemática: 80 } } } });
+    const base = orcamentoSemana(cfg(), 'ano1', '2026-11-23');
+    const red = orcamentoSemana(cfg(), 'ano1', '2026-11-23', { exams: { a: { id: 'a', data: '2026-11-21', concurso: 'en', notas: { Redação: 40, Matemática: 80 } } } });
     expect(red.red - base.red).toBe(120); expect(base.mat - red.mat).toBe(120);
     // simulado só de Física, fraca: a doadora é a matéria com mais horas (Matemática)
-    const so = orcamentoSemana(cfg(), 'base', '2026-11-23', { exams: { a: { id: 'a', data: '2026-11-22', concurso: 'ita', notas: { Física: 40 } } } });
+    const so = orcamentoSemana(cfg(), 'ano1', '2026-11-23', { exams: { a: { id: 'a', data: '2026-11-22', concurso: 'ita', notas: { Física: 40 } } } });
     expect(so.fis - base.fis).toBe(120); expect(base.mat - so.mat).toBe(120);
   });
   it('limites da regra dos 50%: simulado na própria segunda ou 8 dias antes não vale', () => {
-    const base = orcamentoSemana(cfg(), 'base', '2026-11-23');
-    const com = (data) => orcamentoSemana(cfg(), 'base', '2026-11-23', { exams: { a: { id: 'a', data, concurso: 'en', notas: { Física: 40, Matemática: 90 } } } }).fis - base.fis;
+    const base = orcamentoSemana(cfg(), 'ano1', '2026-11-23');
+    const com = (data) => orcamentoSemana(cfg(), 'ano1', '2026-11-23', { exams: { a: { id: 'a', data, concurso: 'en', notas: { Física: 40, Matemática: 90 } } } }).fis - base.fis;
     expect(com('2026-11-22')).toBe(120); // 1 dia antes
     expect(com('2026-11-16')).toBe(120); // 7 dias antes
     expect(com('2026-11-15')).toBe(0);   // 8 dias antes
@@ -536,7 +568,7 @@ describe('planner v2: casos de borda (revisão)', () => {
   });
   it('bloco contínuo (prova, correção, redação) vira uma sessão só no cronômetro, sem descontar pausa', () => {
     const dias = sem(cfg(), '2027-06-07');
-    const red = dias[6].blocos.find((b) => b.cat === 'red'), corr = dias[5].blocos.find((b) => b.cat === 'corr');
+    const red = dias[6].blocos.find((b) => b.cat === 'revl'), corr = dias[5].blocos.find((b) => b.cat === 'corr');
     expect(planoDoBloco(red)).toMatchObject({ sessoes: 1, len: red.min });
     expect(planoDoBloco(corr)).toMatchObject({ sessoes: 1, len: corr.min });
     const dois = { sessoes: 2, bruto: 110, min: 100 };
@@ -544,19 +576,19 @@ describe('planner v2: casos de borda (revisão)', () => {
     expect(foco_iniciar({ id: 'x', titulo: 't', materia: 'm', ...red }, undefined, 0)).toMatchObject({ sessoes: 1, len: red.min });
   });
   it('o id do bloco usa o horário: editar outra janela não troca o id dos blocos que não mudaram', () => {
-    const c = cfg(); const g = gerarFases(c);
-    const antes = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:40');
+    const c = fixar(cfg()); const g = gerarFases(c);
+    const antes = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:30');
     c.rotina.janelas[2][0].fim = '11:00'; // mexe só na terça
-    const depois = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:40');
+    const depois = blocosDoDia(c, g, '2026-11-23').find((b) => b.ini === '06:30');
     expect(depois.id).toBe(antes.id);
-    expect(antes.id).toMatch(/^2026-11-23:[a-z]+@0640$/);
+    expect(antes.id).toMatch(/^2026-11-23:[a-z]+@0630$/);
   });
-  it('migração: janelas e meta que você editou sobrevivem a uma nova versão do seed', () => {
+  it('migração: a meta que você editou e a rampa sobrevivem; janelas antigas viram as calculadas', () => {
     const salvo = cfg(); salvo.versaoSeed = 3;
-    salvo.rotina.janelas[1] = [{ ini: '05:00', fim: '07:00' }]; salvo.rotina.metaLiquida = 38; salvo.rotina.rampa.ativa = true;
+    salvo.rotina.janelas = { 1: [{ ini: '05:00', fim: '07:00' }] }; salvo.rotina.metaLiquida = 38; salvo.rotina.rampa.ativa = true;
     salvo.modeloSemana = { util: [] };
     const novo = migrarCfg(salvo, cfg());
-    expect(novo.rotina.janelas[1]).toEqual([{ ini: '05:00', fim: '07:00' }]);
+    expect(novo.rotina.janelas).toBeUndefined();
     expect(novo.rotina.metaLiquida).toBe(38); expect(novo.rotina.rampa.ativa).toBe(true);
     expect(novo.modeloSemana).toBeUndefined();
   });
@@ -591,8 +623,8 @@ describe('Meus livros', () => {
     expect(recursosAtivos(c, 'Física').some((r) => r.id === 'fisica-total')).toBe(true); // vídeos valem sempre
     const d = cfg(); d.biblioteca.principal.Física = 'topicos-fisica';
     expect(recursosAtivos(d, 'Física').filter((r) => r.serie === 'topicos-fisica')).toHaveLength(3);
-    expect(vinculosDoTopico(d, 'Física', 'Dinâmica, energia, impulso e colisões')[0].recurso).toBe('topicos-fisica-1');
-    expect(vinculosDoTopico(c, 'Física', 'Dinâmica, energia, impulso e colisões')).toHaveLength(0);
+    expect(vinculosDoTopico(d, 'Física', 'Energia mecânica')[0].recurso).toBe('topicos-fisica-1');
+    expect(vinculosDoTopico(c, 'Física', 'Energia mecânica')).toHaveLength(0);
     expect(principalDe(c, 'Química')).toBe('feltre');
   });
   it('cota de páginas: 10 pág/h x 2 h = 20 páginas, a partir do início', () => {
