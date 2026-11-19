@@ -22,7 +22,7 @@
   const plano = $derived(prazos());
   let aba = $state('trilha'), mp = $state('Matemática');
   // estado para escolher o próximo tópico (os de Matemática, Física e Química seguem o calendário de prazos)
-  const stP = $derived({ lacunas: app.lacunas, feitos: contarBlocos(app.done), dividas: app.dividas, virt: {}, excluir: new Set(), faseId: faseAtual.id, acertos: acertoPorTopico(app.done) });
+  const stP = $derived({ lacunas: app.lacunas, feitos: contarBlocos(app.done), dividas: app.dividas, virt: {}, excluir: new Set(), faseId: faseAtual.id, acertos: acertoPorTopico(app.done), dominio: app.dominio });
   const optsProx = $derived(emZero ? { faseZero: true, dominio: app.dominio } : { dominio: app.dominio });
   const proximoDe = (m) => {
     if (temPrazo(m)) { const e = escolherTopico(app.cfg, plano, m, stP, app.dia); return e ? topicosDe(app.cfg, m).find((t) => t.nome === e.item.nome) ?? null : null; }

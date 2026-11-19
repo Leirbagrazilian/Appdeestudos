@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import seed from '../src/data/seed.json';
 import { gerarFases } from '../src/lib/phases.js';
-import { planoPrazos } from '../src/lib/prazos.js';
+import { planoPrazos, sabadoDoResgate } from '../src/lib/prazos.js';
 import { blocosDoDia, blocosAjustados } from '../src/lib/planner.js';
 import { tarefasDoDia } from '../src/lib/tarefas.js';
 import { migrarCfg } from '../src/lib/migracao.js';
@@ -117,12 +117,15 @@ describe('Fase 0: tarefa do dia', () => {
 });
 
 describe('Fase 0: repetição até dominar', () => {
-  it('uma tentativa que falhou: o bloco repete o MESMO tópico como tentativa 2', () => {
+  it('MATAR HOJE que falhou não segura o plano: o tópico vai para o resgate do sábado e o plano segue com o próximo', () => {
     const c = cfg();
     const t = tarefaMat(c, { dominio: { [`Matemática|${T1}`]: falhas(1) } });
-    expect(t.topico).toBe(T1);
-    expect(t.repeticao).toBe(true);
-    expect(t.tentativa).toBe(2);
+    expect(t.topico).toBe(T2); // segue com o próximo
+    const plano = planoPrazos(c, fases), tn = plano.por.get(`Matemática|${T1}`);
+    const sab = sabadoDoResgate(tn.prazo);
+    const bl = [{ id: `${sab}:resg`, cat: 'resg', materia: 'Resgate', min: 120 }];
+    const r = tarefasDoDia(c, bl, { lacunas: {}, faseId: 'zero', plano, dia: sab, dominio: { [`Matemática|${T1}`]: falhas(1) } })[`${sab}:resg`];
+    expect(r).toMatchObject({ topico: T1, matar: true, repeticao: true, tentativa: 2 }); // no sábado, tentativa 2
   });
   it('sem tentativas, a tarefa não é repetição e é a tentativa 1', () => {
     const t = tarefaMat(cfg());

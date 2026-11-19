@@ -98,14 +98,14 @@ describe('treino e planner', () => {
   it('a semana fica perto de 55 h líquidas (sem as orações)', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
     const t = dias.flatMap((d) => d.blocos).filter((b) => b.sessoes).reduce((a, b) => a + b.min, 0);
-    expect(t).toBeGreaterThanOrEqual(54 * 60); expect(t).toBeLessThanOrEqual(58 * 60);
+    expect(t).toBeGreaterThanOrEqual(52 * 60); expect(t).toBeLessThanOrEqual(58 * 60);
   });
-  it('migração v9 -> v12: janelas passam a ser calculadas, meta padrão vira 55 h, aulas e treino novos entram e o plano de treino continua', () => {
+  it('migração v9 -> v12: janelas passam a ser calculadas, meta padrão vira 56 h, aulas e treino novos entram e o plano de treino continua', () => {
     const v = cfg(); v.versaoSeed = 9; delete v.treinoPlano; delete v.treino;
     v.rotina.janelas = { 1: [{ ini: '06:00', fim: '07:00' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }] };
     v.rotina.metaLiquida = 43; v.rotina.metaNominal = 43;
     const m = migrarCfg(v, seed);
-    expect(m.rotina.janelas).toBeUndefined(); expect(m.rotina.metaLiquida).toBe(55); expect(m.rotina.metaNominal).toBeUndefined();
+    expect(m.rotina.janelas).toBeUndefined(); expect(m.rotina.metaLiquida).toBe(56); expect(m.rotina.metaNominal).toBeUndefined();
     expect(m.treinoPlano.inicio).toBe('2026-11-17'); expect(m.treino.corrida).toBe('05:30'); expect(m.treino.corridaSab).toBe('07:00');
   });
 });

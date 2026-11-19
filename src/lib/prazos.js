@@ -3,7 +3,7 @@
 // Também decide o status de cada tópico (dominado, dívida, bloqueado, atrasado...) e o ritmo geral. Tudo puro.
 import { addDays, diffDays, weekday } from './dates.js';
 import { diaLivre } from './rotina.js';
-import { estaTravado } from './dominio.js';
+import { estaTravado, resumo as resumoDominio } from './dominio.js';
 
 export const BLOCO_MIN = 100; // 1 bloco previsto = 2 sessões de foco (100 min líquidos)
 export const MATERIAS_PRAZO = ['Matemática', 'Física', 'Química'];
@@ -184,20 +184,25 @@ export function statusDe(plano, item, st, dia) {
   return item.inicio <= dia ? 'andamento' : 'futuro';
 }
 
+/** O MATAR HOJE do tópico já falhou (abaixo de 8/10) e ele ainda não foi dominado: vai para o resgate do sábado. */
+export const falhouMatar = (dominio, materia, nome, lacunas) => !dominadoT(lacunas, materia, nome) && resumoDominio(dominio?.[chave(materia, nome)]).falhas > 0;
+
 /** Dívidas de verdade agora (para o caderno de erros): [{ materia, nome }]. */
 export function dividasAtuais(plano, st, dia) {
   return Object.values(plano.porMateria).flat().filter((i) => emDivida(i, st, dia)).map((i) => ({ materia: i.materia, nome: i.nome, prazo: i.prazo }));
 }
 
-/** Tópicos que o resgate deste sábado cobre: os não dominados e já começados cujo prazo caiu na semana (o sábado de resgate deles é este);
- *  depois, as dívidas mais antigas (é a chance de pagar). */
+/** Tópicos que o resgate deste sábado cobre: os que falharam no MATAR HOJE, os não dominados e já começados cujo prazo caiu na semana
+ *  (o sábado de resgate deles é este) e, depois, as dívidas mais antigas (é a chance de pagar). */
 export function resgateDoSabado(plano, st, dia) {
   const todos = Object.values(plano.porMateria).flat();
   const naoDom = (i) => !dominadoT(st.lacunas, i.materia, i.nome);
-  const semana = todos.filter((i) => sabadoDoResgate(i.prazo) === dia && (st.feitos?.[chave(i.materia, i.nome)] ?? 0) > 0 && naoDom(i));
-  const dividas = todos.filter((i) => !semana.includes(i) && st.dividas?.[chave(i.materia, i.nome)] && naoDom(i));
+  const iniciado = (i) => (st.feitos?.[chave(i.materia, i.nome)] ?? 0) > 0;
+  const falhou = todos.filter((i) => falhouMatar(st.dominio, i.materia, i.nome, st.lacunas) && !emDivida(i, st, dia));
+  const semana = todos.filter((i) => !falhou.includes(i) && sabadoDoResgate(i.prazo) === dia && iniciado(i) && naoDom(i));
+  const dividas = todos.filter((i) => !falhou.includes(i) && !semana.includes(i) && st.dividas?.[chave(i.materia, i.nome)] && naoDom(i));
   const ord = (a, b) => a.prazo.localeCompare(b.prazo) || a.seq - b.seq;
-  return [...semana.sort(ord), ...dividas.sort(ord)];
+  return [...falhou.sort(ord), ...semana.sort(ord), ...dividas.sort(ord)];
 }
 
 /**
@@ -209,7 +214,8 @@ export function escolherTopico(cfg, plano, materia, st, dia) {
   const lista = plano.porMateria[materia] ?? [];
   const zero = st.faseId === 'zero', sem = semConteudoNovo(st.faseId);
   const feito = (i) => st.feitos?.[chave(materia, i.nome)] ?? 0;
-  const livre = (i) => !dominadoT(st.lacunas, materia, i.nome) && !emDivida(i, st, dia) && !prereqPendentes(plano, st.lacunas, i).length && !st.excluir?.has(i.nome) && !estaTravado(st.dominio?.[chave(materia, i.nome)]); // travado (3 tentativas): precisa de ajuda antes
+  const livre = (i) => !dominadoT(st.lacunas, materia, i.nome) && !emDivida(i, st, dia) && !prereqPendentes(plano, st.lacunas, i).length && !st.excluir?.has(i.nome) && !estaTravado(st.dominio?.[chave(materia, i.nome)]) // travado (3 tentativas): precisa de ajuda antes
+    && !falhouMatar(st.dominio, materia, i.nome, st.lacunas); // não matou: vai para o resgate do sábado e o plano segue com o próximo
   const abertos = lista.filter((i) => livre(i) && (zero ? i.ano === 0 : true) && (sem ? feito(i) > 0 : true));
   const monta = (i, extra = {}) => {
     const k = Math.floor(feito(i) + (st.virt?.[chave(materia, i.nome)] ?? 0) + 1e-6) + 1; // bloco em que você está
@@ -217,7 +223,7 @@ export function escolherTopico(cfg, plano, materia, st, dia) {
   };
   if (abertos.length) return monta(abertos[0]);
   // sem tópico aberto: paga uma dívida (tentar de novo), senão reforço do mais fraco (só na Fase 0)
-  const div = lista.filter((i) => emDivida(i, st, dia) && !st.excluir?.has(i.nome));
+  const div = lista.filter((i) => (emDivida(i, st, dia) || falhouMatar(st.dominio, materia, i.nome, st.lacunas)) && !st.excluir?.has(i.nome));
   if (div.length) return { ...monta(div[0]), matar: true, k: div[0].blocos, pagandoDivida: true };
   if (zero) {
     const pool = lista.filter((i) => i.ano === 0 && !st.excluir?.has(i.nome));

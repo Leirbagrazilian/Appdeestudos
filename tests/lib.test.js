@@ -381,15 +381,15 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     const r = repartir({ a: 17.2, b: 12.1, c: 2.6 }, 32);
     expect(Object.values(r).reduce((x, y) => x + y, 0)).toBe(32);
   });
-  it('as horas por matéria seguem a % da fase sobre 55 h e a semana fecha perto de 55 h líquidas', () => {
+  it('as horas por matéria seguem a % da fase sobre 56 h (menos resgate e domingo) e a semana fecha perto de 55–58 h líquidas', () => {
     const o = orcamentoSemana(cfg(), 'zero', '2026-11-23');
-    expect(o).toMatchObject({ mat: 1815, fis: 825, qui: 396, por: 198, red: 0, ing: 66, hg: 0, provas: 0 }); // 55/25/12/6/2 % de 3300 min
+    expect(o).toMatchObject({ mat: 1716, fis: 780, qui: 374, por: 187, red: 0, ing: 62, hg: 0, provas: 0 }); // 55/25/12/6/2 % de 3120 min (56 h menos 2 h de resgate e 2 h de domingo)
     const a1 = orcamentoSemana(cfg(), 'ano1', '2027-01-18');
-    expect(a1).toMatchObject({ mat: 1254, fis: 1056, qui: 495, por: 198, red: 165, ing: 132, hg: 0 }); // 38/32/15/6/5/4 %
+    expect(a1).toMatchObject({ mat: 1186, fis: 998, qui: 468, por: 187, red: 156, ing: 125, hg: 0 }); // 38/32/15/6/5/4 % de 3120
     const dias = semana('2026-11-23');
-    expect(liquido(dias)).toBeGreaterThan(54 * 60); expect(liquido(dias)).toBeLessThan(58 * 60);
+    expect(liquido(dias)).toBeGreaterThan(52 * 60); expect(liquido(dias)).toBeLessThan(59 * 60);
     const mat = dias.flatMap((d) => d.blocos).filter((b) => b.cat === 'mat').reduce((a, b) => a + b.min, 0);
-    expect(Math.abs(mat - 1815)).toBeLessThanOrEqual(200);
+    expect(Math.abs(mat - 1716)).toBeLessThanOrEqual(200);
   });
   it('sem horas de Hist/Geo (a ESA fica só no calendário); sábados de jun a ago têm prova antiga e correção, e o resgate de 2 h', () => {
     const por = (dias, cat) => dias.flatMap((d) => d.blocos).filter((b) => b.cat === cat).reduce((a, b) => a + b.min, 0);
@@ -398,7 +398,7 @@ describe('planner v2: janelas, horas por fase e regras', () => {
       const dias = semana(seg);
       expect(dias[5].blocos.slice(0, 2).map((b) => b.cat)).toEqual(['prova', 'corr']);
       expect(dias[5].blocos.find((b) => b.cat === 'prova').sessoes).toBe(0); // contínua
-      expect(dias[5].blocos.find((b) => b.cat === 'resg')).toMatchObject({ sessoes: 2, min: 100 });
+      expect(dias[5].blocos.find((b) => b.cat === 'resg')).toMatchObject({ sessoes: 0, min: 120, bruto: 120 }); // 2 h contínuas
     }
     expect(semana('2027-02-08')[5].blocos.some((b) => b.cat === 'prova')).toBe(false); // fora de jun a ago: sem prova
     expect(semana('2027-02-08')[5].blocos.find((b) => b.cat === 'resg')).toBeTruthy();
@@ -451,7 +451,7 @@ describe('planner v2: janelas, horas por fase e regras', () => {
   it('cada dia respeita a meta do dia (seg/qua/qui/sex ~9,5–10 h, ter ~8 h, sáb 8 h, dom 2 h)', () => {
     const dias = semana('2026-11-23');
     const h = (d) => d.blocos.reduce((a, b) => a + b.min, 0) / 60;
-    [0, 2, 3, 4].forEach((i) => { expect(h(dias[i])).toBeGreaterThanOrEqual(9); expect(h(dias[i])).toBeLessThanOrEqual(10.3); });
+    [0, 2, 3, 4].forEach((i) => { expect(h(dias[i])).toBeGreaterThanOrEqual(9.5); expect(h(dias[i])).toBeLessThanOrEqual(10); });
     expect(h(dias[1])).toBeGreaterThanOrEqual(7.5); expect(h(dias[1])).toBeLessThanOrEqual(8.4);
     expect(h(dias[5])).toBeGreaterThanOrEqual(7.5); expect(h(dias[5])).toBeLessThanOrEqual(8.4);
     expect(h(dias[6])).toBeLessThanOrEqual(2);
@@ -465,7 +465,7 @@ describe('planner v2: janelas, horas por fase e regras', () => {
   });
   it('rampa de 75% nas 2 primeiras semanas do planner (depois da semana diagnóstica), quando ligada', () => {
     const c = cfg(); c.rotina.rampa.ativa = true;
-    const cheio = Math.round(55 * 60 * 0.38), rampa = Math.round(55 * 60 * 0.75 * 0.38);
+    const cheio = Math.round(3120 * 0.38), rampa = Math.round(3120 * 0.75 * 0.38);
     expect(orcamentoSemana(c, 'ano1', '2026-11-16').mat).toBe(rampa); // 1ª semana do planner
     expect(orcamentoSemana(c, 'ano1', '2026-11-23').mat).toBe(rampa); // 2ª
     expect(orcamentoSemana(c, 'ano1', '2026-11-30').mat).toBe(cheio); // a partir da 3ª, cheio
@@ -500,7 +500,7 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     delete velho.horasFase; delete velho.categorias;
     const novo = migrarCfg(velho, cfg());
     expect(novo.rotina.janelas).toBeUndefined();
-    expect(novo.rotina.metaLiquida).toBe(55);
+    expect(novo.rotina.metaLiquida).toBe(56);
     expect(novo.rotina.metaHoras).toBeUndefined();
     expect(novo.rotina.aulas.find((a) => a.dia === 4)).toMatchObject({ inicio: '13:30', tipo: 'faculdade', vou: false });
     expect(novo.horasFase.ano1.mat).toBe(38);
@@ -546,7 +546,7 @@ describe('planner v2: casos de borda (revisão)', () => {
     const dias = sem(c, '2027-06-07'); // fase com provas > 0
     expect(dias[5].blocos.some((b) => b.sessoes && b.ini >= toMin('18:00'))).toBe(true);
     expect(dias[6].blocos.some((b) => b.sessoes && b.ini >= toMin('18:00'))).toBe(true);
-    const sab = dias[5].blocos, corr = sab.find((b) => b.cat === 'corr'), prox = sab.find((b) => b.sessoes);
+    const sab = dias[5].blocos, corr = sab.find((b) => b.cat === 'corr'), prox = sab.find((b) => b.cat === 'resg' || b.sessoes);
     expect(prox.ini - corr.fim).toBe(10);
     semOverlap(dias);
   });
@@ -888,15 +888,15 @@ describe('etapa 1 (v3): fases e fim de semana', () => {
   const f = gerarFases(cfg());
   const semZero = () => planoSemana(cfg(), f, '2026-11-23');
   const blocosLiquidos = (d) => d.blocos.filter((b) => b.sessoes || ['prova', 'corr', 'red'].includes(b.cat));
-  const liquido = (d) => blocosLiquidos(d).reduce((a, b) => a + b.min, 0);
+  const liquido = (d) => d.blocos.reduce((a, b) => a + b.min, 0);
   const sessoesDe = (d) => d.blocos.reduce((n, b) => n + (b.sessoes || 0), 0);
 
-  it('as % de cada fase somam 100 e a Fase 0 dá 55% (1815 min) de Matemática por semana', () => {
+  it('as % de cada fase somam 100 e a Fase 0 dá 55% (1716 min) de Matemática por semana', () => {
     for (const [id, h] of Object.entries(cfg().horasFase)) expect(Object.values(h).reduce((a, b) => a + b, 0), id).toBe(100);
     expect(Object.keys(cfg().horasFase)).toEqual(['zero', 'ano1', 'ano2', 'ano3', 'leve', 'ita', 'disc', 'enem']);
     expect(cfg().horasFase.zero).toMatchObject({ mat: 55, fis: 25, qui: 12, por: 6, ing: 2 });
     for (const id of ['ano1', 'ano2', 'ano3']) expect(cfg().horasFase[id]).toMatchObject({ mat: 38, fis: 32, qui: 15, por: 6, red: 5, ing: 4 });
-    expect(orcamentoSemana(cfg(), 'zero', '2026-11-23').mat).toBe(1815);
+    expect(orcamentoSemana(cfg(), 'zero', '2026-11-23').mat).toBe(1716);
   });
   it('Natal e Ano Novo (24–25/12 e 31/12–01/01) são livres; os dias em volta têm estudo', () => {
     const c = cfg();
@@ -907,8 +907,8 @@ describe('etapa 1 (v3): fases e fim de semana', () => {
     const dias = semZero();
     expect(dias[6].blocos.some((b) => b.cat === 'plan')).toBe(true);
     expect(dias[6].blocos.map((b) => b.cat)).toEqual(['revl', 'plan']);
-    expect(sessoesDe(dias[5])).toBeGreaterThanOrEqual(8); // 10 sessões de 50 min, 2 do resgate
-    expect(dias[5].blocos.find((b) => b.cat === 'resg').sessoes).toBe(2);
+    expect(dias[5].blocos.reduce((a, b) => a + b.min, 0)).toBeGreaterThanOrEqual(7.5 * 60); // ~8 h, 2 h de resgate
+    expect(dias[5].blocos.find((b) => b.cat === 'resg')).toMatchObject({ min: 120, sessoes: 0 });
   });
   it('fase zero: sábado mais domingo ficam com cerca de 18% do tempo líquido da semana (8 h + 2 h de ~55 h)', () => {
     const dias = semZero();

@@ -11,7 +11,7 @@ import * as foco from '../lib/foco.js';
 import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
-import { migrarLacunas } from '../lib/trilha.js';
+import { migrarLacunas, migrarDominio, migrarDone } from '../lib/trilha.js';
 import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
 import { faseDoDia, maxExtraZero } from '../lib/phases.js';
 import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
@@ -51,7 +51,7 @@ export async function iniciar() {
   aplicarPrefs(pf());
   Object.assign(app, { done, reviews, errors, exams });
   chaves.forEach((k, i) => { app[k] = extras[i] ?? structuredClone(EXTRAS[k]); });
-  if (antes < 12) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); } // notas dos tópicos antigos passam para os novos (campo `antigos`)
+  if (antes < 12) await migrarEstadosAntigos(); // notas, domínio e blocos dos tópicos antigos passam para os novos (campo `antigos`)
   app.timer = timer ?? null;
   app.ultimoBackup = ultimoBackup ?? null;
   app.lembreteAdiado = lembreteAdiado ?? null;
@@ -66,6 +66,13 @@ export async function iniciar() {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { app.dia = today(); sincronizarDividas(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono }); } });
 }
 
+/** Notas (lacunas), estado do domínio e blocos feitos: o que era de tópico antigo vale também no tópico novo; o antigo não é apagado. */
+async function migrarEstadosAntigos() {
+  app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas');
+  app.dominio = migrarDominio(app.dominio, app.cfg.topicos); await salvarKV('dominio');
+  const mud = migrarDone(app.done, app.cfg.topicos);
+  for (const [id, v] of Object.entries(mud)) { app.done[id] = v; await db.put('done', id, snap(v)); }
+}
 export async function salvarCfg() { aplicarPrefs(pf()); await db.put('kv', 'config', snap(app.cfg)); }
 export const salvarKV = (k) => db.put('kv', k, snap(app[k]));
 
@@ -478,7 +485,7 @@ export async function importar(d) {
   for (const k of Object.keys(EXTRAS)) { app[k] = d.extras?.[k] ?? structuredClone(EXTRAS[k]); await salvarKV(k); }
   const antes = d.cfg.versaoSeed ?? 1;
   app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
-  if (antes < 12) { app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas'); }
+  if (antes < 12) await migrarEstadosAntigos();
 }
 export async function restaurarSeed() {
   const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema,

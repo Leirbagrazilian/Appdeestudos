@@ -53,7 +53,10 @@ export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
   const semIdx = Math.floor(diffDays(primeira, segunda) / 7);
   const r = cfg.rotina?.rampa;
   const rampa = r?.ativa && semIdx >= 0 && semIdx < (r.semanas ?? 2) ? (r.fator ?? 0.75) : 1;
-  const total = liquida * 60 * rampa;
+  // o resgate de sábado e as 2 h de domingo (revisão leve + planejamento) saem antes: os % valem para o resto
+  const dom = cfg.rotina?.domingo, domMin = dom ? Math.max(0, toMin(dom.fim) - toMin(dom.ini)) : 0;
+  const fixo = (cfg.rotina?.resgateSabadoMin ?? 0) + domMin;
+  const total = Math.max(0, liquida * 60 - fixo) * rampa;
   const min = {};
   for (const c of [...POOL, 'red', 'provas']) min[c] = Math.round((total * (hf[c] ?? 0)) / 100);
   // sábados de junho a agosto (Ano 2 e Ano 3): 1 prova antiga por semana (EFOMM em jun–jul, Escola Naval em agosto)
@@ -169,14 +172,14 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   // segunda a sexta: o tipo não importa, então janelas que se sobrepõem viram uma só
   for (let i = 0; i < 5; i++) if (!livre[i]) for (const j of corta(marcar(janelasValidas(janelasDoDia(cfg, i + 1).map((x) => ({ ...x, tipo: undefined })))), reservas[i + 1])) janelasLivres.push({ i, ini: j.ini, fim: j.fim, curta: j.curta });
   janelasLivres.sort((a, b) => a.i - b.i || a.ini - b.ini);
-  // Resgate do sábado (2 sessões): tópicos da semana que não foram "matados"; sem pendência, prova antiga ou questões.
-  const nResg = Math.round(Number(cfg.rotina?.resgateSabado ?? 0));
-  if (nResg > 0) {
-    const k = janelasLivres.findIndex((j) => j.i === 5 && sessoesDe(j) >= nResg);
+  // Resgate do sábado (2 h contínuas): tópicos da semana que não foram "matados"; sem pendência, prova antiga ou questões.
+  const resgMin = Math.round(Number(cfg.rotina?.resgateSabadoMin ?? 0));
+  if (resgMin > 0) {
+    const k = janelasLivres.findIndex((j) => j.i === 5 && j.fim - j.ini >= resgMin);
     if (k >= 0) {
-      const j = janelasLivres[k], dur = brutoDeSlots(nResg, s, p);
-      dias[5].blocos.push({ cat: 'resg', ini: j.ini, fim: j.ini + dur, min: nResg * s, bruto: dur, sessoes: nResg });
-      j.ini += dur + p;
+      const j = janelasLivres[k];
+      dias[5].blocos.push({ cat: 'resg', ini: j.ini, fim: j.ini + resgMin, min: resgMin, bruto: resgMin, sessoes: 0 });
+      j.ini += resgMin + p;
       if (sessoesDe(j) < 1) janelasLivres.splice(k, 1);
     }
   }
@@ -235,6 +238,7 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
   const ordem = [...POOL, 'prova', 'red'];
   const rest = { ...aloc }, cred = Object.fromEntries(ordem.map((c) => [c, 0]));
   let ultimaCat = null, ultimoDia = -1;
+  const fimUso = janelasLivres.map((j) => j.ini), colocado = Object.fromEntries(POOL.map((c) => [c, 0]));
   janelasLivres.forEach((j, k) => {
     let rem = Math.min(uso[k], teto[k]), ponteiro = j.ini;
     while (rem > 0) {
@@ -248,9 +252,25 @@ export function planoSemana(cfg, fases, segunda, ctx = {}) {
       cred[c] -= soma * tam; rest[c] -= take;
       const dur = brutoDeSlots(take, s, p);
       dias[j.i].blocos.push(bloco(c, ponteiro, dur, take));
+      if (c in colocado) colocado[c] += take * s;
       ponteiro += dur + p; rem -= take; ultimaCat = c; ultimoDia = j.i;
     }
+    fimUso[k] = ponteiro;
   });
+  // Sobras de janela cheia (20 a 49 min): sessão curta da matéria que mais está devendo, até a meta do dia
+  if (metaDia) {
+    janelasLivres.forEach((j, k) => {
+      if (uso[k] < teto[k] || uso[k] < nJan[k] || j.curta) return;
+      const sobra = j.fim - fimUso[k], dia = dias[j.i];
+      const feitoDia = dia.blocos.reduce((a, b) => a + b.min, 0), falta = Number(metaDia[(j.i + 1) % 7] ?? 0) * 60 - feitoDia;
+      const dur = Math.min(sobra, s - 1, Math.floor(falta));
+      if (dur < 20) return;
+      const c = POOL.filter((x) => min[x] > 0).sort((a, b) => (min[b] - colocado[b]) - (min[a] - colocado[a]))[0];
+      if (!c) return;
+      dia.blocos.push({ cat: c, ini: fimUso[k], fim: fimUso[k] + dur, min: dur, bruto: dur, sessoes: 1, sobra: true });
+      colocado[c] += dur;
+    });
+  }
   for (const d of dias) d.blocos.sort((a, b) => a.ini - b.ini);
   return dias;
 }

@@ -37,11 +37,12 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
   let blocos = d.blocos;
 
   // Última semana antes da prova: revisão leve (só ~60% do estudo do dia).
-  const leve = revisaoLeve(cfg, dia);
+  // semana leve (23–29/08) e a semana antes de cada prova: só ~60% do estudo do dia
+  const leve = revisaoLeve(cfg, dia) ?? (fase.id === 'leve' ? { nome: 'Escola Naval' } : null);
   if (leve) {
     const total = blocos.filter((b) => b.sessoes).reduce((a, b) => a + b.min, 0);
     let acum = 0;
-    blocos = blocos.filter((b) => { if (!b.sessoes) return true; if (acum >= total * 0.6) return false; acum += b.min; return true; });
+    blocos = blocos.filter((b) => { if (!b.sessoes) return true; if (acum > 0 && acum + b.min > total * 0.62) return false; acum += b.min; return true; }); // ~60%, sem passar do teto
   }
 
   const cont = {};

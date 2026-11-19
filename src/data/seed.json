@@ -229,17 +229,16 @@
       "ini": "15:00",
       "fim": "17:00"
     },
-    "metaLiquida": 55,
+    "metaLiquida": 56,
     "metaDia": {
-      "1": 9.75,
+      "1": 9.6,
       "2": 8,
-      "3": 9.75,
-      "4": 9.75,
-      "5": 9.75,
+      "3": 9.6,
+      "4": 9.6,
+      "5": 9.6,
       "6": 8,
       "0": 2
     },
-    "resgateSabado": 2,
     "diaRedacao": 3,
     "provaSabadoMin": 240,
     "diasLivres": [
@@ -253,7 +252,8 @@
       "ativa": false,
       "semanas": 2,
       "fator": 0.75
-    }
+    },
+    "resgateSabadoMin": 120
   },
   "metodos": {
     "recuperacao": "Prática de recuperação: faça as questões sem consultar nada. Tentar lembrar fixa mais do que reler.",

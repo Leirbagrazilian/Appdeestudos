@@ -199,3 +199,73 @@ describe('sono', () => {
     expect(alertaSono(c, sono, '2027-01-20').alerta).toBe(false);
   });
 });
+
+import { migrarLacunas, migrarDominio, migrarDone } from '../src/lib/trilha.js';
+import { planoSemana } from '../src/lib/semana.js';
+import { blocosDoDia } from '../src/lib/planner.js';
+import { reservasDaSemana } from '../src/lib/oracao.js';
+
+describe('revisão: migração sem perda de dados', () => {
+  const c = cfg();
+  it('lacunas: órfãs ficam guardadas e matérias fora do seed novo continuam', () => {
+    const velho = { Matemática: { 'Números inteiros: adição e subtração': 3, MMC: 2, 'Conjuntos, lógica e funções': 1 }, 'Outra matéria': { x: 2 } };
+    const novo = migrarLacunas(velho, c.topicos);
+    expect(novo.Matemática['Números inteiros: adição e subtração']).toBe(3); // sem correspondência: fica
+    expect(novo.Matemática['Divisibilidade, MMC e MDC']).toBe(2);
+    expect(novo.Matemática['Teoria de conjuntos']).toBe(1);
+    expect(novo.Matemática['Conjuntos, lógica e funções']).toBe(1); // o antigo também fica
+    expect(novo['Outra matéria']).toEqual({ x: 2 });
+    expect(migrarLacunas(novo, c.topicos)).toEqual(novo);
+  });
+  it('dominio: o estado do tópico antigo vale também na chave nova, sem apagar a antiga', () => {
+    const est = { regs: { a: { feitas: 10, acertos: 5, data: '2026-11-17' }, b: { feitas: 10, acertos: 6, data: '2026-11-18' } } };
+    const dom = { 'Matemática|MMC': est, 'Matemática|Sem correspondência': { regs: {} } };
+    const novo = migrarDominio(dom, c.topicos);
+    expect(novo['Matemática|Divisibilidade, MMC e MDC']).toEqual(est);
+    expect(novo['Matemática|MMC']).toEqual(est);
+    expect(novo['Matemática|Sem correspondência']).toBeTruthy();
+    const ja = { ...dom, 'Matemática|Divisibilidade, MMC e MDC': { regs: {} } };
+    expect(migrarDominio(ja, c.topicos)['Matemática|Divisibilidade, MMC e MDC']).toEqual({ regs: {} }); // não sobrescreve o que já existe
+  });
+  it('done: o tópico antigo dos blocos feitos passa para o novo (contarBlocos segue valendo)', () => {
+    const done = { a: { materia: 'Matemática', topico: 'MDC', min: 100 }, b: { materia: 'Matemática', topico: 'Teoria de conjuntos', min: 50 }, c: { materia: 'Português', topico: 'X', min: 50 } };
+    const mud = migrarDone(done, c.topicos);
+    expect(Object.keys(mud)).toEqual(['a']);
+    expect(mud.a).toMatchObject({ topico: 'Divisibilidade, MMC e MDC', topicoAntigo: 'MDC' });
+    expect(contarBlocos({ ...done, ...mud })['Matemática|Divisibilidade, MMC e MDC']).toBe(1);
+  });
+});
+
+describe('revisão: carga da semana', () => {
+  const f = fases;
+  const res = (c) => (seg) => reservasDaSemana(c, {}, seg);
+  const min = (dias, cat) => dias.flatMap((d) => d.blocos).filter((b) => b.cat === cat).reduce((a, b) => a + b.min, 0);
+  it('os % por matéria da spec batem (Ano 1 e Fase 0), contando o que sobra das janelas', () => {
+    const c = cfg();
+    const testa = (seg, pct) => {
+      const dias = planoSemana(c, f, seg);
+      const cats = Object.keys(pct), tot = cats.reduce((a, k) => a + min(dias, k), 0);
+      for (const k of cats) expect(Math.abs((min(dias, k) / tot) * 100 - pct[k]), `${seg} ${k}`).toBeLessThan(4.5);
+    };
+    testa('2027-01-18', { mat: 38, fis: 32, qui: 15, por: 6, red: 5, ing: 4 });
+    testa('2026-11-23', { mat: 55, fis: 25, qui: 12, por: 6, ing: 2 });
+  });
+  it('resgate do sábado tem 2 h (120 min) e segunda/quarta/quinta/sexta ficam entre 9,5 e 10 h, com as orações', () => {
+    const c = cfg();
+    for (const seg of ['2026-11-23', '2027-01-18', '2027-05-10']) {
+      const dias = planoSemana(c, f, seg, { reservas: res(c) });
+      expect(dias[5].blocos.find((b) => b.cat === 'resg')).toMatchObject({ min: 120, bruto: 120 });
+      for (const i of [0, 2, 3, 4]) { const h = dias[i].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(h, `${seg} dia ${i}`).toBeGreaterThanOrEqual(9.5); expect(h, `${seg} dia ${i}`).toBeLessThanOrEqual(10); }
+      const ter = dias[1].blocos.reduce((a, b) => a + b.min, 0) / 60; expect(ter).toBeGreaterThanOrEqual(7.5); expect(ter).toBeLessThanOrEqual(8.5);
+      const tot = dias.reduce((a, d) => a + d.blocos.reduce((x, b) => x + b.min, 0), 0) / 60; expect(tot).toBeGreaterThan(53); expect(tot).toBeLessThan(59);
+    }
+  });
+  it('a semana leve (23–29/08) tem carga reduzida (~60%) no checklist do dia', () => {
+    const c = cfg();
+    const sess = (dia) => blocosDoDia(c, f, dia).filter((b) => b.sessoes).reduce((a, b) => a + b.min, 0);
+    const normal = sess('2027-07-14'), leve = sess('2027-08-25');
+    expect(leve).toBeLessThanOrEqual(normal * 0.7); expect(leve).toBeGreaterThan(0);
+    c.concursos.find((x) => x.id === 'en').eventos.find((e) => e.tipo === 'prova').inicio = '2027-09-15'; // mesmo sem a prova na semana, a fase leve reduz
+    expect(sess('2027-08-25')).toBeLessThanOrEqual(normal * 0.7);
+  });
+});
