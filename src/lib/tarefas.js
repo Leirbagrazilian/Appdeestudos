@@ -114,7 +114,7 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
   const lim = ctx.faseId, zero = lim === 'zero';
   const acertos = zero || ctx.plano ? acertoPorTopico(ctx.done) : {};
   const feitos = ctx.plano ? contarBlocos(ctx.done) : {};
-  const stP = (ex) => ({ lacunas: ctx.lacunas ?? {}, feitos, dividas: ctx.dividas ?? {}, virt: virtP, excluir: ex, faseId: lim, acertos });
+  const stP = (ex) => ({ lacunas: ctx.lacunas ?? {}, feitos, dividas: ctx.dividas ?? {}, virt: virtP, excluir: ex, faseId: lim, acertos, dominio: ctx.dominio ?? {} });
   for (const b of blocos) {
     if (!REGISTRAVEL.includes(b.cat) || b.diagnostico || ctx.done?.[b.id]) continue;
     let materia = b.materia, info = null, t;

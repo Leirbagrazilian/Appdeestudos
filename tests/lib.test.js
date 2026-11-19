@@ -104,7 +104,7 @@ describe('planner', () => {
   it('depois da semana diagnóstica vale o planner: blocos com horário e id por matéria', () => {
     const f = gerarFases(cfg());
     const b = blocosDoDia(cfg(), f, '2026-11-23');
-    expect(b[0]).toMatchObject({ ini: '06:30', fim: '07:50', min: 100, bruto: 110 }); // 2 sessões de 50 min com 10 de pausa
+    expect(b[0]).toMatchObject({ ini: '06:30', fim: '08:20', min: 100, bruto: 110 }); // 2 sessões de 50 min com 10 de pausa
     expect(b.every((x) => /^2026-11-23:[a-z]+(@\d{4})?$/.test(x.id))).toBe(true);
     expect(new Set(b.map((x) => x.id)).size).toBe(b.length);
     expect(b.at(-1).cat).toBe('erros'); // caderno de erros: 10 min, sem horário fixo
@@ -540,7 +540,7 @@ describe('planner v2: casos de borda (revisão)', () => {
     expect(janelasValidas([{ ini: '07:00', fim: '12:00' }, { ini: '10:00', fim: '11:00' }, { ini: '11:30', fim: '13:30' }])).toEqual([{ ini: 420, fim: 810, tipo: undefined }]);
   });
   it('janelas extras de sábado e domingo viram estudo normal (e sábado tem pausa depois da correção)', () => {
-    const c = fixar(cfg());
+    const c = fixar(cfg()); delete c.rotina.metaDia; // sem teto por dia: só as janelas
     c.rotina.janelas[6] = [{ ini: '08:00', fim: '15:00', tipo: 'prova' }, { ini: '18:00', fim: '20:00' }]; // sábado com a janela longa da prova, para sobrar estudo logo depois da correção
     c.rotina.janelas[0].push({ ini: '18:00', fim: '20:00' });
     const dias = sem(c, '2027-06-07'); // fase com provas > 0
@@ -710,11 +710,11 @@ import { ajustarLeitura } from '../src/lib/livros.js';
 describe('bloco = tarefa exata', () => {
   const novo = () => {
     const c = cfg();
-    const v = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-3|Trigonometria');
+    const v = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-1|Teoria de conjuntos');
     Object.assign(v, { pagIni: 1, pagFim: 100, exIni: 1, exFim: 50 });
     return c;
   };
-  const lac = { Matemática: { ...dominarFase0(cfg()).Matemática, 'Conjuntos, lógica e funções': 3 } }; // Fase 0 dominada (ctx.faseId 'base'); próximo tópico: Trigonometria
+  const lac = { Matemática: { ...dominarFase0(cfg()).Matemática } }; // Fase 0 dominada (ctx.faseId 'ano1'); próximo tópico: Teoria de conjuntos
   const bl = (id, min = 100, materia = 'Matemática', cat = 'mat') => ({ id: `2026-11-23:${id}`, cat, materia, min });
 
   it('divisão do bloco: vídeo 25, teoria 45, questões 30; sem vídeo ou sem páginas, redistribui', () => {
@@ -728,59 +728,59 @@ describe('bloco = tarefa exata', () => {
   });
   it('tarefa completa: tópico da Trilha, vídeo, páginas, exercícios e questões', () => {
     const c = novo();
-    const t = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base' })['2026-11-23:mat@0600'];
-    expect(t.topico).toBe('Trigonometria');
+    const t = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'ano1' })['2026-11-23:mat@0600'];
+    expect(t.topico).toBe('Teoria de conjuntos');
     expect(t.video).toMatchObject({ min: 25 }); expect(t.video.url).toMatch(/^https:/);
-    expect(t.paginas).toMatchObject({ de: 1, ate: 8, n: 8, min: 45, vinculoId: 'iezzi-3|Trigonometria' });
-    expect(t.paginas.livro).toBe('Fundamentos de Matemática Elementar v.3');
+    expect(t.paginas).toMatchObject({ de: 1, ate: 8, n: 8, min: 45, vinculoId: 'iezzi-1|Teoria de conjuntos' });
+    expect(t.paginas.livro).toBe('Fundamentos de Matemática Elementar v.1');
     expect(t.exercicios).toEqual({ de: 1, ate: 4 });
     expect(t.questoes.n).toBe(3); // 30 min a 6 questões/h
     expect(t.semPaginas).toBe(false);
   });
   it('sem páginas cadastradas: mostra vídeo e questões e pede para cadastrar as páginas', () => {
-    const t = tarefasDoDia(cfg(), [bl('mat@0600')], { lacunas: lac, faseId: 'base' })['2026-11-23:mat@0600'];
+    const t = tarefasDoDia(cfg(), [bl('mat@0600')], { lacunas: lac, faseId: 'ano1' })['2026-11-23:mat@0600'];
     expect(t.paginas).toBeNull(); expect(t.semPaginas).toBe(true); expect(t.temLivro).toBe(true);
     expect(t.video.min).toBe(45); expect(t.partes.questoes).toBe(55);
   });
   it('vários blocos da mesma matéria no dia continuam de onde o anterior parou; blocos feitos ficam de fora', () => {
     const c = novo();
     const blocos = [bl('mat@0600'), bl('mat@1230'), bl('mat@1630')];
-    const t = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'base' });
+    const t = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'ano1' });
     expect(t[blocos[0].id].paginas).toMatchObject({ de: 1, ate: 8 });
     expect(t[blocos[1].id].paginas).toMatchObject({ de: 9, ate: 16 });
     expect(t[blocos[2].id].paginas).toMatchObject({ de: 17, ate: 24 });
     // o primeiro já foi feito e a leitura andou: o segundo começa na 9
-    const feito = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'base', done: { [blocos[0].id]: {} }, leitura: { 'iezzi-3|Trigonometria': { proxima: 9, registros: [] } } });
+    const feito = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'ano1', done: { [blocos[0].id]: {} }, leitura: { 'iezzi-1|Teoria de conjuntos': { proxima: 9, registros: [] } } });
     expect(feito[blocos[0].id]).toBeUndefined();
     expect(feito[blocos[1].id].paginas.de).toBe(9);
   });
   it('quando o tópico acaba o livro no dia, o bloco seguinte passa ao próximo tópico', () => {
-    const c = novo(); c.biblioteca.vinculos.find((x) => x.id === 'iezzi-3|Trigonometria').pagFim = 10;
+    const c = novo(); c.biblioteca.vinculos.find((x) => x.id === 'iezzi-1|Teoria de conjuntos').pagFim = 10;
     const blocos = [bl('mat@0600'), bl('mat@1230'), bl('mat@1630')];
-    const t = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'base' });
-    expect(t[blocos[0].id].topico).toBe('Trigonometria');
-    expect(t[blocos[1].id]).toMatchObject({ topico: 'Trigonometria', paginas: { de: 9, ate: 10, restante: 0 } });
-    expect(t[blocos[2].id].topico).toBe('PA, PG, matrizes e sistemas');
+    const t = tarefasDoDia(c, blocos, { lacunas: lac, faseId: 'ano1' });
+    expect(t[blocos[0].id].topico).toBe('Teoria de conjuntos');
+    expect(t[blocos[1].id]).toMatchObject({ topico: 'Teoria de conjuntos', paginas: { de: 9, ate: 10, restante: 0 } });
+    expect(t[blocos[2].id].topico).toBe('Conjuntos numéricos');
   });
   it('questões: links colados por tópico e cota grátis do dia (10 QConcursos + 5 Estuda.com)', () => {
     const c = novo();
-    c.questoesLinks = { Matemática: { Trigonometria: { qconcursos: 'https://qc/x', estuda: 'https://es/x', pdf: 'https://pdf/x', video: 'https://v/x' } } };
-    expect(linksDe(c, 'Matemática', 'Trigonometria').outro).toBe('');
+    c.questoesLinks = { Matemática: { 'Teoria de conjuntos': { qconcursos: 'https://qc/x', estuda: 'https://es/x', pdf: 'https://pdf/x', video: 'https://v/x' } } };
+    expect(linksDe(c, 'Matemática', 'Teoria de conjuntos').outro).toBe('');
     expect(limitesCota(c)).toEqual({ qconcursos: 10, estuda: 5 });
-    expect(fontesQuestoes(c, 'Matemática', 'Trigonometria', {}).map((f) => [f.site, f.restante, f.esgotada])).toEqual([['qconcursos', 10, false], ['estuda', 5, false], ['pdf', null, false]]);
-    const meio = fontesQuestoes(c, 'Matemática', 'Trigonometria', { qconcursos: 10, estuda: 2 });
+    expect(fontesQuestoes(c, 'Matemática', 'Teoria de conjuntos', {}).map((f) => [f.site, f.restante, f.esgotada])).toEqual([['qconcursos', 10, false], ['estuda', 5, false], ['pdf', null, false]]);
+    const meio = fontesQuestoes(c, 'Matemática', 'Teoria de conjuntos', { qconcursos: 10, estuda: 2 });
     expect(meio[0].esgotada).toBe(true); expect(meio[1]).toMatchObject({ esgotada: false, restante: 3 });
-    expect(videoDe(c, 'Matemática', 'Trigonometria')).toEqual({ url: 'https://v/x', origem: 'topico' });
+    expect(videoDe(c, 'Matemática', 'Teoria de conjuntos')).toEqual({ url: 'https://v/x', origem: 'topico' });
     // cota acabou: sugere PDF/prova (sem páginas) ou exercícios do livro (com páginas)
     const cotas = { qconcursos: 10, estuda: 5 };
-    const t = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base', cotasDia: cotas })['2026-11-23:mat@0600'];
+    const t = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'ano1', cotasDia: cotas })['2026-11-23:mat@0600'];
     expect(t.questoes).toMatchObject({ cotaEsgotada: true, alternativa: 'pdf' }); // tem link de PDF: sugere a prova em PDF
-    delete c.questoesLinks.Matemática.Trigonometria.pdf;
-    const semPdf = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base', cotasDia: cotas })['2026-11-23:mat@0600'];
+    delete c.questoesLinks.Matemática['Teoria de conjuntos'].pdf;
+    const semPdf = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'ano1', cotasDia: cotas })['2026-11-23:mat@0600'];
     expect(semPdf.questoes).toMatchObject({ cotaEsgotada: true, alternativa: 'livro' }); // senão, os exercícios do livro
-    const aindaTem = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'base', cotasDia: { qconcursos: 10, estuda: 4 } })['2026-11-23:mat@0600'];
+    const aindaTem = tarefasDoDia(c, [bl('mat@0600')], { lacunas: lac, faseId: 'ano1', cotasDia: { qconcursos: 10, estuda: 4 } })['2026-11-23:mat@0600'];
     expect(aindaTem.questoes).toMatchObject({ cotaEsgotada: false, alternativa: null });
-    const sem = tarefasDoDia(cfg(), [bl('mat@0600')], { lacunas: lac, faseId: 'base' })['2026-11-23:mat@0600'];
+    const sem = tarefasDoDia(cfg(), [bl('mat@0600')], { lacunas: lac, faseId: 'ano1' })['2026-11-23:mat@0600'];
     expect(sem.questoes).toMatchObject({ semLinks: true, cotaEsgotada: false, alternativa: null });
     expect(aplicarCota({ qconcursos: 4 }, { qconcursos: 3, estuda: 2, pdf: 9 })).toEqual({ qconcursos: 7, estuda: 2 }); // PDF não tem cota
     expect(aplicarCota({ estuda: 1 }, { estuda: -5 })).toEqual({ estuda: 0 });
@@ -792,12 +792,12 @@ describe('bloco = tarefa exata', () => {
   });
   it('registro de resultado: acerto por tópico e deltas de páginas, cota e erros', () => {
     const done = {
-      a: { materia: 'Matemática', topico: 'Trigonometria', questoes: { feitas: 10, acertos: 7 } },
-      b: { materia: 'Matemática', topico: 'Trigonometria', questoes: { feitas: 5, acertos: 2 } },
+      a: { materia: 'Matemática', topico: 'Teoria de conjuntos', questoes: { feitas: 10, acertos: 7 } },
+      b: { materia: 'Matemática', topico: 'Teoria de conjuntos', questoes: { feitas: 5, acertos: 2 } },
       c: { materia: 'Física', topico: 'Cinemática', questoes: { feitas: 4, acertos: 4 } },
       d: { materia: 'Física', questoes: { feitas: 9, acertos: 1 } }, // sem tópico: não entra
     };
-    expect(acertoPorTopico(done)).toEqual({ 'Matemática|Trigonometria': { feitas: 15, acertos: 9 }, 'Física|Cinemática': { feitas: 4, acertos: 4 } });
+    expect(acertoPorTopico(done)).toEqual({ 'Matemática|Teoria de conjuntos': { feitas: 15, acertos: 9 }, 'Física|Cinemática': { feitas: 4, acertos: 4 } });
     // primeiro registro
     expect(deltaResultado(null, { feitas: 5, acertos: 3, site: 'qconcursos', paginas: 8 })).toEqual({ paginas: 8, cotas: { qconcursos: 5 }, errosFaltando: 2 });
     // correção: leu 10 em vez de 8, fez 6 no Estuda e já tinha registrado 2 erros
@@ -821,9 +821,9 @@ describe('etapa 5: migração dos campos novos', () => {
     expect(novo.divisaoBloco).toEqual({ video: 25, teoria: 45, questoes: 30 });
     expect(novo.sitesQuestoes.map((s) => s.id)).toEqual(['khan', 'obmep', 'qconcursos', 'estuda', 'pdf', 'outro']);
     expect(novo.questoesLinks).toEqual({});
-    const comLinks = cfg(); comLinks.versaoSeed = 5; comLinks.questoesLinks = { Matemática: { Trigonometria: { qconcursos: 'https://qc/x' } } }; comLinks.cotasGratis = { qconcursos: 7, estuda: 3 };
+    const comLinks = cfg(); comLinks.versaoSeed = 5; comLinks.questoesLinks = { Matemática: { 'Teoria de conjuntos': { qconcursos: 'https://qc/x' } } }; comLinks.cotasGratis = { qconcursos: 7, estuda: 3 };
     const n2 = migrarCfg(comLinks, cfg());
-    expect(n2.questoesLinks.Matemática.Trigonometria.qconcursos).toBe('https://qc/x');
+    expect(n2.questoesLinks.Matemática['Teoria de conjuntos'].qconcursos).toBe('https://qc/x');
     expect(n2.cotasGratis).toEqual({ qconcursos: 7, estuda: 3 }); // editou: fica
   });
 });
@@ -835,12 +835,12 @@ describe('etapa 6: dia mínimo, revisão de domingo e cobertura', () => {
   const f = gerarFases(cfg());
   it('tarefa do dia mínimo: só questões (20 em 45 min) do próximo tópico, com os links e a cota', () => {
     const c = cfg();
-    c.questoesLinks = { Matemática: { 'Conjuntos, lógica e funções': { qconcursos: 'https://qc/x' } } };
+    c.questoesLinks = { Matemática: { 'Teoria de conjuntos': { qconcursos: 'https://qc/x' } } };
     const bl = blocosAjustados(c, f, '2026-11-23', { dificeis: { '2026-11-23': true } });
-    const t = tarefasDoDia(c, bl, { lacunas: dominarFase0(c), faseId: 'base', cotasDia: { qconcursos: 10 } })[bl[0].id];
+    const t = tarefasDoDia(c, bl, { lacunas: dominarFase0(c), faseId: 'ano1', cotasDia: { qconcursos: 10 } })[bl[0].id];
     expect(t.questoes.n).toBe(QUESTOES_DIA_MINIMO); expect(t.questoes.min).toBe(45);
     expect(t.video).toBeNull(); expect(t.paginas).toBeNull();
-    expect(t.topico).toBe('Conjuntos, lógica e funções'); expect(t.questoes.cotaEsgotada).toBe(true);
+    expect(t.topico).toBe('Teoria de conjuntos'); expect(t.questoes.cotaEsgotada).toBe(true);
     expect(REGISTRAVEL).toContain('minimo');
   });
   it('resumo da semana: horas, questões, erros, dias cumpridos, revisões e adiados', () => {
@@ -874,9 +874,9 @@ describe('etapa 6: dia mínimo, revisão de domingo e cobertura', () => {
   it('cobertura de páginas por matéria: só vínculos ativos com páginas cadastradas', () => {
     const c = cfg();
     expect(coberturaPaginas(c, {}, 'Matemática')).toEqual({ lidas: 0, total: 0, pct: null });
-    const v = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-3|Trigonometria'); Object.assign(v, { pagIni: 1, pagFim: 100 });
-    const w = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-9|Geometria plana'); Object.assign(w, { pagIni: 1, pagFim: 100 });
-    const leit = { 'iezzi-3|Trigonometria': { proxima: 51, registros: [] } }; // 50 de 100
+    const v = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-1|Teoria de conjuntos'); Object.assign(v, { pagIni: 1, pagFim: 100 });
+    const w = c.biblioteca.vinculos.find((x) => x.id === 'iezzi-9|Polígonos'); Object.assign(w, { pagIni: 1, pagFim: 100 });
+    const leit = { 'iezzi-1|Teoria de conjuntos': { proxima: 51, registros: [] } }; // 50 de 100
     expect(coberturaPaginas(c, leit, 'Matemática')).toEqual({ lidas: 50, total: 200, pct: 0.25 });
     // vínculo de livro que não é o principal não conta
     const t = c.biblioteca.vinculos.find((x) => x.recurso === 'topicos-fisica-1'); Object.assign(t, { pagIni: 1, pagFim: 10 });
@@ -891,29 +891,30 @@ describe('etapa 1 (v3): fases e fim de semana', () => {
   const liquido = (d) => blocosLiquidos(d).reduce((a, b) => a + b.min, 0);
   const sessoesDe = (d) => d.blocos.reduce((n, b) => n + (b.sessoes || 0), 0);
 
-  it('as horas de cada fase somam 43h líquidas e a fase zero dá 1440 min de Matemática por semana', () => {
-    for (const [id, h] of Object.entries(cfg().horasFase)) {
-      expect(Object.values(h).reduce((a, b) => a + b, 0), id).toBe(43);
-    }
-    expect(Object.keys(cfg().horasFase)).toEqual(['zero', 'base', 'efomm', 'en', 'ita', 'enem']);
-    expect(orcamentoSemana(cfg(), 'zero', '2026-11-23').mat).toBe(1440);
+  it('as % de cada fase somam 100 e a Fase 0 dá 55% (1815 min) de Matemática por semana', () => {
+    for (const [id, h] of Object.entries(cfg().horasFase)) expect(Object.values(h).reduce((a, b) => a + b, 0), id).toBe(100);
+    expect(Object.keys(cfg().horasFase)).toEqual(['zero', 'ano1', 'ano2', 'ano3', 'leve', 'ita', 'disc', 'enem']);
+    expect(cfg().horasFase.zero).toMatchObject({ mat: 55, fis: 25, qui: 12, por: 6, ing: 2 });
+    for (const id of ['ano1', 'ano2', 'ano3']) expect(cfg().horasFase[id]).toMatchObject({ mat: 38, fis: 32, qui: 15, por: 6, red: 5, ing: 4 });
+    expect(orcamentoSemana(cfg(), 'zero', '2026-11-23').mat).toBe(1815);
   });
-  it('Natal e Ano Novo têm blocos de estudo (não são dias livres)', () => {
+  it('Natal e Ano Novo (24–25/12 e 31/12–01/01) são livres; os dias em volta têm estudo', () => {
     const c = cfg();
-    for (const dia of ['2026-12-24', '2026-12-25', '2026-12-31', '2027-01-01']) {
-      expect(blocosDoDia(c, f, dia).some((b) => b.sessoes), dia).toBe(true);
-    }
+    for (const dia of ['2026-12-24', '2026-12-25', '2026-12-31', '2027-01-01']) expect(blocosDoDia(c, f, dia).some((b) => b.sessoes), dia).toBe(false);
+    for (const dia of ['2026-12-23', '2026-12-26', '2026-12-30', '2027-01-02']) expect(blocosDoDia(c, f, dia).some((b) => b.sessoes), dia).toBe(true);
   });
-  it('fase zero: domingo tem pelo menos 5 sessões de estudo além do planejamento e sábado tem pelo menos 6', () => {
+  it('fase zero: sábado tem 8 h (2 de resgate) e o domingo tem 2 h de revisão leve com o planejamento no fim', () => {
     const dias = semZero();
     expect(dias[6].blocos.some((b) => b.cat === 'plan')).toBe(true);
-    expect(sessoesDe(dias[6])).toBeGreaterThanOrEqual(5);
-    expect(sessoesDe(dias[5])).toBeGreaterThanOrEqual(6);
+    expect(dias[6].blocos.map((b) => b.cat)).toEqual(['revl', 'plan']);
+    expect(sessoesDe(dias[5])).toBeGreaterThanOrEqual(8); // 10 sessões de 50 min, 2 do resgate
+    expect(dias[5].blocos.find((b) => b.cat === 'resg').sessoes).toBe(2);
   });
-  it('fase zero: sábado mais domingo ficam com pelo menos 28% do tempo líquido da semana (peso de fim de semana)', () => {
+  it('fase zero: sábado mais domingo ficam com cerca de 18% do tempo líquido da semana (8 h + 2 h de ~55 h)', () => {
     const dias = semZero();
     const total = dias.reduce((a, d) => a + liquido(d), 0);
-    expect((liquido(dias[5]) + liquido(dias[6])) / total).toBeGreaterThanOrEqual(0.28);
+    const fds = (liquido(dias[5]) + liquido(dias[6])) / total;
+    expect(fds).toBeGreaterThanOrEqual(0.14); expect(fds).toBeLessThanOrEqual(0.2);
   });
   it('repartirComTeto respeita os tetos, redistribui a sobra e soma o total', () => {
     const r = repartirComTeto([1, 1, 1, 1], [1, 10, 10, 0], 12);
@@ -926,12 +927,12 @@ describe('etapa 1 (v3): fases e fim de semana', () => {
     // total maior do que a soma dos tetos: enche todos e para
     expect(repartirComTeto([1, 1], [2, 3], 10)).toEqual([2, 3]);
   });
-  it('extraZero=2 empurra o fim da Zero em 14 dias e o início da Base', () => {
+  it('extraZero=2 empurra o fim da Zero em 14 dias e o início do Ano 1', () => {
     const c = cfg(); c.perfil.extraZero = 2;
     const [z0, b0] = f, [z, b] = gerarFases(c);
     expect(z.fim).toBe(addDays(z0.fim, 14));
     expect(b.inicio).toBe(addDays(b0.inicio, 14));
     expect(b.inicio).toBe(addDays(z.fim, 1));
-    expect(b.fim).toBe(b0.fim); // a Base só encurta; a fase 2 não se move
+    expect(b.fim).toBe(addDays(b0.fim, 14));
   });
 });

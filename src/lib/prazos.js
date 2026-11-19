@@ -3,6 +3,7 @@
 // Também decide o status de cada tópico (dominado, dívida, bloqueado, atrasado...) e o ritmo geral. Tudo puro.
 import { addDays, diffDays, weekday } from './dates.js';
 import { diaLivre } from './rotina.js';
+import { estaTravado } from './dominio.js';
 
 export const BLOCO_MIN = 100; // 1 bloco previsto = 2 sessões de foco (100 min líquidos)
 export const MATERIAS_PRAZO = ['Matemática', 'Física', 'Química'];
@@ -208,7 +209,7 @@ export function escolherTopico(cfg, plano, materia, st, dia) {
   const lista = plano.porMateria[materia] ?? [];
   const zero = st.faseId === 'zero', sem = semConteudoNovo(st.faseId);
   const feito = (i) => st.feitos?.[chave(materia, i.nome)] ?? 0;
-  const livre = (i) => !dominadoT(st.lacunas, materia, i.nome) && !emDivida(i, st, dia) && !prereqPendentes(plano, st.lacunas, i).length && !st.excluir?.has(i.nome);
+  const livre = (i) => !dominadoT(st.lacunas, materia, i.nome) && !emDivida(i, st, dia) && !prereqPendentes(plano, st.lacunas, i).length && !st.excluir?.has(i.nome) && !estaTravado(st.dominio?.[chave(materia, i.nome)]); // travado (3 tentativas): precisa de ajuda antes
   const abertos = lista.filter((i) => livre(i) && (zero ? i.ano === 0 : true) && (sem ? feito(i) > 0 : true));
   const monta = (i, extra = {}) => {
     const k = Math.floor(feito(i) + (st.virt?.[chave(materia, i.nome)] ?? 0) + 1e-6) + 1; // bloco em que você está
