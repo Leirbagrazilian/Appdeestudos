@@ -3,6 +3,7 @@
 // Também decide o status de cada tópico (dominado, dívida, bloqueado, atrasado...) e o ritmo geral. Tudo puro.
 import { addDays, diffDays, weekday } from './dates.js';
 import { diaLivre } from './rotina.js';
+import { baseMinutos } from './semana.js';
 import { estaTravado, resumo as resumoDominio } from './dominio.js';
 
 export const BLOCO_MIN = 100; // 1 bloco previsto = 2 sessões de foco (100 min líquidos)
@@ -28,7 +29,7 @@ export function pesoDe(cfg, materia, t) {
 function minutosDoDia(cfg, faseId, dia, cat) {
   if (diaLivre(cfg, dia)) return 0;
   const pct = cfg.horasFase?.[faseId]?.[cat] ?? 0;
-  const semana = ((cfg.rotina?.metaLiquida ?? 55) * 60 * pct) / 100;
+  const semana = (baseMinutos(cfg) * pct) / 100; // mesma base do planner (sem resgate e domingo)
   const md = cfg.rotina?.metaDia;
   const soma = md ? Object.values(md).reduce((a, b) => a + Number(b), 0) : 7;
   const parte = md ? Number(md[weekday(dia)] ?? 0) / soma : 1 / 7;

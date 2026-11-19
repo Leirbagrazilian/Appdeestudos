@@ -269,3 +269,31 @@ describe('revisão: carga da semana', () => {
     expect(sess('2027-08-25')).toBeLessThanOrEqual(normal * 0.7);
   });
 });
+
+import { orcamentoSemana } from '../src/lib/semana.js';
+describe('revisão: prazos usam a mesma base do planner', () => {
+  it('minutos previstos por matéria em prazos ≈ orçamento real da semana', () => {
+    const c = cfg();
+    // soma dos blocos previstos de uma semana cheia (seg a dom) de Ano 1: usa o suprimento via plano com 1 tópico só por matéria
+    const o = orcamentoSemana(c, 'ano1', '2027-01-18');
+    const mini = structuredClone(c);
+    for (const m of ['Matemática', 'Física', 'Química']) mini.topicos[m] = [{ ...c.topicos[m].find((t) => t.ano === 1), peso: 2 }];
+    const p = planoPrazos(mini, fases);
+    for (const [m, cat] of [['Matemática', 'mat'], ['Física', 'fis'], ['Química', 'qui']]) {
+      const it = p.porMateria[m][0], dias = (new Date(it.prazo) - new Date('2027-01-11')) / 864e5 + 1;
+      const previstoPorSemana = (it.blocos * 100) / (dias / 7);
+      expect(Math.abs(previstoPorSemana - o[cat]) / o[cat], m).toBeLessThan(0.15);
+    }
+  });
+  it('escolherTopico pula o tópico que falhou no MATAR HOJE e segue para o próximo não dependente', () => {
+    const tn01 = item('Matemática', 'TN01');
+    const base = { lacunas: {}, feitos: {}, dividas: {}, virt: {}, excluir: new Set(), faseId: 'zero', acertos: {}, dominio: {} };
+    expect(escolherTopico(cfg(), plano, 'Matemática', base, '2026-11-18').item.codigo).toBe('TN01');
+    const falha = { regs: { a: { feitas: 10, acertos: 5, data: '2026-11-18' } } }; // sem `treino`: tentativa do MATAR HOJE
+    const st = { ...base, dominio: { [`Matemática|${tn01.nome}`]: falha } };
+    expect(escolherTopico(cfg(), plano, 'Matemática', st, '2026-11-18').item.codigo).toBe('MB01');
+    // bloco de treino que não chegou a 8/10 não conta como falha: o tópico continua
+    const treino = { regs: { a: { feitas: 10, acertos: 5, data: '2026-11-18', treino: true } } };
+    expect(escolherTopico(cfg(), plano, 'Matemática', { ...base, dominio: { [`Matemática|${tn01.nome}`]: treino } }, '2026-11-18').item.codigo).toBe('TN01');
+  });
+});

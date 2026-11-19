@@ -43,6 +43,12 @@ export function repartir(pesos, total) {
   return res;
 }
 
+/** Minutos da semana que os % das matérias dividem: meta líquida menos o resgate de sábado e as 2 h de domingo (revisão leve + planejamento). */
+export function baseMinutos(cfg) {
+  const dom = cfg.rotina?.domingo, domMin = dom ? Math.max(0, toMin(dom.fim) - toMin(dom.ini)) : 0;
+  return Math.max(0, (cfg.rotina?.metaLiquida ?? 55) * 60 - (cfg.rotina?.resgateSabadoMin ?? 0) - domMin);
+}
+
 /** Minutos líquidos de cada matéria na semana que começa em `segunda`: meta líquida (55 h) × % da matéria na fase. */
 export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
   const hf = cfg.horasFase?.[faseId] ?? cfg.horasFase?.ano1 ?? {};
@@ -53,10 +59,7 @@ export function orcamentoSemana(cfg, faseId, segunda, ctx = {}) {
   const semIdx = Math.floor(diffDays(primeira, segunda) / 7);
   const r = cfg.rotina?.rampa;
   const rampa = r?.ativa && semIdx >= 0 && semIdx < (r.semanas ?? 2) ? (r.fator ?? 0.75) : 1;
-  // o resgate de sábado e as 2 h de domingo (revisão leve + planejamento) saem antes: os % valem para o resto
-  const dom = cfg.rotina?.domingo, domMin = dom ? Math.max(0, toMin(dom.fim) - toMin(dom.ini)) : 0;
-  const fixo = (cfg.rotina?.resgateSabadoMin ?? 0) + domMin;
-  const total = Math.max(0, liquida * 60 - fixo) * rampa;
+  const total = baseMinutos(cfg) * rampa;
   const min = {};
   for (const c of [...POOL, 'red', 'provas']) min[c] = Math.round((total * (hf[c] ?? 0)) / 100);
   // sábados de junho a agosto (Ano 2 e Ano 3): 1 prova antiga por semana (EFOMM em jun–jul, Escola Naval em agosto)
