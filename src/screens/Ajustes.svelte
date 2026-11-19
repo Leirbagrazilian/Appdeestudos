@@ -4,7 +4,7 @@
   import { sino } from '../lib/audio.js';
   import { gerarICS } from '../lib/ics.js';
   import { baixar, validar } from '../lib/backup.js';
-  import { pedir, suportado } from '../lib/notify.js';
+  import { pedir, suportado, periodicoSuportado, registrarPeriodico, cancelarPeriodico } from '../lib/notify.js';
   import { fmtBR } from '../lib/dates.js';
   import { slotsDaJanela, janelasValidas, toHHMM } from '../lib/semana.js';
   import { janelasDoDia, presencaPorAula } from '../lib/rotina.js';
@@ -26,8 +26,10 @@
   async function ativarNotif() {
     notif = await pedir();
     app.cfg.notificacoes = notif === 'granted'; salvar();
-    if (notif !== 'granted') msg = 'O navegador não permitiu notificações. Os alertas continuam na tela Hoje e no arquivo .ics.';
+    if (notif !== 'granted') { msg = 'O navegador não permitiu notificações. Os alertas continuam na tela Hoje e no arquivo .ics.'; return; }
+    if (periodicoSuportado() && !(await registrarPeriodico())) msg = 'Não foi possível ativar os avisos com o app fechado. Os avisos com o app aberto continuam.';
   }
+  async function desativarNotif() { app.cfg.notificacoes = false; salvar(); await cancelarPeriodico(); }
   async function resetar() { if (confirm('Voltar as datas, horários e metas para o padrão? Seu histórico de estudo é mantido.')) { await restaurarSeed(); msg = 'Padrão restaurado.'; } }
   const setPref = (k, v) => { app.cfg.prefs = { ...pf(), [k]: v }; salvar(); if (k === 'vibracao' && v) vibrar(pf(), 'ok'); if (k === 'sons' && v) sino(); };
   const OPCOES = {
@@ -227,11 +229,20 @@
   <button class="sec" onclick={addAula}>＋ Adicionar compromisso</button>
 </section>
 
+<h2>Modo Sargento</h2>
+<section class="card bloco">
+  <div class="tg"><span><strong>Modo Sargento</strong><span class="muted">Frases secas de instrutor, cobrança nas notificações e o placar contra o concorrente na Hoje. Desligado, volta o tom padrão.</span></span>
+    <button role="switch" aria-checked={app.cfg.tom !== 'padrao'} aria-label="Modo Sargento" class="sw" class:on={app.cfg.tom !== 'padrao'} onclick={() => { app.cfg.tom = app.cfg.tom === 'padrao' ? 'sargento' : 'padrao'; salvar(); }}><i></i></button></div>
+</section>
+
 <h2>Notificações</h2>
 <section class="card bloco">
   {#if notif === 'unsupported'}<p class="muted">Este navegador não oferece notificações. Use o arquivo .ics.</p>
-  {:else if app.cfg.notificacoes && notif === 'granted'}<p>Ativadas: avisos de inscrição (14, 7 e 1 dia) e de revisões, ao abrir o app.</p><button class="sec" onclick={() => { app.cfg.notificacoes = false; salvar(); }}>Desativar</button>
-  {:else}<p class="muted">Funcionam quando você abre o app. Para avisos garantidos, importe o .ics na Google Agenda.</p><button class="pri" onclick={ativarNotif}>Ativar notificações</button>{/if}
+  {:else if app.cfg.notificacoes && notif === 'granted'}<p>Ativadas: avisos de inscrição (14, 7 e 1 dia) e de revisões, ao abrir o app.</p>
+    {#if periodicoSuportado()}<p class="muted">Cobrança com o app fechado ativa. O Chrome decide quando acorda o app (normalmente 1 a 2 vezes por dia) e ele precisa estar instalado.</p>
+    {:else}<p class="muted">Seu navegador não permite avisos com o app fechado. Os avisos com o app aberto continuam.</p>{/if}
+    <button class="sec" onclick={desativarNotif}>Desativar</button>
+  {:else}<p class="muted">Funcionam quando você abre o app. Para avisos garantidos, importe o .ics na Google Agenda.</p>{#if !periodicoSuportado()}<p class="muted">Seu navegador não permite avisos com o app fechado.</p>{:else}<p class="muted">Com o app instalado, o Chrome decide quando acorda o app para cobrar (normalmente 1 a 2 vezes por dia).</p>{/if}<button class="pri" onclick={ativarNotif}>Ativar notificações</button>{/if}
 </section>
 
 <h2>Backup e agenda</h2>

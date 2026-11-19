@@ -27,6 +27,7 @@
   import Esquadrilha from '../components/Esquadrilha.svelte';
   import Emblema from '../components/Emblema.svelte';
   import { fraseDoDia } from '../lib/frases.js';
+  import { placar, textoSaldo } from '../lib/avisos.js';
   import Sono from '../components/Sono.svelte';
   import { horariosNoite, estadoDoDia, alertaSono, noiteDe } from '../lib/sono.js';
   import { presencaPorAula, aulasDoDia } from '../lib/rotina.js';
@@ -112,7 +113,11 @@
   const mostrarCarta = $derived(verCarta || (app.cfg.carta && (dificil || (hora >= 19 && pct < 0.3))));
   // Frase por contexto (noite, dia cumprido, dia mínimo, bloco feito, prova próxima, domingo, início), estável ao longo do dia.
   const feitos = $derived(blocos.filter((b) => app.done[b.id]).length);
-  const frase = $derived(fraseDoDia(app.cfg.frases, { hora, pct, feitos, dificil, diaSemana: new Date(app.dia + 'T12:00').getDay(), diasProva: prox?.dias ?? null }, app.dia) || 'Disciplina hoje, farda amanhã.');
+  const frase = $derived(fraseDoDia(app.cfg.frases, { hora, pct, feitos, dificil, diaSemana: new Date(app.dia + 'T12:00').getDay(), diasProva: prox?.dias ?? null }, app.dia, app.cfg.tom ?? 'sargento') || 'Disciplina hoje, farda amanhã.');
+
+  // Placar contra o concorrente (modo Sargento): ele cumpre 100% da meta todo dia; saldo = feito - meta.
+  const sargento = $derived(app.cfg.tom !== 'padrao');
+  const pl = $derived(placar(semana.map((plan, i) => ({ dia: addDays(startOfWeek(app.dia), i), meta: plan.reduce((s, b) => s + b.min, 0), feito: plan.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) })), app.dia));
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
@@ -167,6 +172,17 @@
   <p class="luzes seq">Sequência: <strong>{seq}</strong> {seq === 1 ? 'dia' : 'dias'} com estudo, treino e oração</p>
   <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
 </section>
+
+{#if sargento && pl.dia.meta}
+  <section class="card placar" aria-label="Placar contra o concorrente">
+    <p class="data">Placar · você × concorrente</p>
+    <div class="pl">
+      <div><strong class:atras={pl.dia.saldo < 0}>{textoSaldo(pl.dia.saldo)}</strong><span>no dia · {fmtMin(pl.dia.feito)} de {fmtMin(pl.dia.meta)}</span></div>
+      <div><strong class:atras={pl.semana.saldo < 0}>{textoSaldo(pl.semana.saldo)}</strong><span>na semana · {fmtMin(pl.semana.feito)} de {fmtMin(pl.semana.meta)}</span></div>
+    </div>
+    <p class="sub">O concorrente cumpre 100% da meta todo dia.</p>
+  </section>
+{/if}
 
 {#if capitulo}
   <section class="card cap entra" aria-label="Campanha concluída">
@@ -432,6 +448,13 @@
   .mini-foto { width: 44px; height: 44px; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
   .mini-foto img { width: 100%; height: 100%; object-fit: cover; }
   .foto { display: block; width: calc(100% - 46px); margin: 0 0 12px 46px; border-radius: 12px; }
+  .placar { margin-top: 16px; padding: 14px 16px; }
+  .pl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+  .pl div { display: grid; gap: 2px; }
+  .pl strong { font-size: 1.25rem; color: var(--ac); }
+  .pl strong.atras { color: var(--al); }
+  .pl span { font-size: .8125rem; color: var(--tx2); }
+  .placar .sub { margin: 8px 0 0; font-size: .8125rem; color: var(--tx2); }
   .foco-sem { margin-top: 12px; padding: 4px 0 4px 14px; border-left: 2px solid var(--ac); display: grid; gap: 2px; font-weight: 600; }
   .lembrete { display: flex; gap: 8px; justify-content: center; align-items: center; color: var(--tx2); font-size: .85rem; margin: 24px 0 0; text-align: center; }
 </style>

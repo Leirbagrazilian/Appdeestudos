@@ -1,6 +1,6 @@
 import seed from '../data/seed.json';
 import * as db from '../lib/db.js';
-import { today } from '../lib/dates.js';
+import { today, addDays } from '../lib/dates.js';
 import { gerarFases } from '../lib/phases.js';
 import { agendarRevisoes, avaliar } from '../lib/spaced.js';
 import { verificar } from '../lib/notify.js';
@@ -18,8 +18,11 @@ import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 import { planoPrazos, dividasAtuais, contarBlocos, temPrazo, chave as chavePrazo } from '../lib/prazos.js';
-import { horasEntre, noiteDe, validarNoite } from '../lib/sono.js';
-import { agendarTelas } from '../lib/notify.js';
+import { horasEntre, noiteDe, validarNoite, horariosNoite, acordarDe } from '../lib/sono.js';
+import { blocosAjustados } from '../lib/planner.js';
+import { diaLivre } from '../lib/rotina.js';
+import { resumoDoDia } from '../lib/avisos.js';
+import { agendarTelas, registrarPeriodico } from '../lib/notify.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
 const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { base: 1, dias: {}, proxima: 1 }, sono: {}, sonoNoites: {}, presenca: {}, dividas: {} };
@@ -61,9 +64,11 @@ export async function iniciar() {
   verificar(app.cfg, app.reviews, app.dia);
   agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono });
   await sincronizarDividas();
+  gravarResumo();
+  if (app.cfg.notificacoes) registrarPeriodico();
   app.pronto = true;
   // atualiza o "hoje" se o app ficar aberto na virada do dia
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { app.dia = today(); sincronizarDividas(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono }); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { app.dia = today(); sincronizarDividas(); agendarResumo(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono }); } });
 }
 
 /** Notas (lacunas), estado do domínio e blocos feitos: o que era de tópico antigo vale também no tópico novo; o antigo não é apagado. */
@@ -73,8 +78,25 @@ async function migrarEstadosAntigos() {
   const mud = migrarDone(app.done, app.cfg.topicos);
   for (const [id, v] of Object.entries(mud)) { app.done[id] = v; await db.put('done', id, snap(v)); }
 }
-export async function salvarCfg() { aplicarPrefs(pf()); await db.put('kv', 'config', snap(app.cfg)); }
-export const salvarKV = (k) => db.put('kv', k, snap(app[k]));
+export async function salvarCfg() { aplicarPrefs(pf()); await db.put('kv', 'config', snap(app.cfg)); agendarResumo(); }
+const MEXE_NO_RESUMO = ['adiados', 'dificeis', 'sono', 'sonoNoites'];
+export const salvarKV = (k) => { if (MEXE_NO_RESUMO.includes(k)) agendarResumo(); return db.put('kv', k, snap(app[k])); };
+
+// ---------- resumo para os avisos com o app fechado ----------
+/** Grava em kv 'resumoAvisos' o plano dos próximos 4 dias (blocos, dormir/acordar, meta): é o que o service worker lê. */
+export async function gravarResumo() {
+  try {
+    const fs = fases(), planos = new Map(), ctx = { noites: app.sonoNoites, sono: app.sono }, dias = {};
+    for (let i = 0; i < 4; i++) {
+      const d = addDays(app.dia, i), livre = diaLivre(app.cfg, d);
+      const blocos = livre ? [] : blocosAjustados(app.cfg, fs, d, { ...ajustes(), planos });
+      dias[d] = resumoDoDia({ dia: d, blocos, dormir: horariosNoite(app.cfg, d, ctx).dormir, acordar: acordarDe(app.cfg, d, ctx), livre });
+    }
+    await db.put('kv', 'resumoAvisos', { gerado: Date.now(), ativo: !!app.cfg.notificacoes, tom: app.cfg.tom ?? 'sargento', dias });
+  } catch {}
+}
+let timerResumo;
+export function agendarResumo() { clearTimeout(timerResumo); timerResumo = setTimeout(gravarResumo, 300); }
 
 let timerToast;
 const ELOGIOS = ['Mais um bloco cumprido.', 'A base está mais segura.', 'Missão cumprida, Gabriel.', 'Constância é o seu superpoder.', 'Assim se constrói uma aprovação.', 'Um passo mais perto da farda.', 'Bom trabalho. Respire e siga.', 'Uma luz a mais acesa na base.'];
@@ -93,6 +115,7 @@ async function registrar(b, extra = {}) {
   if (reg.assunto) for (const r of agendarRevisoes({ origem: b.id, assunto: reg.assunto, materia: b.materia, dia: app.dia })) {
     app.reviews[r.id] = r; await db.put('reviews', r.id, r);
   }
+  agendarResumo();
   comemorar();
   avisar(`${b.titulo} concluído`, () => desmarcar(b.id), undefined, REGISTRAVEL.includes(b.cat) ? { rotulo: 'Registrar', fn: () => { app.toast = null; app.registroAberto = { id: b.id }; } } : null);
   checarConquistas();
@@ -107,7 +130,7 @@ export async function alternarBloco(b, assunto = '', tarefa = null) {
 }
 
 export async function desmarcar(id) {
-  delete app.done[id]; await db.del('done', id);
+  delete app.done[id]; await db.del('done', id); agendarResumo();
   for (const k of Object.keys(app.reviews)) if (app.reviews[k].origem === id) { delete app.reviews[k]; await db.del('reviews', k); }
   app.toast = null;
 }
@@ -488,7 +511,7 @@ export async function importar(d) {
   if (antes < 12) await migrarEstadosAntigos();
 }
 export async function restaurarSeed() {
-  const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema,
+  const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema, tom: app.cfg.tom,
     questoesLinks: app.cfg.questoesLinks, biblioteca: app.cfg.biblioteca, cotasGratis: app.cfg.cotasGratis };
   app.cfg = { ...structuredClone(seed), ...manter }; await salvarCfg();
 }

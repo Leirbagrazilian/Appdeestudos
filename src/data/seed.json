@@ -2512,7 +2512,7 @@
       }
     ]
   },
-  "versaoSeed": 12,
+  "versaoSeed": 13,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -2598,7 +2598,60 @@
       "Dia vencido. Sua mãe ainda vai contar essa história com orgulho.",
       "Dever cumprido. Poucos fazem o que você fez hoje.",
       "Tudo feito. Recolher, descansar e voltar amanhã."
-    ]
+    ],
+    "sargento": {
+      "inicio": [
+        "Dia começou. Primeiro bloco agora.",
+        "O concorrente já abriu o caderno. Abre o seu.",
+        "Sem negociar com a cama. Mesa, agora.",
+        "Plano está pronto. Falta você.",
+        "Não pensa. Começa.",
+        "Cada minuto parado é do concorrente."
+      ],
+      "bloco": [
+        "Bloco feito. Não comemora. Próximo.",
+        "Um bloco não é um dia. Segue.",
+        "Feito. O concorrente já está no próximo.",
+        "Registrou, acabou. Próximo bloco.",
+        "Ritmo. Não desacelera agora.",
+        "Bom. Agora repete."
+      ],
+      "cumprido": [
+        "Meta batida. Amanhã é igual.",
+        "Cumpriu. Era o mínimo. Descansa e volta no horário.",
+        "Dia fechado. Dorme direito, que amanhã tem mais.",
+        "Missão do dia concluída. Sem exagero, sem folga.",
+        "Igualou o concorrente hoje. Amanhã, passa dele."
+      ],
+      "dificil": [
+        "Dia ruim existe. Dia mínimo é obrigatório.",
+        "Sem energia? Faz o mínimo. Zero não é opção.",
+        "45 minutos de questões. Sem desculpa, sem drama.",
+        "Cansado também estuda. Só menos. Mas estuda.",
+        "O mínimo de hoje protege a sequência de amanhã."
+      ],
+      "prova": [
+        "Prova perto. Cada erro de hoje é um ponto a menos lá.",
+        "Contagem regressiva rodando. Sem folga.",
+        "Na prova ninguém pergunta como você se sentia. Treina.",
+        "Falta pouco. Revisa o que errou e cala a dúvida.",
+        "Questão errada hoje, acerto na prova. Confere o caderno."
+      ],
+      "domingo": [
+        "Domingo também conta. Longão e revisão da semana.",
+        "Fecha a semana: revisa, ajusta, prepara a próxima.",
+        "Descanso é o que sobra depois do dever. Cumpre primeiro.",
+        "O concorrente não tem domingo. Faz o plano.",
+        "Revisão da semana. Olha os números sem enfeitar."
+      ],
+      "noite": [
+        "Noite. Fecha o dia e desliga a tela no horário.",
+        "Sono é parte do treino. Deita no horário.",
+        "Revisão feita? Então apaga a luz.",
+        "Amanhã cedo, sem desculpa. Dorme agora.",
+        "O dia acabou. O que ficou para trás entra amanhã."
+      ]
+    }
   },
   "materiasInfo": {
     "Matemática": {
@@ -5853,5 +5906,6 @@
     },
     "minimoH": 6,
     "normalH": 7
-  }
+  },
+  "tom": "sargento"
 }

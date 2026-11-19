@@ -281,7 +281,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(8);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(12);
+    expect(novo.versaoSeed).toBe(13);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 8 fases seguem a ordem e o ENEM vai do fim das discursivas até a prova', () => {
@@ -701,7 +701,7 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(12); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(13); expect(novo.ritmos.teoria).toBe(10);
   });
 });
 
