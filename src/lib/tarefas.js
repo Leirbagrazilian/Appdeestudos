@@ -1,11 +1,12 @@
 // Bloco = tarefa exata: vídeo -> páginas do livro -> exercícios -> questões do tópico.
 // O app não guarda questões: cada tópico tem links (colados por você) para listas em sites grátis.
-import { proximoTopico } from './trilha.js';
+import { proximoTopico, topicosDe } from './trilha.js';
+import { temPrazo, escolherTopico, contarBlocos, resgateDoSabado, BLOCO_MIN, chave as chaveT, pesoDe } from './prazos.js';
 import { resumo as resumoDominio, MIN_FEITAS, MAX_TENTATIVAS } from './dominio.js';
 import { recursoPorId, recursosAtivos, vinculosDoTopico, temPaginas, ritmoDe, ritmoQuestoes, cotaPaginas, proximaPagina } from './livros.js';
 
 export const ESTUDO = ['mat', 'fis', 'qui', 'por', 'ing', 'hg'];
-export const REGISTRAVEL = [...ESTUDO, 'minimo']; // blocos que abrem o registro de resultado
+export const REGISTRAVEL = [...ESTUDO, 'minimo', 'resg']; // blocos que abrem o registro de resultado
 export const QUESTOES_DIA_MINIMO = 20;
 export const CAMPOS_LINK = ['video', 'khan', 'obmep', 'qconcursos', 'estuda', 'pdf', 'outro'];
 const SITES_COTA = ['qconcursos', 'estuda'];
@@ -34,14 +35,16 @@ export const aplicarCota = (cotasDia, deltas) => {
 };
 
 /** Divide os minutos do bloco entre vídeo, teoria (páginas e exercícios) e questões, só entre o que existe. */
-export function divisaoBloco(cfg, minutos, { video, paginas }, faseId = null) {
-  const peso = (faseId === 'zero' ? cfg.divisaoBlocoZero : null) ?? cfg.divisaoBloco ?? { video: 25, teoria: 45, questoes: 30 };
+export function divisaoBloco(cfg, minutos, { video, paginas }, faseId = null, matar = false) {
+  // MATAR HOJE: sem aula nova (fecha a teoria e faz questões até 8 de 10)
+  const peso = matar ? { video: 0, teoria: 25, questoes: 75 } : (faseId === 'zero' ? cfg.divisaoBlocoZero : null) ?? cfg.divisaoBloco ?? { video: 25, teoria: 45, questoes: 30 };
   const p = { video: video ? peso.video : 0, teoria: paginas ? peso.teoria : 0, questoes: peso.questoes };
   const soma = p.video + p.teoria + p.questoes;
   const r5 = (x) => Math.round(x / 5) * 5;
   const v = r5((minutos * p.video) / soma), t = r5((minutos * p.teoria) / soma);
   // vídeo curto: no máximo 20 min na Fase 0
   const vv = faseId === 'zero' ? Math.min(v, 20) : v;
+  if (matar) return { video: 0, teoria: t, questoes: Math.max(0, minutos - t) };
   return { video: vv, teoria: t, questoes: Math.max(0, minutos - vv - t) };
 }
 
@@ -107,18 +110,37 @@ const rotuloLivro = (r, v) => `${r.titulo}${r.volume ? ` v.${r.volume}` : ''}${v
  * ctx = { lacunas, leitura, done, cotasDia, faseId, dominio }
  */
 export function tarefasDoDia(cfg, blocos, ctx = {}) {
-  const out = {}, virt = {}, esgotados = {};
+  const out = {}, virt = {}, esgotados = {}, virtP = {};
   const lim = ctx.faseId, zero = lim === 'zero';
-  const acertos = zero ? acertoPorTopico(ctx.done) : {};
+  const acertos = zero || ctx.plano ? acertoPorTopico(ctx.done) : {};
+  const feitos = ctx.plano ? contarBlocos(ctx.done) : {};
+  const stP = (ex) => ({ lacunas: ctx.lacunas ?? {}, feitos, dividas: ctx.dividas ?? {}, virt: virtP, excluir: ex, faseId: lim, acertos, dominio: ctx.dominio ?? {} });
   for (const b of blocos) {
     if (!REGISTRAVEL.includes(b.cat) || b.diagnostico || ctx.done?.[b.id]) continue;
-    const materia = b.materia;
+    let materia = b.materia, info = null, t;
+    // Resgate do sábado: o 1º tópico não matado da semana; sem pendência, prova antiga ou questões
+    if (b.cat === 'resg') {
+      const lista = ctx.plano ? resgateDoSabado(ctx.plano, stP(new Set()), ctx.dia ?? '') : [];
+      if (!lista.length) { out[b.id] = { resgateLivre: true, materia: b.materia, min: b.min, topicosResgate: [] }; continue; }
+      const i = lista[0];
+      materia = i.materia;
+      info = { item: i, k: i.blocos, de: i.blocos, matar: true, prazo: i.prazo, atrasado: true, resgate: true, lista: lista.map((x) => ({ materia: x.materia, nome: x.nome })) };
+      t = topicosDe(cfg, materia).find((x) => x.nome === i.nome) ?? null;
+    }
     const ex = (esgotados[materia] ??= new Set());
     const opts = { faseZero: zero, dominio: ctx.dominio ?? {}, acertos };
-    // Fase 0: blocos ainda não feitos do mesmo dia seguem para o tópico seguinte; se o resultado do anterior for ruim, ele volta a ser o próximo
-    const t = proximoTopico(cfg, ctx.lacunas ?? {}, materia, zero ? 1 : 3, ex, opts) ?? (zero ? proximoTopico(cfg, ctx.lacunas ?? {}, materia, 1, new Set(), opts) : null);
+    if (!info) {
+      if (ctx.plano && temPrazo(materia)) {
+        info = escolherTopico(cfg, ctx.plano, materia, stP(ex), ctx.dia ?? '');
+        t = info ? topicosDe(cfg, materia).find((x) => x.nome === info.item.nome) ?? null : null;
+      } else {
+        // Fase 0: blocos ainda não feitos do mesmo dia seguem para o tópico seguinte; se o resultado do anterior for ruim, ele volta a ser o próximo
+        t = proximoTopico(cfg, ctx.lacunas ?? {}, materia, zero ? 1 : 3, ex, opts) ?? (zero ? proximoTopico(cfg, ctx.lacunas ?? {}, materia, 1, new Set(), opts) : null);
+      }
+    }
     if (!t) { out[b.id] = { semTopico: true, materia }; continue; }
-    if (zero && b.cat !== 'minimo') ex.add(t.nome);
+    if (info && b.cat !== 'resg') { if (b.cat !== 'minimo') { virtP[chaveT(materia, t.nome)] = (virtP[chaveT(materia, t.nome)] ?? 0) + b.min / BLOCO_MIN; if (info.matar) ex.add(t.nome); } } // bloco seguinte do dia: mesmo tópico (ou, se este fecha hoje, o próximo)
+    else if (zero && b.cat !== 'minimo') ex.add(t.nome);
     if (b.cat === 'minimo') {
       // Dia mínimo: só questões (20 em 45 min) do próximo tópico; as revisões vencidas ficam na lista de revisões
       const fontes = fontesQuestoes(cfg, materia, t.nome, ctx.cotasDia ?? {}, lim);
@@ -135,7 +157,8 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
     const concluidoLivro = !!v && !vivo(v) && vincs.filter(temPaginas).every((x) => !vivo(x));
     const video = videoDe(cfg, materia, t.nome);
     const usaPaginas = !!v && vivo(v);
-    const div = divisaoBloco(cfg, b.min, { video, paginas: usaPaginas }, lim);
+    const matar = !!info?.matar;
+    const div = divisaoBloco(cfg, b.min, { video, paginas: usaPaginas }, lim, matar);
 
     let paginas = null, exercicios = null;
     if (usaPaginas) {
@@ -150,7 +173,7 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
         if (c.restante === 0 && vincs.filter(temPaginas).every((x) => (virt[x.id] ?? proximaPagina(x, ctx.leitura?.[x.id])) > +x.pagFim)) ex.add(t.nome);
       }
     }
-    const nQ = Math.max(zero ? MIN_FEITAS : 1, Math.round((ritmoQuestoes(cfg, lim) * div.questoes) / 60)); // Fase 0: no mínimo 10 para valer 8 em 10
+    const nQ = Math.max(zero || matar ? MIN_FEITAS : 1, Math.round((ritmoQuestoes(cfg, lim) * div.questoes) / 60)); // Fase 0: no mínimo 10 para valer 8 em 10
     const fontes = fontesQuestoes(cfg, materia, t.nome, ctx.cotasDia ?? {}, lim);
     // a cota grátis (QConcursos + Estuda.com) acabou quando todos os sites COM cota que você usa estão esgotados
     const comCota = fontes.filter((f) => f.limite != null);
@@ -161,7 +184,9 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
       paginas, exercicios, concluidoLivro,
       temLivro: recursosAtivos(cfg, materia).some((r) => r.tipo === 'livro'),
       semPaginas: !usaPaginas && !concluidoLivro,
-      zero, ...(zero ? dominioDoTopico(ctx.dominio, materia, t.nome) : {}),
+      zero, ...(zero || info ? dominioDoTopico(ctx.dominio, materia, t.nome) : {}),
+      // prazo do tópico (Matemática, Física e Química): bloco k de n; no último, MATAR HOJE
+      ...(info ? { matar, prazo: { k: info.k, de: info.de, data: info.prazo, atrasado: !!info.atrasado, codigo: info.item.codigo, peso: info.item.peso, aviso: info.item.aviso, pagandoDivida: !!info.pagandoDivida, reforco: !!info.reforco, resgate: !!info.resgate, lista: info.lista ?? null } } : {}),
       vinculoId: v?.id ?? null,
       questoes: {
         n: nQ, min: div.questoes, fontes, buscas: buscasExercicios(zero, fontes, materia, t.nome),

@@ -62,16 +62,16 @@ describe('integridade do seed: links e ids', () => {
 });
 
 describe('busca automática por tópico', () => {
-  it('todo tópico da Fase 0 de Matemática, Física e Química ganha buscas válidas (YouTube e Khan)', () => {
+  it('todo tópico de Matemática, Física e Química ganha buscas válidas (YouTube e Khan)', () => {
     let n = 0;
-    for (const m of MATERIAS_BUSCA) for (const t of seed.topicos[m].filter((x) => x.fase === 0)) {
+    for (const m of MATERIAS_BUSCA) for (const t of seed.topicos[m]) { // todos os tópicos (Fase 0 e Anos 1 a 3)
       const b = buscasDoTopico(m, t.nome); n++;
       expect(b.video.length).toBeGreaterThan(0); expect(b.exercicios.length).toBeGreaterThan(0);
       for (const f of [...b.video, ...b.exercicios]) { expect(urlOk(f.url), f.url).toBe(true); expect(f.auto).toBe(true); expect(f.rotulo).toBeTruthy(); }
       expect(b.video[0].url.startsWith('https://www.youtube.com/results?search_query=')).toBe(true);
       expect(b.exercicios[0].url.startsWith('https://pt.khanacademy.org/search?page_search_query=')).toBe(true);
     }
-    expect(n).toBeGreaterThan(100);
+    expect(n).toBeGreaterThan(180);
   });
   it('a consulta leva o nome do tópico, codificada (acentos, dois-pontos, sinais)', () => {
     expect(urlYouTube('Frações: soma  e subtração')).toBe('https://www.youtube.com/results?search_query=Fra%C3%A7%C3%B5es%3A+soma+e+subtra%C3%A7%C3%A3o');

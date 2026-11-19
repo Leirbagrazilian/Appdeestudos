@@ -3,11 +3,16 @@
     "nome": "Gabriel",
     "nascimento": "2005-11-25",
     "inicioPlano": "2026-11-10",
-    "semanasEspecifica": 7,
     "inicioZero": "2026-11-16",
     "fimZero": "2027-01-10",
     "extraZero": 0,
-    "inicioFase2": "2027-05-01"
+    "ano1Fim": "2027-03-14",
+    "ano2Fim": "2027-06-13",
+    "ano3Fim": "2027-08-22",
+    "itaInicio": "2027-08-30",
+    "itaFim": "2027-09-26",
+    "discFim": "2027-10-22",
+    "portaoEm": null
   },
   "concursos": [
     {
@@ -180,127 +185,75 @@
         "dia": 1,
         "inicio": "07:30",
         "fim": "11:10",
-        "nome": "Faculdade"
+        "nome": "Faculdade seg",
+        "tipo": "faculdade",
+        "vou": false
       },
       {
         "dia": 3,
         "inicio": "09:00",
         "fim": "11:00",
-        "nome": "Faculdade"
+        "nome": "Faculdade qua",
+        "tipo": "faculdade",
+        "vou": false
       },
       {
         "dia": 4,
         "inicio": "13:30",
         "fim": "17:00",
-        "nome": "Faculdade"
-      },
-      {
-        "dia": 2,
-        "inicio": "15:00",
-        "fim": "16:00",
-        "nome": "Academia"
+        "nome": "Faculdade qui",
+        "tipo": "faculdade",
+        "vou": false
       },
       {
         "dia": 2,
         "inicio": "18:30",
         "fim": "20:00",
-        "nome": "Jiu-jitsu"
+        "nome": "Jiu-jitsu",
+        "tipo": "fixo"
       }
     ],
-    "janelas": {
-      "1": [
-        {
-          "ini": "06:40",
-          "fim": "07:10"
-        },
-        {
-          "ini": "12:30",
-          "fim": "18:30"
-        },
-        {
-          "ini": "20:00",
-          "fim": "21:00"
-        }
-      ],
-      "2": [
-        {
-          "ini": "07:00",
-          "fim": "12:00"
-        },
-        {
-          "ini": "13:00",
-          "fim": "15:00"
-        },
-        {
-          "ini": "16:00",
-          "fim": "18:00"
-        }
-      ],
-      "3": [
-        {
-          "ini": "06:30",
-          "fim": "08:30"
-        },
-        {
-          "ini": "12:00",
-          "fim": "18:00"
-        },
-        {
-          "ini": "19:00",
-          "fim": "20:00"
-        }
-      ],
-      "4": [
-        {
-          "ini": "06:30",
-          "fim": "12:30"
-        },
-        {
-          "ini": "18:00",
-          "fim": "20:00"
-        }
-      ],
-      "5": [
-        {
-          "ini": "08:00",
-          "fim": "12:00"
-        },
-        {
-          "ini": "13:00",
-          "fim": "17:00"
-        }
-      ],
-      "6": [
-        {
-          "ini": "08:00",
-          "fim": "14:00",
-          "tipo": "prova"
-        },
-        {
-          "ini": "15:00",
-          "fim": "18:00"
-        }
-      ],
-      "0": [
-        {
-          "ini": "08:00",
-          "fim": "12:00"
-        },
-        {
-          "ini": "13:00",
-          "fim": "17:00",
-          "tipo": "domingo"
-        }
-      ]
+    "inicioEstudo": "06:30",
+    "fimEstudo": "21:00",
+    "refeicoes": [
+      {
+        "ini": "12:00",
+        "fim": "13:00"
+      },
+      {
+        "ini": "18:00",
+        "fim": "19:00"
+      }
+    ],
+    "domingo": {
+      "ini": "15:00",
+      "fim": "17:00"
     },
-    "metaNominal": 43,
-    "metaLiquida": 43,
+    "metaLiquida": 56,
+    "metaDia": {
+      "1": 9.6,
+      "2": 8,
+      "3": 9.6,
+      "4": 9.6,
+      "5": 9.6,
+      "6": 8,
+      "0": 2
+    },
+    "diaRedacao": 3,
+    "provaSabadoMin": 240,
+    "diasLivres": [
+      "12-24",
+      "12-25",
+      "12-31",
+      "01-01"
+    ],
+    "presencaMin": 75,
     "rampa": {
       "ativa": false,
       "semanas": 2,
       "fator": 0.75
     },
-    "pesoFimDeSemana": 1.3
+    "resgateSabadoMin": 120
   },
   "metodos": {
     "recuperacao": "Prática de recuperação: faça as questões sem consultar nada. Tentar lembrar fixa mais do que reler.",
@@ -310,43 +263,57 @@
     "diagnostico": "Diagnóstico: o objetivo é descobrir o que falta, não tirar nota. Errar aqui é informação útil."
   },
   "provaSabado": {
-    "zero": "Sem prova antiga: só exercícios do tópico (a prova entra a partir da fase das inscrições)",
-    "base": "Sem prova antiga: exercícios e questões por tópico (a prova entra a partir da fase das inscrições)",
-    "efomm": "Prova antiga da EFOMM ou da ESA, alternando (uma por semana)",
-    "en": "Prova antiga da Escola Naval (CPAEN), uma por semana",
-    "ita": "Prova antiga do ITA (1ª fase) e questões discursivas",
+    "zero": "Sem prova antiga: só exercícios do tópico (a prova entra depois do portão)",
+    "ano1": "Sem prova antiga: exercícios e questões por tópico",
+    "ano2": "Prova antiga da EFOMM (junho)",
+    "ano3": "Prova antiga da EFOMM",
+    "junJul": "Prova antiga da EFOMM",
+    "ago": "Prova antiga da Escola Naval (CPAEN)",
+    "leve": "Revisão leve: sem prova nova",
+    "ita": "Prova antiga do ITA (1ª fase)",
+    "disc": "Questões discursivas do ITA (2ª fase)",
     "enem": "Prova antiga do ENEM (dia 1 e dia 2)"
   },
   "fases": {
     "zero": {
       "nome": "Base do zero",
       "numero": 0,
-      "foco": "Matemática, Física e Química do fundamental, do zero. Cada tópico só avança com 8 acertos em 10. Nada de prova antiga ou simulado agora: só exercícios."
+      "foco": "Matemática, Física e Química do fundamental, do zero. Cada tópico tem prazo e só fecha com 8 acertos em 10. Fase 0 dura até o portão (Khan 9º ano ≥ 80% e melhora no checkpoint EFOMM)."
     },
-    "base": {
-      "nome": "Ensino médio",
+    "ano1": {
+      "nome": "Ano 1",
       "numero": 1,
-      "foco": "Conteúdo do ensino médio com exercícios nível ENEM e depois ESA. Ainda sem simulado semanal."
+      "foco": "Conteúdo novo do 1º ano do plano (11/01 a 14/03), em ordem, com prazo por tópico. Redação 1 vez por semana."
     },
-    "efomm": {
-      "nome": "Específica EFOMM + ESA",
+    "ano2": {
+      "nome": "Ano 2",
       "numero": 2,
-      "foco": "Provas antigas da EFOMM e da ESA, uma por semana. Em caso de conflito de datas, a EFOMM tem prioridade."
+      "foco": "Conteúdo novo do 2º ano do plano (15/03 a 13/06). Sábados de junho: prova antiga da EFOMM."
     },
-    "en": {
-      "nome": "Específica Escola Naval",
+    "ano3": {
+      "nome": "Ano 3 + cálculo EN",
       "numero": 3,
-      "foco": "Provas antigas e redação no estilo da Escola Naval."
+      "foco": "Último conteúdo novo e cálculo da Escola Naval (14/06 a 22/08). Sábados: prova antiga da EFOMM (jun–jul) e da Escola Naval (agosto)."
+    },
+    "leve": {
+      "nome": "Semana leve · Escola Naval",
+      "numero": 4,
+      "foco": "23 a 29/08: sem conteúdo novo, revisão leve e sono em dia para a prova da Escola Naval."
     },
     "ita": {
-      "nome": "Reta final ITA",
-      "numero": 4,
-      "foco": "Química, discursivas do ITA, redação e provas antigas."
+      "nome": "Reta final ITA 1ª fase",
+      "numero": 5,
+      "foco": "30/08 a 26/09: provas antigas do ITA e caderno de erros."
+    },
+    "disc": {
+      "nome": "Discursivas ITA",
+      "numero": 6,
+      "foco": "Até cerca de 22/10: questões discursivas da 2ª fase."
     },
     "enem": {
-      "nome": "ENEM (provas antigas)",
-      "numero": 5,
-      "foco": "Só provas antigas do ENEM: rede de segurança para o SISU."
+      "nome": "ENEM (plano B)",
+      "numero": 7,
+      "foco": "Provas antigas do ENEM: rede de segurança."
     }
   },
   "diagnostico": {
@@ -754,907 +721,1655 @@
   "topicos": {
     "Matemática": [
       {
-        "nome": "Números inteiros: adição e subtração",
+        "codigo": "TN01",
+        "nome": "Divisibilidade, MMC e MDC",
+        "ano": 0,
         "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Números inteiros: multiplicação e divisão",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Divisibilidade e números primos",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Fatoração em números primos",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "MMC",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "MDC",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Problemas com MMC e MDC",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Frações: conceito e frações equivalentes",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Frações: simplificação e comparação",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Frações: soma e subtração com denominadores diferentes",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Frações: multiplicação e divisão",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Frações: problemas do dia a dia",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Revisão da semana: inteiros e frações",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Decimais: leitura e comparação",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Decimais: soma e subtração",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Decimais: multiplicação e divisão",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Fração e decimal: conversão e dízimas periódicas",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Potências: definição e propriedades",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Potências de base 10 e notação científica",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Potências com expoente negativo",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Raízes quadradas e cúbicas",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Raízes: propriedades e simplificação",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Expressões numéricas: ordem das operações",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Expressões numéricas com frações e potências",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Problemas com decimais e potências",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Revisão da semana: decimais, potências e raízes",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Razão e escala",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Proporção: propriedade fundamental",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Grandezas direta e inversamente proporcionais",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Regra de três simples direta",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Regra de três simples inversa",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Regra de três composta",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Porcentagem: conceito e cálculo",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Porcentagem: aumento e desconto",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Porcentagem: problemas",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Juros simples",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Divisão proporcional",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Problemas de razão e proporção",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Revisão da semana: proporção e porcentagem",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Expressões algébricas: valor numérico",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Monômios e polinômios: operações",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Equação do 1º grau: resolução",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Equação do 1º grau com frações",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Problemas que viram equação do 1º grau",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Equações literais: isolar a variável",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Inequação do 1º grau",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Problemas com inequações",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Problemas de idades e números",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Problemas de dinheiro, tempo e movimento",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Problemas variados do 1º grau",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Revisão da semana: álgebra básica",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Sistemas 2×2: substituição",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Sistemas 2×2: adição",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Problemas com sistemas",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Produtos notáveis: quadrado da soma e da diferença",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Produtos notáveis: produto da soma pela diferença",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Cubo da soma e da diferença",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Fatoração: fator comum e agrupamento",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Fatoração: diferença de quadrados",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Fatoração: trinômio quadrado perfeito",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Simplificação de expressões com fatoração",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Problemas variados de álgebra",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Revisão da semana: sistemas e fatoração",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Equação do 2º grau: incompleta",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Equação do 2º grau: fórmula de Bhaskara",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Discriminante e número de raízes",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Soma e produto das raízes",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Problemas com equação do 2º grau",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Equações redutíveis ao 2º grau",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Frações algébricas: simplificação",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Frações algébricas: soma e subtração",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Frações algébricas: multiplicação e divisão",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Equações fracionárias",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Problemas variados do 2º grau",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Revisão da semana: 2º grau e frações algébricas",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Ângulos: tipos e medidas",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Ângulos entre paralelas e transversal",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Triângulos: classificação e soma dos ângulos",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Teorema de Pitágoras",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Áreas: quadrado, retângulo e triângulo",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Áreas: paralelogramo, trapézio e losango",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Circunferência: comprimento e área do círculo",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Semelhança de triângulos",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Teorema de Tales",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Razões trigonométricas: seno, cosseno e tangente",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Ângulos notáveis: 30°, 45° e 60°",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Problemas de trigonometria no triângulo retângulo",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Revisão da semana: geometria básica",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Conjuntos, lógica e funções",
         "antigos": [
-          "Funções",
-          "Logaritmos e exponenciais"
+          "Divisibilidade e números primos",
+          "Fatoração em números primos",
+          "MMC",
+          "MDC",
+          "Problemas com MMC e MDC"
         ]
       },
       {
-        "nome": "Trigonometria",
+        "codigo": "MB01",
+        "nome": "Frações e equações",
+        "ano": 0,
+        "fase": 0,
+        "peso": 3,
         "antigos": [
-          "Trigonometria"
+          "Frações: conceito e frações equivalentes",
+          "Frações: simplificação e comparação",
+          "Frações: soma e subtração com denominadores diferentes",
+          "Frações: multiplicação e divisão",
+          "Frações: problemas do dia a dia",
+          "Equação do 1º grau: resolução",
+          "Equação do 1º grau com frações"
         ]
       },
       {
-        "nome": "PA, PG, matrizes e sistemas",
+        "codigo": "MB03",
+        "nome": "Potenciação e radiciação",
+        "ano": 0,
+        "fase": 0,
         "antigos": [
-          "PA e PG",
-          "Matrizes e sistemas"
+          "Potências: definição e propriedades",
+          "Potências de base 10 e notação científica",
+          "Potências com expoente negativo",
+          "Raízes quadradas e cúbicas",
+          "Raízes: propriedades e simplificação"
         ]
       },
       {
-        "nome": "Combinatória, probabilidade e estatística",
+        "codigo": "MB04",
+        "nome": "Razão e proporção",
+        "ano": 0,
+        "fase": 0,
         "antigos": [
-          "Análise combinatória",
-          "Probabilidade"
+          "Razão e escala",
+          "Proporção: propriedade fundamental",
+          "Grandezas direta e inversamente proporcionais",
+          "Regra de três simples direta",
+          "Regra de três simples inversa",
+          "Regra de três composta",
+          "Divisão proporcional",
+          "Problemas de razão e proporção"
         ]
       },
       {
-        "nome": "Geometria plana",
+        "codigo": "EF01",
+        "nome": "Porcentagem",
+        "ano": 0,
+        "fase": 0,
+        "antigos": [
+          "Porcentagem: conceito e cálculo",
+          "Porcentagem: aumento e desconto",
+          "Porcentagem: problemas"
+        ]
+      },
+      {
+        "codigo": "EF02",
+        "nome": "Juros",
+        "ano": 0,
+        "fase": 0,
+        "peso": 1,
+        "antigos": [
+          "Juros simples"
+        ]
+      },
+      {
+        "codigo": "MB02",
+        "nome": "Fatoração e manipulações algébricas",
+        "ano": 0,
+        "fase": 0,
+        "peso": 3,
+        "antigos": [
+          "Expressões algébricas: valor numérico",
+          "Produtos notáveis: quadrado da soma e da diferença",
+          "Produtos notáveis: produto da soma pela diferença",
+          "Cubo da soma e da diferença",
+          "Fatoração: fator comum e agrupamento",
+          "Fatoração: diferença de quadrados",
+          "Fatoração: trinômio quadrado perfeito",
+          "Simplificação de expressões com fatoração"
+        ]
+      },
+      {
+        "codigo": "GP01",
+        "nome": "Ângulos e conceitos iniciais",
+        "ano": 0,
+        "fase": 0,
+        "peso": 1,
+        "antigos": [
+          "Ângulos: tipos e medidas",
+          "Ângulos entre paralelas e transversal",
+          "Triângulos: classificação e soma dos ângulos"
+        ]
+      },
+      {
+        "codigo": "GP07",
+        "nome": "Triângulo retângulo",
+        "ano": 0,
+        "fase": 0,
+        "peso": 1,
+        "antigos": [
+          "Teorema de Pitágoras"
+        ]
+      },
+      {
+        "codigo": "GP02",
+        "nome": "Semelhança e Tales",
+        "ano": 0,
+        "fase": 0,
+        "antigos": [
+          "Semelhança de triângulos",
+          "Teorema de Tales"
+        ]
+      },
+      {
+        "codigo": "TG02",
+        "nome": "Trigonometria no triângulo retângulo",
+        "ano": 0,
+        "fase": 0,
+        "antigos": [
+          "Razões trigonométricas: seno, cosseno e tangente",
+          "Ângulos notáveis: 30°, 45° e 60°",
+          "Problemas de trigonometria no triângulo retângulo"
+        ]
+      },
+      {
+        "codigo": "CNJ01",
+        "nome": "Teoria de conjuntos",
+        "ano": 1,
+        "peso": 1,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "CNJ02",
+        "nome": "Conjuntos numéricos",
+        "ano": 1,
+        "peso": 1,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "BN01",
+        "nome": "Base de numeração",
+        "ano": 1,
+        "peso": 1
+      },
+      {
+        "codigo": "FX01",
+        "nome": "Função: definições",
+        "ano": 1,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "FX02",
+        "nome": "Afim",
+        "ano": 1,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "GP03",
+        "nome": "Polígonos",
+        "ano": 1,
         "antigos": [
           "Geometria plana"
         ]
       },
       {
-        "nome": "Geometria espacial",
+        "codigo": "GP04",
+        "nome": "Circunferência",
+        "ano": 1,
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "codigo": "TG01",
+        "nome": "Arcos e ângulos",
+        "ano": 1,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "FX03",
+        "nome": "Quadrática",
+        "ano": 1,
+        "peso": 3,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "FX06",
+        "nome": "Composta e inversa",
+        "ano": 1,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "SPG01",
+        "nome": "PA",
+        "ano": 1,
+        "antigos": [
+          "PA, PG, matrizes e sistemas"
+        ]
+      },
+      {
+        "codigo": "SPG02",
+        "nome": "PG",
+        "ano": 1,
+        "antigos": [
+          "PA, PG, matrizes e sistemas"
+        ]
+      },
+      {
+        "codigo": "EF03",
+        "nome": "Estatística",
+        "ano": 1,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "GP05",
+        "nome": "Quadriláteros",
+        "ano": 1,
+        "peso": 1,
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "codigo": "GA01",
+        "nome": "Pontos e coordenadas",
+        "ano": 1,
+        "peso": 1,
+        "antigos": [
+          "Analítica, vetores, cônicas e quádricas"
+        ]
+      },
+      {
+        "codigo": "GA02",
+        "nome": "Retas",
+        "ano": 1,
+        "antigos": [
+          "Analítica, vetores, cônicas e quádricas"
+        ]
+      },
+      {
+        "codigo": "TG03",
+        "nome": "Ciclo trigonométrico",
+        "ano": 1,
+        "peso": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "FX04",
+        "nome": "Modular",
+        "ano": 2,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "FX05",
+        "nome": "Outras funções clássicas",
+        "ano": 2,
+        "antigos": [
+          "Conjuntos, lógica e funções"
+        ]
+      },
+      {
+        "codigo": "LOG01",
+        "nome": "Exponencial",
+        "ano": 2
+      },
+      {
+        "codigo": "LOG02",
+        "nome": "Logaritmos",
+        "ano": 2,
+        "peso": 3
+      },
+      {
+        "codigo": "LOG03",
+        "nome": "Função logarítmica",
+        "ano": 2
+      },
+      {
+        "codigo": "LOG04",
+        "nome": "Equações e inequações logarítmicas",
+        "ano": 2
+      },
+      {
+        "codigo": "GP08",
+        "nome": "Trigonometria em triângulos quaisquer",
+        "ano": 2,
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "codigo": "GP09",
+        "nome": "Áreas de polígonos",
+        "ano": 2,
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "codigo": "GP10",
+        "nome": "Áreas circulares",
+        "ano": 2,
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "codigo": "MD01",
+        "nome": "Matrizes",
+        "ano": 2,
+        "antigos": [
+          "PA, PG, matrizes e sistemas"
+        ]
+      },
+      {
+        "codigo": "MD02",
+        "nome": "Determinante",
+        "ano": 2,
+        "antigos": [
+          "PA, PG, matrizes e sistemas"
+        ]
+      },
+      {
+        "codigo": "MD03",
+        "nome": "Sistemas lineares",
+        "ano": 2,
+        "antigos": [
+          "PA, PG, matrizes e sistemas"
+        ]
+      },
+      {
+        "codigo": "CB01",
+        "nome": "PFC",
+        "ano": 2,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "CB02",
+        "nome": "Fatorial e permutações",
+        "ano": 2,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "CB03",
+        "nome": "Arranjo e combinações",
+        "ano": 2,
+        "peso": 3,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "CB04",
+        "nome": "Combinatória avançada",
+        "ano": 2,
+        "peso": 3,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "PB01",
+        "nome": "Probabilidade",
+        "ano": 2,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "PB02",
+        "nome": "Probabilidade condicional",
+        "ano": 2,
+        "peso": 1,
+        "antigos": [
+          "Combinatória, probabilidade e estatística"
+        ]
+      },
+      {
+        "codigo": "TN03",
+        "nome": "Aritmética modular",
+        "ano": 2
+      },
+      {
+        "codigo": "GE07",
+        "nome": "Geometria de posição",
+        "ano": 2,
+        "peso": 1,
         "antigos": [
           "Geometria espacial"
         ]
       },
       {
-        "nome": "Analítica, vetores, cônicas e quádricas",
+        "codigo": "GE01",
+        "nome": "Prismas",
+        "ano": 2,
         "antigos": [
-          "Geometria analítica"
+          "Geometria espacial"
         ]
       },
       {
-        "nome": "Números complexos e polinômios",
+        "codigo": "GE02",
+        "nome": "Pirâmides",
+        "ano": 2,
         "antigos": [
-          "Números complexos",
-          "Polinômios"
+          "Geometria espacial"
         ]
       },
       {
-        "nome": "Cálculo (só Escola Naval)",
+        "codigo": "GE03",
+        "nome": "Cilindros",
+        "ano": 2,
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "codigo": "GE04",
+        "nome": "Cones",
+        "ano": 2,
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "codigo": "GE05",
+        "nome": "Poliedros",
+        "ano": 2,
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "codigo": "GE09",
+        "nome": "Esferas",
+        "ano": 2,
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "codigo": "GE08",
+        "nome": "Sólidos de revolução",
+        "ano": 2,
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "codigo": "GE06",
+        "nome": "Inscrição de sólidos",
+        "ano": 2,
+        "antigos": [
+          "Geometria espacial"
+        ]
+      },
+      {
+        "codigo": "GA03",
+        "nome": "Cônicas",
+        "ano": 2,
+        "peso": 3,
+        "antigos": [
+          "Analítica, vetores, cônicas e quádricas"
+        ]
+      },
+      {
+        "codigo": "PL01",
+        "nome": "Polinômios: introdução",
+        "ano": 2,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "PL02",
+        "nome": "Operações com polinômios",
+        "ano": 2,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "GP06",
+        "nome": "Triângulos e pontos notáveis",
+        "ano": 3,
+        "antigos": [
+          "Geometria plana"
+        ]
+      },
+      {
+        "codigo": "GA04",
+        "nome": "Lugares geométricos",
+        "ano": 3,
+        "antigos": [
+          "Analítica, vetores, cônicas e quádricas"
+        ]
+      },
+      {
+        "codigo": "TG04",
+        "nome": "Equações trigonométricas: introdução",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG05",
+        "nome": "Arcos compostos",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG06",
+        "nome": "Transformações",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG07",
+        "nome": "Equações trigonométricas avançadas",
+        "ano": 3,
+        "peso": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG08",
+        "nome": "Inequações trigonométricas",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG09",
+        "nome": "Funções trigonométricas",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG10",
+        "nome": "Funções trigonométricas inversas",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "TG11",
+        "nome": "Desigualdades trigonométricas",
+        "ano": 3,
+        "antigos": [
+          "Trigonometria"
+        ]
+      },
+      {
+        "codigo": "BW01",
+        "nome": "Binômio de Newton",
+        "ano": 3,
+        "peso": 1
+      },
+      {
+        "codigo": "NCP01",
+        "nome": "Unidade imaginária",
+        "ano": 3,
+        "peso": 1,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "NCP02",
+        "nome": "Forma algébrica",
+        "ano": 3,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "NCP03",
+        "nome": "Forma trigonométrica",
+        "ano": 3,
+        "peso": 3,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "NCP04",
+        "nome": "Lugares geométricos nos complexos",
+        "ano": 3,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "PL03",
+        "nome": "Equações algébricas",
+        "ano": 3,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "PL04",
+        "nome": "Polinômios avançado",
+        "ano": 3,
+        "peso": 3,
+        "antigos": [
+          "Números complexos e polinômios"
+        ]
+      },
+      {
+        "codigo": "SPG03",
+        "nome": "Progressão harmônica",
+        "ano": 3,
+        "peso": 1
+      },
+      {
+        "codigo": "GA05",
+        "nome": "Vetores no R³ e quádricas",
+        "ano": 3,
         "concursos": [
           "en"
+        ],
+        "antigos": [
+          "Analítica, vetores, cônicas e quádricas"
+        ]
+      },
+      {
+        "codigo": "CL01",
+        "nome": "Limites",
+        "ano": 3,
+        "concursos": [
+          "en"
+        ],
+        "peso": 1,
+        "antigos": [
+          "Cálculo (só Escola Naval)"
+        ]
+      },
+      {
+        "codigo": "CL02",
+        "nome": "Derivadas",
+        "ano": 3,
+        "concursos": [
+          "en"
+        ],
+        "peso": 3,
+        "antigos": [
+          "Cálculo (só Escola Naval)"
+        ]
+      },
+      {
+        "codigo": "CL03",
+        "nome": "Aplicações da derivada",
+        "ano": 3,
+        "concursos": [
+          "en"
+        ],
+        "antigos": [
+          "Cálculo (só Escola Naval)"
+        ]
+      },
+      {
+        "codigo": "CL04",
+        "nome": "Integrais",
+        "ano": 3,
+        "concursos": [
+          "en"
+        ],
+        "peso": 3,
+        "antigos": [
+          "Cálculo (só Escola Naval)"
         ]
       }
     ],
     "Física": [
       {
-        "nome": "Grandezas físicas e unidades do SI",
+        "codigo": "F-MD01",
+        "nome": "Grandezas, SI e notação científica",
+        "ano": 0,
         "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Conversão de unidades: comprimento, massa e tempo",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Conversão de unidades: área, volume e velocidade",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Notação científica e ordem de grandeza",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Medidas e algarismos significativos",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Revisão da semana: unidades",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Grandezas escalares e vetoriais",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Vetores: módulo, direção e sentido",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Soma de vetores na mesma direção",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Soma de vetores perpendiculares (Pitágoras)",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Soma de vetores: regra do paralelogramo",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Revisão da semana: vetores",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Posição, deslocamento e distância percorrida",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Velocidade média",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Movimento uniforme: função horária",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Movimento uniforme: encontro e ultrapassagem",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Gráficos do movimento uniforme",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Revisão da semana: movimento uniforme",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Aceleração média",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "MUV: função da velocidade",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "MUV: função horária da posição",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Equação de Torricelli",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Gráficos do MUV",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Revisão da semana: MUV",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Queda livre",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Lançamento vertical para cima",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Lançamento vertical: altura máxima e tempo de voo",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Problemas de queda e lançamento",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Cinemática: problemas mistos",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Revisão da semana: queda livre e lançamento",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Força e a 1ª lei de Newton (inércia)",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "2ª lei de Newton: F = m·a",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "3ª lei de Newton: ação e reação",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Peso e massa",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Força resultante",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Revisão da semana: leis de Newton",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Diagrama de forças",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Força normal",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Tração em fios",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Blocos ligados por fio",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Plano inclinado sem atrito",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Revisão da semana: Newton aplicado",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Cinemática: lançamento oblíquo e movimento circular"
-      },
-      {
-        "nome": "Dinâmica, energia, impulso e colisões",
+        "peso": 1,
         "antigos": [
-          "Dinâmica",
-          "Trabalho e energia"
+          "Grandezas físicas e unidades do SI",
+          "Conversão de unidades: comprimento, massa e tempo",
+          "Conversão de unidades: área, volume e velocidade",
+          "Notação científica e ordem de grandeza"
         ]
       },
       {
-        "nome": "Gravitação e estática"
-      },
-      {
-        "nome": "Fluidos",
+        "codigo": "F-CN01",
+        "nome": "MU",
+        "ano": 0,
+        "fase": 0,
         "antigos": [
-          "Hidrostática"
+          "Posição, deslocamento e distância percorrida",
+          "Velocidade média",
+          "Movimento uniforme: função horária",
+          "Movimento uniforme: encontro e ultrapassagem"
         ]
       },
       {
-        "nome": "Termologia e termodinâmica",
+        "codigo": "F-CN03",
+        "nome": "Gráficos do movimento",
+        "ano": 0,
+        "fase": 0,
         "antigos": [
-          "Termologia"
+          "Gráficos do movimento uniforme",
+          "Gráficos do MUV"
         ]
       },
       {
-        "nome": "MHS, ondas, som e luz",
+        "codigo": "F-CN02",
+        "nome": "MUV e Torricelli",
+        "ano": 0,
+        "fase": 0,
+        "peso": 3,
+        "prereq": [
+          "MB02"
+        ],
         "antigos": [
-          "Ondulatória",
-          "Óptica"
+          "Aceleração média",
+          "MUV: função da velocidade",
+          "MUV: função horária da posição",
+          "Equação de Torricelli"
         ]
       },
       {
-        "nome": "Eletrostática",
+        "codigo": "F-CN04",
+        "nome": "Queda livre e lançamento vertical",
+        "ano": 0,
+        "fase": 0,
+        "peso": 1,
         "antigos": [
-          "Eletricidade"
+          "Queda livre",
+          "Lançamento vertical para cima",
+          "Lançamento vertical: altura máxima e tempo de voo",
+          "Problemas de queda e lançamento"
         ]
       },
       {
-        "nome": "Eletrodinâmica",
+        "codigo": "F-MD04",
+        "nome": "Vetores",
+        "ano": 0,
+        "fase": 0,
+        "prereq": [
+          "TG02"
+        ],
         "antigos": [
-          "Eletricidade"
+          "Grandezas escalares e vetoriais",
+          "Vetores: módulo, direção e sentido",
+          "Soma de vetores na mesma direção",
+          "Soma de vetores perpendiculares (Pitágoras)",
+          "Soma de vetores: regra do paralelogramo"
         ]
       },
       {
-        "nome": "Magnetismo e indução",
+        "codigo": "F-DN01",
+        "nome": "Leis de Newton",
+        "ano": 0,
+        "fase": 0,
+        "peso": 3,
         "antigos": [
-          "Magnetismo"
+          "Força e a 1ª lei de Newton (inércia)",
+          "2ª lei de Newton: F = m·a",
+          "3ª lei de Newton: ação e reação",
+          "Peso e massa",
+          "Força resultante"
         ]
+      },
+      {
+        "codigo": "F-DN02",
+        "nome": "Forças: peso, normal, tração, elástica",
+        "ano": 0,
+        "fase": 0,
+        "peso": 3,
+        "antigos": [
+          "Diagrama de forças",
+          "Força normal",
+          "Tração em fios",
+          "Blocos ligados por fio"
+        ]
+      },
+      {
+        "codigo": "F-MD02",
+        "nome": "Algarismos significativos e erros",
+        "ano": 1,
+        "peso": 1,
+        "antigos": [
+          "Medidas e algarismos significativos"
+        ]
+      },
+      {
+        "codigo": "F-MD03",
+        "nome": "Análise dimensional",
+        "ano": 1,
+        "peso": 1
+      },
+      {
+        "codigo": "F-CN05",
+        "nome": "Lançamento horizontal e oblíquo",
+        "ano": 1,
+        "prereq": [
+          "TG02"
+        ],
+        "antigos": [
+          "Cinemática: lançamento oblíquo e movimento circular"
+        ]
+      },
+      {
+        "codigo": "F-DN03",
+        "nome": "Atrito",
+        "ano": 1,
+        "peso": 1,
+        "antigos": [
+          "Dinâmica, energia, impulso e colisões"
+        ]
+      },
+      {
+        "codigo": "F-DN04",
+        "nome": "Plano inclinado e polias",
+        "ano": 1,
+        "antigos": [
+          "Dinâmica, energia, impulso e colisões"
+        ]
+      },
+      {
+        "codigo": "F-EN01",
+        "nome": "Trabalho e potência",
+        "ano": 1,
+        "antigos": [
+          "Dinâmica, energia, impulso e colisões"
+        ]
+      },
+      {
+        "codigo": "F-EN02",
+        "nome": "Energia mecânica",
+        "ano": 1,
+        "peso": 3,
+        "antigos": [
+          "Dinâmica, energia, impulso e colisões"
+        ]
+      },
+      {
+        "codigo": "F-EN03",
+        "nome": "Impulso e quantidade de movimento",
+        "ano": 1,
+        "peso": 3,
+        "antigos": [
+          "Dinâmica, energia, impulso e colisões"
+        ]
+      },
+      {
+        "codigo": "F-CN06",
+        "nome": "Movimento circular",
+        "ano": 1,
+        "prereq": [
+          "TG01"
+        ],
+        "antigos": [
+          "Cinemática: lançamento oblíquo e movimento circular"
+        ]
+      },
+      {
+        "codigo": "F-TM01",
+        "nome": "Termometria",
+        "ano": 1,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-TM02",
+        "nome": "Dilatação",
+        "ano": 1,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-TM03",
+        "nome": "Calorimetria e mudança de fase",
+        "ano": 1,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-EL01",
+        "nome": "Corrente e lei de Ohm",
+        "ano": 1,
+        "antigos": [
+          "Eletrodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-EL02",
+        "nome": "Associação de resistores",
+        "ano": 1,
+        "antigos": [
+          "Eletrodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-EL03",
+        "nome": "Potência e efeito Joule",
+        "ano": 1,
+        "antigos": [
+          "Eletrodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-OD01",
+        "nome": "Ondas: conceitos",
+        "ano": 1,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OG01",
+        "nome": "Princípios da óptica e espelhos planos",
+        "ano": 1,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-DN05",
+        "nome": "Dinâmica circular",
+        "ano": 2,
+        "prereq": [
+          "TG01"
+        ]
+      },
+      {
+        "codigo": "F-DN06",
+        "nome": "Referenciais acelerados e girantes",
+        "ano": 2
+      },
+      {
+        "codigo": "F-EN04",
+        "nome": "Colisões e centro de massa",
+        "ano": 2,
+        "antigos": [
+          "Dinâmica, energia, impulso e colisões"
+        ]
+      },
+      {
+        "codigo": "F-ES01",
+        "nome": "Estática do ponto",
+        "ano": 2,
+        "antigos": [
+          "Gravitação e estática"
+        ]
+      },
+      {
+        "codigo": "F-ES02",
+        "nome": "Estática do corpo extenso",
+        "ano": 2,
+        "antigos": [
+          "Gravitação e estática"
+        ]
+      },
+      {
+        "codigo": "F-ES03",
+        "nome": "Estabilidade do equilíbrio",
+        "ano": 2,
+        "antigos": [
+          "Gravitação e estática"
+        ]
+      },
+      {
+        "codigo": "F-GR01",
+        "nome": "Gravitação: Kepler e Newton",
+        "ano": 2,
+        "antigos": [
+          "Gravitação e estática"
+        ]
+      },
+      {
+        "codigo": "F-GR02",
+        "nome": "Órbitas e energia gravitacional",
+        "ano": 2,
+        "prereq": [
+          "FX03"
+        ],
+        "antigos": [
+          "Gravitação e estática"
+        ]
+      },
+      {
+        "codigo": "F-MH01",
+        "nome": "MHS",
+        "ano": 2,
+        "prereq": [
+          "TG03"
+        ],
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-MH02",
+        "nome": "Pêndulos e energia no MHS",
+        "ano": 2,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-HD01",
+        "nome": "Pressão e Stevin",
+        "ano": 2,
+        "antigos": [
+          "Fluidos"
+        ]
+      },
+      {
+        "codigo": "F-HD02",
+        "nome": "Pascal e Arquimedes",
+        "ano": 2,
+        "antigos": [
+          "Fluidos"
+        ]
+      },
+      {
+        "codigo": "F-HD03",
+        "nome": "Hidrodinâmica",
+        "ano": 2,
+        "prereq": [
+          "FX03"
+        ],
+        "antigos": [
+          "Fluidos"
+        ]
+      },
+      {
+        "codigo": "F-TM04",
+        "nome": "Gases",
+        "ano": 2,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-TM05",
+        "nome": "Teoria cinética",
+        "ano": 2,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-TM06",
+        "nome": "Transmissão de calor e radiação",
+        "ano": 2,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-TD01",
+        "nome": "1ª lei da termodinâmica",
+        "ano": 2,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-TD02",
+        "nome": "2ª lei, Carnot e refrigeradores",
+        "ano": 2,
+        "peso": 3,
+        "antigos": [
+          "Termologia e termodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-OD02",
+        "nome": "Fenômenos ondulatórios e cordas",
+        "ano": 2,
+        "prereq": [
+          "TG03"
+        ],
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OD03",
+        "nome": "Acústica",
+        "ano": 2,
+        "prereq": [
+          "TG03",
+          "LOG02"
+        ],
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OD04",
+        "nome": "Doppler",
+        "ano": 2,
+        "prereq": [
+          "TG03"
+        ],
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OG02",
+        "nome": "Espelhos esféricos",
+        "ano": 2,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OG03",
+        "nome": "Refração, reflexão total, prismas e dispersão",
+        "ano": 2,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OG04",
+        "nome": "Lentes",
+        "ano": 2,
+        "peso": 1,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OF01",
+        "nome": "Interferência (Young e filmes finos)",
+        "ano": 2,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-OF02",
+        "nome": "Difração e polarização",
+        "ano": 2,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-EE01",
+        "nome": "Carga e Coulomb",
+        "ano": 3,
+        "antigos": [
+          "Eletrostática"
+        ]
+      },
+      {
+        "codigo": "F-EE02",
+        "nome": "Campo elétrico",
+        "ano": 3,
+        "antigos": [
+          "Eletrostática"
+        ]
+      },
+      {
+        "codigo": "F-EE03",
+        "nome": "Potencial e energia",
+        "ano": 3,
+        "peso": 3,
+        "antigos": [
+          "Eletrostática"
+        ]
+      },
+      {
+        "codigo": "F-EE04",
+        "nome": "Condutores em equilíbrio",
+        "ano": 3,
+        "antigos": [
+          "Eletrostática"
+        ]
+      },
+      {
+        "codigo": "F-EE05",
+        "nome": "Capacitores",
+        "ano": 3,
+        "antigos": [
+          "Eletrostática"
+        ]
+      },
+      {
+        "codigo": "F-EL04",
+        "nome": "Geradores e receptores",
+        "ano": 3,
+        "antigos": [
+          "Eletrodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-EL05",
+        "nome": "Kirchhoff",
+        "ano": 3,
+        "peso": 3,
+        "antigos": [
+          "Eletrodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-EL06",
+        "nome": "Medidores e ponte de Wheatstone",
+        "ano": 3,
+        "antigos": [
+          "Eletrodinâmica"
+        ]
+      },
+      {
+        "codigo": "F-MG01",
+        "nome": "Campo magnético",
+        "ano": 3,
+        "antigos": [
+          "Magnetismo e indução"
+        ]
+      },
+      {
+        "codigo": "F-MG02",
+        "nome": "Força magnética",
+        "ano": 3,
+        "antigos": [
+          "Magnetismo e indução"
+        ]
+      },
+      {
+        "codigo": "F-MG03",
+        "nome": "Campo gerado por correntes",
+        "ano": 3,
+        "antigos": [
+          "Magnetismo e indução"
+        ]
+      },
+      {
+        "codigo": "F-IN01",
+        "nome": "Faraday e Lenz",
+        "ano": 3,
+        "peso": 3,
+        "antigos": [
+          "Magnetismo e indução"
+        ]
+      },
+      {
+        "codigo": "F-IN02",
+        "nome": "Indutância",
+        "ano": 3,
+        "antigos": [
+          "Magnetismo e indução"
+        ]
+      },
+      {
+        "codigo": "F-IN03",
+        "nome": "Corrente alternada e transformadores",
+        "ano": 3,
+        "antigos": [
+          "Magnetismo e indução"
+        ]
+      },
+      {
+        "codigo": "F-OF03",
+        "nome": "Interferômetros (Michelson, Fabry-Perot, Mach-Zehnder)",
+        "ano": 3,
+        "antigos": [
+          "MHS, ondas, som e luz"
+        ]
+      },
+      {
+        "codigo": "F-FM01",
+        "nome": "Fotoelétrico e corpo negro",
+        "ano": 3
+      },
+      {
+        "codigo": "F-FM02",
+        "nome": "Bohr",
+        "ano": 3,
+        "peso": 1
+      },
+      {
+        "codigo": "F-FM03",
+        "nome": "Dualidade e incerteza",
+        "ano": 3
+      },
+      {
+        "codigo": "F-RL01",
+        "nome": "Relatividade: postulados, tempo e comprimento",
+        "ano": 3
+      },
+      {
+        "codigo": "F-RL02",
+        "nome": "Relatividade: velocidades",
+        "ano": 3,
+        "peso": 1
+      },
+      {
+        "codigo": "F-RL03",
+        "nome": "Energia e momento relativísticos",
+        "ano": 3,
+        "peso": 1
+      },
+      {
+        "codigo": "F-FN01",
+        "nome": "Física nuclear",
+        "ano": 3,
+        "peso": 1
       }
     ],
     "Química": [
       {
-        "nome": "Matéria, substâncias e misturas",
+        "codigo": "Q-IN01",
+        "nome": "Matéria e substâncias",
+        "ano": 0,
         "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Estados físicos e mudanças de estado",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Separação de misturas",
-        "fase": 0,
-        "sem": 1
-      },
-      {
-        "nome": "Modelos atômicos",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Número atômico, número de massa e isótopos",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Íons e partículas do átomo",
-        "fase": 0,
-        "sem": 2
-      },
-      {
-        "nome": "Tabela periódica: famílias e períodos",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Distribuição eletrônica (diagrama de Pauling)",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Propriedades periódicas",
-        "fase": 0,
-        "sem": 3
-      },
-      {
-        "nome": "Ligação iônica",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Ligação covalente",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Ligação metálica e propriedades das substâncias",
-        "fase": 0,
-        "sem": 4
-      },
-      {
-        "nome": "Ácidos e bases",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Sais",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Óxidos",
-        "fase": 0,
-        "sem": 5
-      },
-      {
-        "nome": "Massa atômica e massa molecular",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Mol e constante de Avogadro",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Massa molar",
-        "fase": 0,
-        "sem": 6
-      },
-      {
-        "nome": "Reações químicas e balanceamento",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Leis de Lavoisier e Proust",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Estequiometria simples: mol e massa",
-        "fase": 0,
-        "sem": 7
-      },
-      {
-        "nome": "Estequiometria e soluções",
+        "peso": 1,
         "antigos": [
-          "Estequiometria",
-          "Soluções"
+          "Matéria, substâncias e misturas",
+          "Estados físicos e mudanças de estado"
         ]
       },
       {
+        "codigo": "Q-IN02",
+        "nome": "Separação de misturas",
+        "ano": 0,
+        "fase": 0,
+        "peso": 1,
+        "antigos": [
+          "Separação de misturas"
+        ]
+      },
+      {
+        "codigo": "Q-AT01",
+        "nome": "Modelos atômicos",
+        "ano": 0,
+        "fase": 0,
+        "antigos": [
+          "Modelos atômicos",
+          "Número atômico, número de massa e isótopos",
+          "Íons e partículas do átomo"
+        ]
+      },
+      {
+        "codigo": "Q-AT02",
+        "nome": "Distribuição eletrônica",
+        "ano": 0,
+        "fase": 0,
+        "antigos": [
+          "Distribuição eletrônica (diagrama de Pauling)"
+        ]
+      },
+      {
+        "codigo": "Q-TP01",
+        "nome": "Tabela periódica e propriedades",
+        "ano": 0,
+        "fase": 0,
+        "antigos": [
+          "Tabela periódica: famílias e períodos",
+          "Propriedades periódicas"
+        ]
+      },
+      {
+        "codigo": "Q-LG01",
+        "nome": "Ligações iônica e covalente",
+        "ano": 1,
+        "antigos": [
+          "Ligação iônica",
+          "Ligação covalente"
+        ]
+      },
+      {
+        "codigo": "Q-LG02",
+        "nome": "Geometria e polaridade",
+        "ano": 1,
+        "antigos": [
+          "Ligação covalente"
+        ]
+      },
+      {
+        "codigo": "Q-LG03",
+        "nome": "Forças intermoleculares",
+        "ano": 1
+      },
+      {
+        "codigo": "Q-IG01",
+        "nome": "Ácidos e bases",
+        "ano": 1,
+        "antigos": [
+          "Ácidos e bases"
+        ]
+      },
+      {
+        "codigo": "Q-IG02",
+        "nome": "Sais e óxidos",
+        "ano": 1,
+        "antigos": [
+          "Sais",
+          "Óxidos"
+        ]
+      },
+      {
+        "codigo": "Q-RE01",
+        "nome": "Reações inorgânicas",
+        "ano": 1,
+        "antigos": [
+          "Reações químicas e balanceamento"
+        ]
+      },
+      {
+        "codigo": "Q-NO01",
+        "nome": "Nox e balanceamento",
+        "ano": 1,
+        "antigos": [
+          "Reações químicas e balanceamento"
+        ]
+      },
+      {
+        "codigo": "Q-ES01",
+        "nome": "Mol e massa molar",
+        "ano": 1,
+        "peso": 1,
+        "prereq": [
+          "MB03"
+        ],
+        "antigos": [
+          "Massa atômica e massa molecular",
+          "Mol e constante de Avogadro",
+          "Massa molar"
+        ]
+      },
+      {
+        "codigo": "Q-ES02",
+        "nome": "Fórmulas químicas",
+        "ano": 1
+      },
+      {
+        "codigo": "Q-ES03",
+        "nome": "Estequiometria",
+        "ano": 1,
+        "peso": 3,
+        "antigos": [
+          "Estequiometria simples: mol e massa",
+          "Estequiometria e soluções"
+        ]
+      },
+      {
+        "codigo": "Q-GS01",
+        "nome": "Gases",
+        "ano": 1,
+        "peso": 1
+      },
+      {
+        "codigo": "Q-SO01",
+        "nome": "Soluções e concentração",
+        "ano": 2,
+        "antigos": [
+          "Estequiometria e soluções"
+        ]
+      },
+      {
+        "codigo": "Q-SO02",
+        "nome": "Diluição, mistura e titulação",
+        "ano": 2,
+        "antigos": [
+          "Estequiometria e soluções"
+        ]
+      },
+      {
+        "codigo": "Q-CL01",
+        "nome": "Propriedades coligativas",
+        "ano": 2
+      },
+      {
+        "codigo": "Q-TQ01",
         "nome": "Termoquímica",
+        "ano": 2,
         "antigos": [
           "Termoquímica"
         ]
       },
       {
+        "codigo": "Q-CN01",
         "nome": "Cinética",
+        "ano": 2,
         "antigos": [
           "Cinética"
         ]
       },
       {
-        "nome": "Equilíbrio",
+        "codigo": "Q-EQ01",
+        "nome": "Equilíbrio químico",
+        "ano": 2,
         "antigos": [
           "Equilíbrio"
         ]
       },
       {
-        "nome": "Eletroquímica",
+        "codigo": "Q-EQ02",
+        "nome": "Equilíbrio iônico e pH",
+        "ano": 2,
+        "peso": 3,
+        "prereq": [
+          "LOG02"
+        ],
+        "antigos": [
+          "Equilíbrio"
+        ]
+      },
+      {
+        "codigo": "Q-EQ03",
+        "nome": "Hidrólise, tampão e Kps",
+        "ano": 2,
+        "peso": 3,
+        "antigos": [
+          "Equilíbrio"
+        ]
+      },
+      {
+        "codigo": "Q-EL01",
+        "nome": "Pilhas",
+        "ano": 2,
         "antigos": [
           "Eletroquímica"
         ]
       },
       {
-        "nome": "Química orgânica",
+        "codigo": "Q-EL02",
+        "nome": "Eletrólise",
+        "ano": 2,
+        "antigos": [
+          "Eletroquímica"
+        ]
+      },
+      {
+        "codigo": "Q-OR01",
+        "nome": "Carbono e cadeias",
+        "ano": 3,
         "antigos": [
           "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-OR02",
+        "nome": "Funções orgânicas",
+        "ano": 3,
+        "antigos": [
+          "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-OR03",
+        "nome": "Nomenclatura",
+        "ano": 3,
+        "peso": 1,
+        "antigos": [
+          "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-OR04",
+        "nome": "Isomeria plana",
+        "ano": 3,
+        "antigos": [
+          "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-OR05",
+        "nome": "Isomeria espacial",
+        "ano": 3,
+        "antigos": [
+          "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-OR06",
+        "nome": "Reações orgânicas",
+        "ano": 3,
+        "antigos": [
+          "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-OR07",
+        "nome": "Polímeros e bioquímica",
+        "ano": 3,
+        "antigos": [
+          "Química orgânica"
+        ]
+      },
+      {
+        "codigo": "Q-RA01",
+        "nome": "Radioatividade",
+        "ano": 3,
+        "peso": 1,
+        "prereq": [
+          "LOG01"
         ]
       }
     ],
@@ -1797,7 +2512,7 @@
       }
     ]
   },
-  "versaoSeed": 11,
+  "versaoSeed": 13,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -1883,7 +2598,60 @@
       "Dia vencido. Sua mãe ainda vai contar essa história com orgulho.",
       "Dever cumprido. Poucos fazem o que você fez hoje.",
       "Tudo feito. Recolher, descansar e voltar amanhã."
-    ]
+    ],
+    "sargento": {
+      "inicio": [
+        "Dia começou. Primeiro bloco agora.",
+        "O concorrente já abriu o caderno. Abre o seu.",
+        "Sem negociar com a cama. Mesa, agora.",
+        "Plano está pronto. Falta você.",
+        "Não pensa. Começa.",
+        "Cada minuto parado é do concorrente."
+      ],
+      "bloco": [
+        "Bloco feito. Não comemora. Próximo.",
+        "Um bloco não é um dia. Segue.",
+        "Feito. O concorrente já está no próximo.",
+        "Registrou, acabou. Próximo bloco.",
+        "Ritmo. Não desacelera agora.",
+        "Bom. Agora repete."
+      ],
+      "cumprido": [
+        "Meta batida. Amanhã é igual.",
+        "Cumpriu. Era o mínimo. Descansa e volta no horário.",
+        "Dia fechado. Dorme direito, que amanhã tem mais.",
+        "Missão do dia concluída. Sem exagero, sem folga.",
+        "Igualou o concorrente hoje. Amanhã, passa dele."
+      ],
+      "dificil": [
+        "Dia ruim existe. Dia mínimo é obrigatório.",
+        "Sem energia? Faz o mínimo. Zero não é opção.",
+        "45 minutos de questões. Sem desculpa, sem drama.",
+        "Cansado também estuda. Só menos. Mas estuda.",
+        "O mínimo de hoje protege a sequência de amanhã."
+      ],
+      "prova": [
+        "Prova perto. Cada erro de hoje é um ponto a menos lá.",
+        "Contagem regressiva rodando. Sem folga.",
+        "Na prova ninguém pergunta como você se sentia. Treina.",
+        "Falta pouco. Revisa o que errou e cala a dúvida.",
+        "Questão errada hoje, acerto na prova. Confere o caderno."
+      ],
+      "domingo": [
+        "Domingo também conta. Longão e revisão da semana.",
+        "Fecha a semana: revisa, ajusta, prepara a próxima.",
+        "Descanso é o que sobra depois do dever. Cumpre primeiro.",
+        "O concorrente não tem domingo. Faz o plano.",
+        "Revisão da semana. Olha os números sem enfeitar."
+      ],
+      "noite": [
+        "Noite. Fecha o dia e desliga a tela no horário.",
+        "Sono é parte do treino. Deita no horário.",
+        "Revisão feita? Então apaga a luz.",
+        "Amanhã cedo, sem desculpa. Dorme agora.",
+        "O dia acabou. O que ficou para trás entra amanhã."
+      ]
+    }
   },
   "materiasInfo": {
     "Matemática": {
@@ -1950,64 +2718,84 @@
   },
   "horasFase": {
     "zero": {
-      "mat": 24,
-      "fis": 10,
-      "qui": 5,
-      "por": 3,
+      "mat": 55,
+      "fis": 25,
+      "qui": 12,
+      "por": 6,
       "red": 0,
-      "ing": 1,
+      "ing": 2,
       "hg": 0,
       "provas": 0
     },
-    "base": {
-      "mat": 18,
-      "fis": 12,
-      "qui": 4,
-      "por": 4,
-      "red": 2,
-      "ing": 1,
-      "hg": 2,
+    "ano1": {
+      "mat": 38,
+      "fis": 32,
+      "qui": 15,
+      "por": 6,
+      "red": 5,
+      "ing": 4,
+      "hg": 0,
       "provas": 0
     },
-    "efomm": {
-      "mat": 13,
-      "fis": 9,
-      "qui": 2,
-      "por": 4,
-      "red": 3,
-      "ing": 2,
-      "hg": 4,
-      "provas": 6
-    },
-    "en": {
-      "mat": 13,
-      "fis": 10,
-      "qui": 2,
-      "por": 4,
-      "red": 3,
-      "ing": 2,
+    "ano2": {
+      "mat": 38,
+      "fis": 32,
+      "qui": 15,
+      "por": 6,
+      "red": 5,
+      "ing": 4,
       "hg": 0,
-      "provas": 9
+      "provas": 0
+    },
+    "ano3": {
+      "mat": 38,
+      "fis": 32,
+      "qui": 15,
+      "por": 6,
+      "red": 5,
+      "ing": 4,
+      "hg": 0,
+      "provas": 0
+    },
+    "leve": {
+      "mat": 38,
+      "fis": 32,
+      "qui": 15,
+      "por": 6,
+      "red": 5,
+      "ing": 4,
+      "hg": 0,
+      "provas": 0
     },
     "ita": {
-      "mat": 13,
-      "fis": 11,
-      "qui": 9,
+      "mat": 25,
+      "fis": 22,
+      "qui": 22,
+      "por": 6,
+      "red": 5,
+      "ing": 5,
+      "hg": 0,
+      "provas": 15
+    },
+    "disc": {
+      "mat": 30,
+      "fis": 28,
+      "qui": 25,
       "por": 3,
-      "red": 2,
+      "red": 10,
       "ing": 2,
       "hg": 0,
-      "provas": 3
+      "provas": 2
     },
     "enem": {
-      "mat": 6,
-      "fis": 4,
-      "qui": 2,
-      "por": 2,
-      "red": 3,
+      "mat": 14,
+      "fis": 9,
+      "qui": 5,
+      "por": 5,
+      "red": 7,
       "ing": 0,
       "hg": 0,
-      "provas": 26
+      "provas": 60
     }
   },
   "categorias": {
@@ -2057,6 +2845,16 @@
     "erros": {
       "materia": "Caderno de erros",
       "titulo": "Caderno de erros",
+      "metodo": "espacada"
+    },
+    "resg": {
+      "materia": "Resgate",
+      "titulo": "Resgate do sábado",
+      "metodo": "recuperacao"
+    },
+    "revl": {
+      "materia": "Revisão leve",
+      "titulo": "Revisão leve da semana",
       "metodo": "espacada"
     }
   },
@@ -2448,10 +3246,10 @@
     ],
     "vinculos": [
       {
-        "id": "iezzi-1|Conjuntos, lógica e funções",
+        "id": "iezzi-1|Teoria de conjuntos",
         "recurso": "iezzi-1",
         "materia": "Matemática",
-        "topico": "Conjuntos, lógica e funções",
+        "topico": "Teoria de conjuntos",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2460,10 +3258,94 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-2|Conjuntos, lógica e funções",
+        "id": "iezzi-1|Conjuntos numéricos",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Conjuntos numéricos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-1|Função: definições",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Função: definições",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-1|Afim",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Afim",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-1|Quadrática",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Quadrática",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-1|Composta e inversa",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Composta e inversa",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-1|Modular",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Modular",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-1|Outras funções clássicas",
+        "recurso": "iezzi-1",
+        "materia": "Matemática",
+        "topico": "Outras funções clássicas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Teoria de conjuntos",
         "recurso": "iezzi-2",
         "materia": "Matemática",
-        "topico": "Conjuntos, lógica e funções",
+        "topico": "Teoria de conjuntos",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2472,10 +3354,94 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-3|Trigonometria",
+        "id": "iezzi-2|Conjuntos numéricos",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Conjuntos numéricos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Função: definições",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Função: definições",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Afim",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Afim",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Quadrática",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Quadrática",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Composta e inversa",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Composta e inversa",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Modular",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Modular",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-2|Outras funções clássicas",
+        "recurso": "iezzi-2",
+        "materia": "Matemática",
+        "topico": "Outras funções clássicas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Arcos e ângulos",
         "recurso": "iezzi-3",
         "materia": "Matemática",
-        "topico": "Trigonometria",
+        "topico": "Arcos e ângulos",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2484,10 +3450,118 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-4|PA, PG, matrizes e sistemas",
+        "id": "iezzi-3|Ciclo trigonométrico",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Ciclo trigonométrico",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Equações trigonométricas: introdução",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Equações trigonométricas: introdução",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Arcos compostos",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Arcos compostos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Transformações",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Transformações",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Equações trigonométricas avançadas",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Equações trigonométricas avançadas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Inequações trigonométricas",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Inequações trigonométricas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Funções trigonométricas",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Funções trigonométricas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Funções trigonométricas inversas",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Funções trigonométricas inversas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-3|Desigualdades trigonométricas",
+        "recurso": "iezzi-3",
+        "materia": "Matemática",
+        "topico": "Desigualdades trigonométricas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-4|PA",
         "recurso": "iezzi-4",
         "materia": "Matemática",
-        "topico": "PA, PG, matrizes e sistemas",
+        "topico": "PA",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2496,10 +3570,58 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-5|Combinatória, probabilidade e estatística",
+        "id": "iezzi-4|PG",
+        "recurso": "iezzi-4",
+        "materia": "Matemática",
+        "topico": "PG",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-4|Matrizes",
+        "recurso": "iezzi-4",
+        "materia": "Matemática",
+        "topico": "Matrizes",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-4|Determinante",
+        "recurso": "iezzi-4",
+        "materia": "Matemática",
+        "topico": "Determinante",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-4|Sistemas lineares",
+        "recurso": "iezzi-4",
+        "materia": "Matemática",
+        "topico": "Sistemas lineares",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Estatística",
         "recurso": "iezzi-5",
         "materia": "Matemática",
-        "topico": "Combinatória, probabilidade e estatística",
+        "topico": "Estatística",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2508,10 +3630,82 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-11|Combinatória, probabilidade e estatística",
+        "id": "iezzi-5|PFC",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "PFC",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Fatorial e permutações",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "Fatorial e permutações",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Arranjo e combinações",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "Arranjo e combinações",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Combinatória avançada",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "Combinatória avançada",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Probabilidade",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "Probabilidade",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-5|Probabilidade condicional",
+        "recurso": "iezzi-5",
+        "materia": "Matemática",
+        "topico": "Probabilidade condicional",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Estatística",
         "recurso": "iezzi-11",
         "materia": "Matemática",
-        "topico": "Combinatória, probabilidade e estatística",
+        "topico": "Estatística",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2520,10 +3714,82 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-9|Geometria plana",
+        "id": "iezzi-11|PFC",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "PFC",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Fatorial e permutações",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "Fatorial e permutações",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Arranjo e combinações",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "Arranjo e combinações",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Combinatória avançada",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "Combinatória avançada",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Probabilidade",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "Probabilidade",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-11|Probabilidade condicional",
+        "recurso": "iezzi-11",
+        "materia": "Matemática",
+        "topico": "Probabilidade condicional",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Polígonos",
         "recurso": "iezzi-9",
         "materia": "Matemática",
-        "topico": "Geometria plana",
+        "topico": "Polígonos",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2532,10 +3798,82 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-10|Geometria espacial",
+        "id": "iezzi-9|Circunferência",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Circunferência",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Quadriláteros",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Quadriláteros",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Trigonometria em triângulos quaisquer",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Trigonometria em triângulos quaisquer",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Áreas de polígonos",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Áreas de polígonos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Áreas circulares",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Áreas circulares",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-9|Triângulos e pontos notáveis",
+        "recurso": "iezzi-9",
+        "materia": "Matemática",
+        "topico": "Triângulos e pontos notáveis",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Geometria de posição",
         "recurso": "iezzi-10",
         "materia": "Matemática",
-        "topico": "Geometria espacial",
+        "topico": "Geometria de posição",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2544,10 +3882,106 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-7|Analítica, vetores, cônicas e quádricas",
+        "id": "iezzi-10|Prismas",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Prismas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Pirâmides",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Pirâmides",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Cilindros",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Cilindros",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Cones",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Cones",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Poliedros",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Poliedros",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Esferas",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Esferas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Sólidos de revolução",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Sólidos de revolução",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-10|Inscrição de sólidos",
+        "recurso": "iezzi-10",
+        "materia": "Matemática",
+        "topico": "Inscrição de sólidos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-7|Pontos e coordenadas",
         "recurso": "iezzi-7",
         "materia": "Matemática",
-        "topico": "Analítica, vetores, cônicas e quádricas",
+        "topico": "Pontos e coordenadas",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2556,10 +3990,58 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-6|Números complexos e polinômios",
+        "id": "iezzi-7|Retas",
+        "recurso": "iezzi-7",
+        "materia": "Matemática",
+        "topico": "Retas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-7|Cônicas",
+        "recurso": "iezzi-7",
+        "materia": "Matemática",
+        "topico": "Cônicas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-7|Lugares geométricos",
+        "recurso": "iezzi-7",
+        "materia": "Matemática",
+        "topico": "Lugares geométricos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-7|Vetores no R³ e quádricas",
+        "recurso": "iezzi-7",
+        "materia": "Matemática",
+        "topico": "Vetores no R³ e quádricas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Polinômios: introdução",
         "recurso": "iezzi-6",
         "materia": "Matemática",
-        "topico": "Números complexos e polinômios",
+        "topico": "Polinômios: introdução",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2568,10 +4050,94 @@
         "sugerido": true
       },
       {
-        "id": "iezzi-8|Cálculo (só Escola Naval)",
+        "id": "iezzi-6|Operações com polinômios",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Operações com polinômios",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Unidade imaginária",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Unidade imaginária",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Forma algébrica",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Forma algébrica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Forma trigonométrica",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Forma trigonométrica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Lugares geométricos nos complexos",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Lugares geométricos nos complexos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Equações algébricas",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Equações algébricas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-6|Polinômios avançado",
+        "recurso": "iezzi-6",
+        "materia": "Matemática",
+        "topico": "Polinômios avançado",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-8|Limites",
         "recurso": "iezzi-8",
         "materia": "Matemática",
-        "topico": "Cálculo (só Escola Naval)",
+        "topico": "Limites",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2580,10 +4146,46 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-1|Dinâmica, energia, impulso e colisões",
+        "id": "iezzi-8|Derivadas",
+        "recurso": "iezzi-8",
+        "materia": "Matemática",
+        "topico": "Derivadas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-8|Aplicações da derivada",
+        "recurso": "iezzi-8",
+        "materia": "Matemática",
+        "topico": "Aplicações da derivada",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "iezzi-8|Integrais",
+        "recurso": "iezzi-8",
+        "materia": "Matemática",
+        "topico": "Integrais",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Atrito",
         "recurso": "topicos-fisica-1",
         "materia": "Física",
-        "topico": "Dinâmica, energia, impulso e colisões",
+        "topico": "Atrito",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2592,10 +4194,10 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-1|Gravitação e estática",
+        "id": "topicos-fisica-1|Plano inclinado e polias",
         "recurso": "topicos-fisica-1",
         "materia": "Física",
-        "topico": "Gravitação e estática",
+        "topico": "Plano inclinado e polias",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2604,10 +4206,10 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-1|Fluidos",
+        "id": "topicos-fisica-1|Trabalho e potência",
         "recurso": "topicos-fisica-1",
         "materia": "Física",
-        "topico": "Fluidos",
+        "topico": "Trabalho e potência",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2616,10 +4218,142 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-2|Termologia e termodinâmica",
+        "id": "topicos-fisica-1|Energia mecânica",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Energia mecânica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Impulso e quantidade de movimento",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Impulso e quantidade de movimento",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Colisões e centro de massa",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Colisões e centro de massa",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Estática do ponto",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Estática do ponto",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Estática do corpo extenso",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Estática do corpo extenso",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Estabilidade do equilíbrio",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Estabilidade do equilíbrio",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Gravitação: Kepler e Newton",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Gravitação: Kepler e Newton",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Órbitas e energia gravitacional",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Órbitas e energia gravitacional",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Pressão e Stevin",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Pressão e Stevin",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Pascal e Arquimedes",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Pascal e Arquimedes",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Hidrodinâmica",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Hidrodinâmica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Termometria",
         "recurso": "topicos-fisica-2",
         "materia": "Física",
-        "topico": "Termologia e termodinâmica",
+        "topico": "Termometria",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2628,10 +4362,10 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-2|MHS, ondas, som e luz",
+        "id": "topicos-fisica-2|Dilatação",
         "recurso": "topicos-fisica-2",
         "materia": "Física",
-        "topico": "MHS, ondas, som e luz",
+        "topico": "Dilatação",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2640,10 +4374,238 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-3|Eletrostática",
+        "id": "topicos-fisica-2|Calorimetria e mudança de fase",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Calorimetria e mudança de fase",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Gases",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Gases",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Teoria cinética",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Teoria cinética",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Transmissão de calor e radiação",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Transmissão de calor e radiação",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|1ª lei da termodinâmica",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "1ª lei da termodinâmica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|2ª lei, Carnot e refrigeradores",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "2ª lei, Carnot e refrigeradores",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Ondas: conceitos",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Ondas: conceitos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Princípios da óptica e espelhos planos",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Princípios da óptica e espelhos planos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|MHS",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "MHS",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Pêndulos e energia no MHS",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Pêndulos e energia no MHS",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Fenômenos ondulatórios e cordas",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Fenômenos ondulatórios e cordas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Acústica",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Acústica",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Doppler",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Doppler",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Espelhos esféricos",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Espelhos esféricos",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Refração, reflexão total, prismas e dispersão",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Refração, reflexão total, prismas e dispersão",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Lentes",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Lentes",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Interferência (Young e filmes finos)",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Interferência (Young e filmes finos)",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Difração e polarização",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Difração e polarização",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-2|Interferômetros (Michelson, Fabry-Perot, Mach-Zehnder)",
+        "recurso": "topicos-fisica-2",
+        "materia": "Física",
+        "topico": "Interferômetros (Michelson, Fabry-Perot, Mach-Zehnder)",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Carga e Coulomb",
         "recurso": "topicos-fisica-3",
         "materia": "Física",
-        "topico": "Eletrostática",
+        "topico": "Carga e Coulomb",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2652,10 +4614,10 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-3|Eletrodinâmica",
+        "id": "topicos-fisica-3|Campo elétrico",
         "recurso": "topicos-fisica-3",
         "materia": "Física",
-        "topico": "Eletrodinâmica",
+        "topico": "Campo elétrico",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2664,10 +4626,10 @@
         "sugerido": true
       },
       {
-        "id": "topicos-fisica-3|Magnetismo e indução",
+        "id": "topicos-fisica-3|Potencial e energia",
         "recurso": "topicos-fisica-3",
         "materia": "Física",
-        "topico": "Magnetismo e indução",
+        "topico": "Potencial e energia",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2676,10 +4638,202 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Estequiometria e soluções",
+        "id": "topicos-fisica-3|Condutores em equilíbrio",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Condutores em equilíbrio",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Capacitores",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Capacitores",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Corrente e lei de Ohm",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Corrente e lei de Ohm",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Associação de resistores",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Associação de resistores",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Potência e efeito Joule",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Potência e efeito Joule",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Geradores e receptores",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Geradores e receptores",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Kirchhoff",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Kirchhoff",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Medidores e ponte de Wheatstone",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Medidores e ponte de Wheatstone",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Campo magnético",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Campo magnético",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Força magnética",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Força magnética",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Campo gerado por correntes",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Campo gerado por correntes",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Faraday e Lenz",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Faraday e Lenz",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Indutância",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Indutância",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-3|Corrente alternada e transformadores",
+        "recurso": "topicos-fisica-3",
+        "materia": "Física",
+        "topico": "Corrente alternada e transformadores",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Estequiometria",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Estequiometria e soluções",
+        "topico": "Estequiometria",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Soluções e concentração",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Soluções e concentração",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-1|Diluição, mistura e titulação",
+        "recurso": "feltre-1",
+        "materia": "Química",
+        "topico": "Diluição, mistura e titulação",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2712,10 +4866,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-2|Equilíbrio",
+        "id": "feltre-2|Equilíbrio químico",
         "recurso": "feltre-2",
         "materia": "Química",
-        "topico": "Equilíbrio",
+        "topico": "Equilíbrio químico",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2724,10 +4878,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-2|Eletroquímica",
+        "id": "feltre-2|Equilíbrio iônico e pH",
         "recurso": "feltre-2",
         "materia": "Química",
-        "topico": "Eletroquímica",
+        "topico": "Equilíbrio iônico e pH",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2736,10 +4890,118 @@
         "sugerido": true
       },
       {
-        "id": "feltre-3|Química orgânica",
+        "id": "feltre-2|Hidrólise, tampão e Kps",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Hidrólise, tampão e Kps",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-2|Pilhas",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Pilhas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-2|Eletrólise",
+        "recurso": "feltre-2",
+        "materia": "Química",
+        "topico": "Eletrólise",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Carbono e cadeias",
         "recurso": "feltre-3",
         "materia": "Química",
-        "topico": "Química orgânica",
+        "topico": "Carbono e cadeias",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Funções orgânicas",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Funções orgânicas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Nomenclatura",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Nomenclatura",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Isomeria plana",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Isomeria plana",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Isomeria espacial",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Isomeria espacial",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Reações orgânicas",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Reações orgânicas",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "feltre-3|Polímeros e bioquímica",
+        "recurso": "feltre-3",
+        "materia": "Química",
+        "topico": "Polímeros e bioquímica",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2832,22 +5094,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Matéria, substâncias e misturas",
+        "id": "feltre-1|Matéria e substâncias",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Matéria, substâncias e misturas",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Estados físicos e mudanças de estado",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Estados físicos e mudanças de estado",
+        "topico": "Matéria e substâncias",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2880,10 +5130,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Número atômico, número de massa e isótopos",
+        "id": "feltre-1|Tabela periódica e propriedades",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Número atômico, número de massa e isótopos",
+        "topico": "Tabela periódica e propriedades",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2892,10 +5142,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Íons e partículas do átomo",
+        "id": "feltre-1|Distribuição eletrônica",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Íons e partículas do átomo",
+        "topico": "Distribuição eletrônica",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2904,10 +5154,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Tabela periódica: famílias e períodos",
+        "id": "feltre-1|Ligações iônica e covalente",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Tabela periódica: famílias e períodos",
+        "topico": "Ligações iônica e covalente",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2916,58 +5166,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Distribuição eletrônica (diagrama de Pauling)",
+        "id": "feltre-1|Geometria e polaridade",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Distribuição eletrônica (diagrama de Pauling)",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Propriedades periódicas",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Propriedades periódicas",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Ligação iônica",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Ligação iônica",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Ligação covalente",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Ligação covalente",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Ligação metálica e propriedades das substâncias",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Ligação metálica e propriedades das substâncias",
+        "topico": "Geometria e polaridade",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -2988,10 +5190,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Sais",
+        "id": "feltre-1|Sais e óxidos",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Sais",
+        "topico": "Sais e óxidos",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -3000,10 +5202,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Óxidos",
+        "id": "feltre-1|Mol e massa molar",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Óxidos",
+        "topico": "Mol e massa molar",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -3012,10 +5214,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Massa atômica e massa molecular",
+        "id": "feltre-1|Reações inorgânicas",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Massa atômica e massa molecular",
+        "topico": "Reações inorgânicas",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -3024,10 +5226,10 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Mol e constante de Avogadro",
+        "id": "feltre-1|Nox e balanceamento",
         "recurso": "feltre-1",
         "materia": "Química",
-        "topico": "Mol e constante de Avogadro",
+        "topico": "Nox e balanceamento",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -3036,58 +5238,22 @@
         "sugerido": true
       },
       {
-        "id": "feltre-1|Massa molar",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Massa molar",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Reações químicas e balanceamento",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Reações químicas e balanceamento",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Leis de Lavoisier e Proust",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Leis de Lavoisier e Proust",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "feltre-1|Estequiometria simples: mol e massa",
-        "recurso": "feltre-1",
-        "materia": "Química",
-        "topico": "Estequiometria simples: mol e massa",
-        "cap": null,
-        "pagIni": null,
-        "pagFim": null,
-        "exIni": null,
-        "exFim": null,
-        "sugerido": true
-      },
-      {
-        "id": "topicos-fisica-1|Cinemática: lançamento oblíquo e movimento circular",
+        "id": "topicos-fisica-1|Lançamento horizontal e oblíquo",
         "recurso": "topicos-fisica-1",
         "materia": "Física",
-        "topico": "Cinemática: lançamento oblíquo e movimento circular",
+        "topico": "Lançamento horizontal e oblíquo",
+        "cap": null,
+        "pagIni": null,
+        "pagFim": null,
+        "exIni": null,
+        "exFim": null,
+        "sugerido": true
+      },
+      {
+        "id": "topicos-fisica-1|Movimento circular",
+        "recurso": "topicos-fisica-1",
+        "materia": "Física",
+        "topico": "Movimento circular",
         "cap": null,
         "pagIni": null,
         "pagFim": null,
@@ -3157,64 +5323,6 @@
     }
   ],
   "fase0": {
-    "semanas": [
-      {
-        "n": 1,
-        "datas": "16–22/11",
-        "mat": "inteiros, 4 operações, divisibilidade, MMC/MDC, frações",
-        "fis": "unidades SI, conversões, notação científica",
-        "qui": "matéria, estados, misturas e separação"
-      },
-      {
-        "n": 2,
-        "datas": "23–29/11",
-        "mat": "decimais, potências, raízes, expressões numéricas",
-        "fis": "grandezas escalares e vetoriais, soma de vetores, Pitágoras",
-        "qui": "átomo, modelos atômicos, nº atômico e de massa"
-      },
-      {
-        "n": 3,
-        "datas": "30/11–06/12",
-        "mat": "razão, proporção, regra de três, porcentagem, juros simples",
-        "fis": "velocidade média, movimento uniforme e gráficos",
-        "qui": "tabela periódica, distribuição eletrônica"
-      },
-      {
-        "n": 4,
-        "datas": "07–13/12",
-        "mat": "expressões algébricas, equação e inequação do 1º grau, problemas",
-        "fis": "movimento uniformemente variado, Torricelli",
-        "qui": "ligações químicas"
-      },
-      {
-        "n": 5,
-        "datas": "14–20/12",
-        "mat": "sistemas 2×2, produtos notáveis, fatoração",
-        "fis": "queda livre, lançamento vertical",
-        "qui": "ácidos, bases, sais e óxidos (básico)"
-      },
-      {
-        "n": 6,
-        "datas": "21–27/12",
-        "mat": "equação do 2º grau, soma e produto, frações algébricas",
-        "fis": "leis de Newton (conceitos)",
-        "qui": "mol e massa molar"
-      },
-      {
-        "n": 7,
-        "datas": "28/12–03/01",
-        "mat": "ângulos, triângulos, Pitágoras, áreas, semelhança, trigonometria no triângulo retângulo",
-        "fis": "leis de Newton aplicadas (peso, normal, tração)",
-        "qui": "balanceamento, estequiometria simples"
-      },
-      {
-        "n": 8,
-        "datas": "04–10/01",
-        "mat": "revisão dos tópicos não dominados e teste de saída",
-        "fis": "revisão",
-        "qui": "revisão"
-      }
-    ],
     "notas": {
       "Português": "Leia 1 texto por dia e responda 3 perguntas (tema, ideia central, uma inferência). Gramática básica nos blocos: classes de palavras e concordância.",
       "Inglês": "Manutenção: 1 hora por semana."
@@ -3428,7 +5536,9 @@
       "rapido": "Metaspeed"
     },
     "liberadoFisio": false,
-    "ritmoMinKm": 7
+    "ritmoMinKm": 7,
+    "corridaSab": "07:00",
+    "musculacaoMin": 60
   },
   "oracaoPlano": {
     "inicio": "2026-11-17",
@@ -3762,5 +5872,40 @@
       "lectio": 15,
       "estudo": 5
     }
-  }
+  },
+  "sono": {
+    "padrao": {
+      "0": {
+        "dormir": "22:00",
+        "acordar": "05:00"
+      },
+      "1": {
+        "dormir": "22:00",
+        "acordar": "05:00"
+      },
+      "2": {
+        "dormir": "22:00",
+        "acordar": "05:00"
+      },
+      "3": {
+        "dormir": "22:00",
+        "acordar": "05:00"
+      },
+      "4": {
+        "dormir": "22:00",
+        "acordar": "05:00"
+      },
+      "5": {
+        "dormir": "22:00",
+        "acordar": "06:30"
+      },
+      "6": {
+        "dormir": "21:00",
+        "acordar": "05:15"
+      }
+    },
+    "minimoH": 6,
+    "normalH": 7
+  },
+  "tom": "sargento"
 }

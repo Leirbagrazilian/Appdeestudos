@@ -2,6 +2,7 @@
   import { slide } from 'svelte/transition';
   import { app, fases, salvarRevisao, apagarRevisao, ajustes } from '../stores/app.svelte.js';
   import Chips from '../components/Chips.svelte';
+  import SonoSemana from '../components/SonoSemana.svelte';
   import { PERGUNTAS, resumoSemana, historico, semanaDe } from '../lib/revisao.js';
   import { addDays, fmtCurta, fmtMin } from '../lib/dates.js';
   import { dur } from '../lib/prefs.js';
@@ -64,6 +65,9 @@
 {#if r.porMateria.length}
   <p class="sub mat">Onde o tempo foi: {r.porMateria.map(([m, min]) => `${m} ${hm(min)}`).join(' · ')}{r.adiados ? ` · ${r.adiados} ${r.adiados === 1 ? 'bloco adiado' : 'blocos adiados'}` : ''}</p>
 {/if}
+
+<h2>Sono da semana</h2>
+<SonoSemana {seg} />
 
 <form class="card f" onsubmit={salvar}>
   {#each PERGUNTAS as [campo, pergunta, ex]}

@@ -6,13 +6,7 @@ const DO_SEED = ['fases', 'provaSabado', 'metodos', 'diagnostico', 'topicos', 'p
 const CAMPOS_CONCURSO = ['nome', 'sigla', 'cor', 'prioridade', 'idade', 'link', 'plano'];
 const mesmoEvento = (a, b) => a.tipo === b.tipo && (a.nome ?? '') === (b.nome ?? '');
 
-const AULAS_V1 = JSON.stringify([{ dia: 1, inicio: '07:30', fim: '11:10', nome: 'Faculdade' }, { dia: 3, inicio: '09:30', fim: '10:10', nome: 'Faculdade' }, { dia: 4, inicio: '13:00', fim: '18:00', nome: 'Faculdade' }]);
-
-// janelas de fim de semana do seed v7: se você não mexeu nelas, passam para as da v8 (sábado e domingo mais cheios)
-const SEG_V9 = JSON.stringify([{ ini: '06:00', fim: '07:00' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }]);
-const SEG_V10 = JSON.stringify([{ ini: '06:30', fim: '07:10' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }]);
-const SAB_V7 = JSON.stringify([{ ini: '08:00', fim: '15:00', tipo: 'prova' }]);
-const DOM_V7 = JSON.stringify([{ ini: '09:00', fim: '12:00', tipo: 'domingo' }]);
+const NOMES_AULAS_ANTIGOS = ['Faculdade', 'Academia', 'Jiu-jitsu'];
 
 export function migrarCfg(salvo, seed) {
   if ((salvo.versaoSeed ?? 1) >= (seed.versaoSeed ?? 1)) return salvo;
@@ -20,22 +14,21 @@ export function migrarCfg(salvo, seed) {
   for (const k of DO_SEED) if (k in seed) cfg[k] = structuredClone(seed[k]);
   for (const k of Object.keys(seed)) if (!(k in cfg)) cfg[k] = structuredClone(seed[k]);
   cfg.perfil = { ...structuredClone(seed.perfil), ...cfg.perfil };
-  // rotina: o que você editou fica; campos novos entram. As aulas do primeiro cadastro (sem edição) são trocadas pelas do SPEC.
-  const aulasSemEdicao = JSON.stringify(salvo.rotina?.aulas ?? null) === AULAS_V1;
+  // rotina: o que você editou fica; campos novos entram.
   cfg.rotina = { ...structuredClone(seed.rotina), ...(cfg.rotina ?? {}) };
-  delete cfg.rotina.metaHoras;
-  if ((salvo.versaoSeed ?? 1) < 8) {
-    cfg.rotina.metaNominal = seed.rotina.metaNominal; // a tabela de horas da v3 já é líquida
-    cfg.rotina.janelas = { ...cfg.rotina.janelas };
-    if (JSON.stringify(salvo.rotina?.janelas?.[6] ?? null) === SAB_V7) cfg.rotina.janelas[6] = structuredClone(seed.rotina.janelas[6]);
-    if (JSON.stringify(salvo.rotina?.janelas?.[0] ?? null) === DOM_V7) cfg.rotina.janelas[0] = structuredClone(seed.rotina.janelas[0]);
-  }
-  if (aulasSemEdicao) cfg.rotina.aulas = structuredClone(seed.rotina.aulas);
   delete cfg.modeloSemana;
-  // v10: corrida às 5h30; o 1º bloco de segunda vira 6h30–7h10 (se você não mexeu na segunda)
-  if ((salvo.versaoSeed ?? 1) < 10 && JSON.stringify(salvo.rotina?.janelas?.[1] ?? null) === SEG_V9) cfg.rotina.janelas = { ...cfg.rotina.janelas, 1: structuredClone(seed.rotina.janelas[1]) };
-  // v11: o 3º terço vem depois da corrida; o 1º bloco de segunda vira 6h40–7h10 (se você não mexeu)
-  if ((salvo.versaoSeed ?? 1) < 11 && [SEG_V9, SEG_V10].includes(JSON.stringify(salvo.rotina?.janelas?.[1] ?? null))) cfg.rotina.janelas = { ...cfg.rotina.janelas, 1: structuredClone(seed.rotina.janelas[1]) };
+  const v = salvo.versaoSeed ?? 1;
+  if (v < 12) {
+    // v12 (plano ~55 h): janelas passam a ser calculadas (6h30–21h menos os fixos); a meta padrão antiga (43 h) vira 55 h
+    delete cfg.rotina.janelas; delete cfg.rotina.metaNominal; delete cfg.rotina.pesoFimDeSemana; delete cfg.rotina.metaHoras;
+    if (salvo.rotina?.metaLiquida == null || salvo.rotina.metaLiquida === 43) cfg.rotina.metaLiquida = seed.rotina.metaLiquida;
+    // aulas: as do seed (faculdade com "vou/não vou", jiu-jitsu); o que você cadastrou à mão continua
+    const meus = (salvo.rotina?.aulas ?? []).filter((a) => !NOMES_AULAS_ANTIGOS.includes(a.nome) && !seed.rotina.aulas.some((n) => n.nome === a.nome));
+    cfg.rotina.aulas = [...structuredClone(seed.rotina.aulas), ...meus];
+    cfg.treino = { ...structuredClone(seed.treino), ...(cfg.treino ?? {}) };
+    for (const k of ['inicioFase2', 'semanasEspecifica']) delete cfg.perfil[k];
+    cfg.sono = { ...structuredClone(seed.sono), ...(cfg.sono ?? {}) };
+  }
   cfg.biblioteca = mesclarBiblioteca(salvo.biblioteca, seed.biblioteca); // o que você cadastrou fica; recursos novos do seed entram
 
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));

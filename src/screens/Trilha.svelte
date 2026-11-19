@@ -1,12 +1,14 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, setLacuna, salvarCfg, fases, destravarTopico } from '../stores/app.svelte.js';
+  import { app, setLacuna, salvarCfg, fases, prazos, destravarTopico, definirPeso } from '../stores/app.svelte.js';
   import { dur } from '../lib/prefs.js';
   import { linksDe, acertoPorTopico, buscasDoTopico } from '../lib/tarefas.js';
   import { coberturaPaginas } from '../lib/livros.js';
   import Chips from '../components/Chips.svelte';
   import Ring from '../components/Ring.svelte';
-  import { NIVEIS, MATERIAS_TRILHA, topicosDe, dominio, proximoTopico, cobertura, semanaZero, esperadosAte } from '../lib/trilha.js';
+  import { NIVEIS, MATERIAS_TRILHA, topicosDe, dominio, proximoTopico, cobertura } from '../lib/trilha.js';
+  import { temPrazo, escolherTopico, contarBlocos, statusDe, ritmo as ritmoPrazos, prereqPendentes, PESOS, MATERIAS_PRAZO } from '../lib/prazos.js';
+  import { fmtBR, diaNome } from '../lib/dates.js';
   import { faseDoDia } from '../lib/phases.js';
   import { situacao, resumo, chave, MAX_TENTATIVAS } from '../lib/dominio.js';
 
@@ -15,37 +17,41 @@
   const info = $derived(app.cfg.materiasInfo?.[materia] ?? {});
   const lista = $derived(topicosDe(app.cfg, materia));
   const fasesL = $derived(fases());
-  const emZero = $derived(faseDoDia(fasesL, app.dia).id === 'zero');
-  const semZ = $derived(semanaZero(fasesL, app.dia));
+  const faseAtual = $derived(faseDoDia(fasesL, app.dia));
+  const emZero = $derived(faseAtual.id === 'zero');
+  const plano = $derived(prazos());
+  let aba = $state('trilha'), mp = $state('Matemática');
+  // estado para escolher o próximo tópico (os de Matemática, Física e Química seguem o calendário de prazos)
+  const stP = $derived({ lacunas: app.lacunas, feitos: contarBlocos(app.done), dividas: app.dividas, virt: {}, excluir: new Set(), faseId: faseAtual.id, acertos: acertoPorTopico(app.done), dominio: app.dominio });
   const optsProx = $derived(emZero ? { faseZero: true, dominio: app.dominio } : { dominio: app.dominio });
-  const proximo = $derived(proximoTopico(app.cfg, app.lacunas, materia, emZero ? 1 : 3, new Set(), optsProx));
+  const proximoDe = (m) => {
+    if (temPrazo(m)) { const e = escolherTopico(app.cfg, plano, m, stP, app.dia); return e ? topicosDe(app.cfg, m).find((t) => t.nome === e.item.nome) ?? null : null; }
+    return proximoTopico(app.cfg, app.lacunas, m, emZero ? 1 : 3, new Set(), optsProx);
+  };
+  const proximo = $derived(proximoDe(materia));
   const pct = $derived(cobertura(app.cfg, app.lacunas, materia));
   const dominados = $derived(lista.filter((t) => dominio(app.lacunas, materia, t.nome) >= 3).length);
-  const proximos = $derived(materias.map((m) => ({ m, t: proximoTopico(app.cfg, app.lacunas, m, emZero ? 1 : 3, new Set(), optsProx) })).filter((x) => x.t));
-  // Fase 0: tabela da semana (SPEC) e quantos tópicos já deveriam estar dominados até ela
-  const f0 = $derived(app.cfg.fase0 ?? null);
-  const linhaSemana = $derived(f0?.semanas?.[Math.min(Math.max(semZ, 1), f0.semanas.length) - 1] ?? null);
-  const semanaCard = $derived(!emZero || !f0 ? [] : [['Matemática', 'mat'], ['Física', 'fis'], ['Química', 'qui']].map(([m, k]) => {
-    const esp = esperadosAte(app.cfg, m, semZ);
-    return { m, texto: linhaSemana?.[k], esp: esp.length, dom: esp.filter((x) => dominio(app.lacunas, m, x.nome) >= 3).length };
-  }));
-  const diaPassa = (n) => (n <= 8 ? '' : ' (prorrogada)');
-  // agrupa a matéria por semana da Fase 0; o resto vem depois, como "Fase 1 em diante"
+  const proximos = $derived(materias.map((m) => ({ m, t: proximoDe(m) })).filter((x) => x.t));
+  // agrupa: Matemática, Física e Química por Ano (0 = Fase 0); as outras matérias por semana da Fase 0 e "depois"
+  const NOME_ANO = ['Fase 0 · Base', 'Ano 1', 'Ano 2', 'Ano 3 + cálculo EN'];
   const grupos = $derived.by(() => {
-    const g = [];
+    const g = [], porAno = temPrazo(materia);
     for (const t of lista) {
-      const id = t.fase === 0 ? `s${t.sem}` : 'f1';
+      const id = porAno ? `a${t.ano ?? 1}` : t.fase === 0 ? `s${t.sem}` : 'f1';
       let x = g.find((y) => y.id === id);
-      if (!x) { x = { id, sem: t.fase === 0 ? t.sem : null, itens: [] }; g.push(x); }
+      if (!x) { x = { id, ano: porAno ? t.ano ?? 1 : null, sem: !porAno && t.fase === 0 ? t.sem : null, itens: [] }; g.push(x); }
       x.itens.push(t);
     }
+    const faseNum = { zero: 0, ano1: 1, ano2: 2, ano3: 3 }[faseAtual.id] ?? 4;
     for (const x of g) {
       x.dom = x.itens.filter((t) => dominio(app.lacunas, materia, t.nome) >= 3).length;
-      x.titulo = x.sem ? `Semana ${x.sem} · ${f0?.semanas?.[x.sem - 1]?.datas ?? ''}` : g.length > 1 ? 'Fase 1 em diante' : '';
-      x.aberto = g.length === 1 || (x.sem ? (emZero ? x.sem === Math.min(semZ, 8) : false) : !emZero);
+      x.titulo = x.ano != null ? NOME_ANO[x.ano] : x.sem ? `Semana ${x.sem} da Fase 0` : g.length > 1 ? 'Depois da Fase 0' : '';
+      x.aberto = g.length === 1 || (x.ano != null ? x.ano === Math.min(faseNum, 3) : x.sem ? emZero : !emZero);
     }
     return g;
   });
+  const ritmoGeral = $derived(ritmoPrazos(plano, app.lacunas, app.dia));
+  const ROT_ST = { dominado: 'dominado', divida: 'dívida', bloqueado: 'bloqueado', atrasado: 'atrasado', hoje: 'vence hoje', andamento: 'em andamento', futuro: 'no prazo' };
   const sit = (t) => situacao(dominio(app.lacunas, materia, t.nome), app.dominio[chave(materia, t.nome)]);
   const falhas = (t) => resumo(app.dominio[chave(materia, t.nome)]);
   const sigla = (id) => app.cfg.concursos.find((c) => c.id === id)?.sigla ?? id;
@@ -75,18 +81,67 @@
   <p class="nota"><strong>Escola Naval elimina:</strong> menos de {en.minPorMateriaPct}% em qualquer matéria, ou redação abaixo de {en.minRedacaoDe100}/100.</p>
 {/if}
 
-{#if emZero && f0}
-  <section class="card f0" aria-label="Semana da Fase 0">
+<div class="abas" role="tablist" aria-label="Trilha ou Prazos">
+  <button role="tab" aria-selected={aba === 'trilha'} class:on={aba === 'trilha'} onclick={() => (aba = 'trilha')}>Trilha</button>
+  <button role="tab" aria-selected={aba === 'prazos'} class:on={aba === 'prazos'} onclick={() => (aba = 'prazos')}>Prazos{ritmoGeral.alerta ? ' ⚠' : ''}</button>
+</div>
+
+{#if aba === 'prazos'}
+  <section class="card rit" aria-label="Ritmo geral">
+    <p class="data">Ritmo · Matemática, Física e Química</p>
+    <p class="big"><strong>{ritmoGeral.dominados}</strong> dominados <span class="sub">de {ritmoGeral.previstos} previstos até hoje ({ritmoGeral.total} no total)</span></p>
+    <div class="barra" role="progressbar" aria-label="Dominados em relação aos previstos até hoje" aria-valuenow={Math.round(ritmoGeral.pct * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{ritmoGeral.pct * 100}%"></i></div>
+    <p class="sub">Data projetada de término: <strong>{ritmoGeral.fimProjetado ? fmtBR(ritmoGeral.fimProjetado) : '-'}</strong> (plano: {ritmoGeral.fimPlano ? fmtBR(ritmoGeral.fimPlano) : '-'}){ritmoGeral.atraso ? ` · ${ritmoGeral.atraso} dias de atraso` : ritmoGeral.adianto ? ` · ${ritmoGeral.adianto} dias à frente` : ' · no ritmo'}</p>
+    {#if ritmoGeral.alerta}
+      <div class="alerta" role="alert">
+        <strong>Atraso de mais de 1 semana.</strong>
+        <ul>{#each ritmoGeral.sugestoes as x}<li>{x}</li>{/each}</ul>
+      </div>
+    {/if}
+  </section>
+  <Chips opcoes={MATERIAS_PRAZO.map((m) => ({ id: m, nome: m }))} bind:valor={mp} rotulo="Matéria dos prazos" />
+  {@const rm = ritmoPrazos(plano, app.lacunas, app.dia, mp)}
+  <p class="sub rmp">{mp}: {rm.dominados} de {rm.previstos} previstos até hoje · término projetado {rm.fimProjetado ? fmtBR(rm.fimProjetado) : '-'}</p>
+  {#each [0, 1, 2, 3] as ano}
+    {@const itens = (plano.porMateria[mp] ?? []).filter((i) => i.ano === ano)}
+    {#if itens.length}
+      <details class="grp" open={ano === (({ zero: 0, ano1: 1, ano2: 2, ano3: 3 })[faseAtual.id] ?? 3)}>
+        <summary><span>{NOME_ANO[ano]}</span><small>{itens.filter((i) => dominio(app.lacunas, mp, i.nome) >= 3).length} de {itens.length} dominados</small></summary>
+        <ul class="grupo card">
+          {#each itens as i (i.nome)}
+            {@const st = statusDe(plano, i, { lacunas: app.lacunas, feitos: stP.feitos, dividas: app.dividas }, app.dia)}
+            <li class="pz">
+              <div class="cab"><span class="cod">{i.codigo}</span>
+                <span class="nm"><strong>{i.nome}</strong>
+                  <span class="sub">{i.blocos} {i.blocos === 1 ? 'bloco' : 'blocos'} · prazo {diaNome(i.prazo).slice(0, 3)} {fmtBR(i.prazo).slice(0, 5)}</span></span>
+                <span class="st {st}">{ROT_ST[st]}</span></div>
+              {#if i.aviso}<p class="sub avi">{i.aviso}</p>{/if}
+              {#if st === 'bloqueado'}<p class="sub avi">Aguardando {prereqPendentes(plano, app.lacunas, i).map((x) => `${x.codigo} ${x.nome}`).join(' e ')} (Matemática).</p>{/if}
+              <div class="peso" role="radiogroup" aria-label="Peso de {i.nome}">
+                {#each PESOS as [v, nome]}<button role="radio" aria-checked={i.peso === v} class:on={i.peso === v} onclick={() => definirPeso(mp, i.nome, v)}>{v} · {nome}</button>{/each}
+              </div>
+            </li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
+  {/each}
+  <p class="sub leg">Peso 1 leve, 2 normal (padrão), 3 pesado: os blocos do Ano são divididos na proporção dos pesos. Mudar o peso recalcula os prazos.</p>
+{:else}
+
+{#if emZero}
+  <section class="card f0" aria-label="Fase 0">
     <p class="data">Fase 0 · Base do zero</p>
-    <h2 class="semh">Semana {semZ} de 8{diaPassa(semZ)}</h2>
+    <h2 class="semh">Até o portão (previsão {fmtBR(app.cfg.perfil.fimZero ?? '2027-01-10')})</h2>
     <ul class="semul">
-      {#each semanaCard as s}
-        <li><strong>{s.m}</strong><span>{s.texto}</span><small>{s.dom} de {s.esp} tópicos dominados até aqui</small></li>
+      {#each MATERIAS_PRAZO as m}
+        {@const z = (plano.porMateria[m] ?? []).filter((i) => i.ano === 0)}
+        <li><strong>{m}</strong><span>{z.filter((i) => dominio(app.lacunas, m, i.nome) >= 3).length} de {z.length} tópicos dominados · último prazo {z.length ? fmtBR(z.at(-1).prazo).slice(0, 5) : '-'}</span></li>
       {/each}
-      <li><strong>Português</strong><span>{f0.notas?.['Português']}</span></li>
-      <li><strong>Inglês</strong><span>{f0.notas?.['Inglês']}</span></li>
+      <li><strong>Português</strong><span>{app.cfg.fase0?.notas?.['Português']}</span></li>
+      <li><strong>Inglês</strong><span>{app.cfg.fase0?.notas?.['Inglês']}</span></li>
     </ul>
-    <p class="sub">Cada tópico só avança com 8 acertos em 10. Abaixo disso, o próximo bloco repete o tópico; depois de 3 tentativas ele fica travado.</p>
+    <p class="sub">Cada tópico tem prazo e só fecha com 8 acertos em 10. O último bloco é o MATAR HOJE.</p>
     <a class="pri" href="#/progresso">Ver o portão da Fase 0</a>
   </section>
 {/if}
@@ -182,6 +237,7 @@
   {/if}
 {/each}
 <p class="sub leg">0 nunca vi · 1 vi pouco · 2 quase lá · 3 domino</p>
+{/if}
 
 <style>
   .f0 { padding: 16px; margin-top: 12px; display: grid; gap: 10px; border-color: var(--ac); }
@@ -191,6 +247,25 @@
   .semul strong { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .04em; }
   .semul small { color: var(--tx2); }
   .f0 .pri { display: grid; place-items: center; min-height: 48px; border-radius: 14px; background: var(--ac); color: var(--ac-tx); font-weight: 700; text-decoration: none; }
+  .abas { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+  .abas button { min-height: 48px; border-radius: 14px; border: 1px solid var(--line); font-weight: 700; color: var(--tx2); }
+  .abas .on { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
+  .rit { padding: 16px; margin-top: 12px; display: grid; gap: 8px; }
+  .big { margin: 0; } .big strong { font-size: 1.6rem; color: var(--ac); }
+  .barra { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; } .barra i { display: block; height: 100%; background: var(--ac); border-radius: 99px; }
+  .alerta { background: var(--al-bg); color: var(--al); border-radius: 12px; padding: 10px 12px; font-size: .9rem; } .alerta ul { margin: 6px 0 0; padding-left: 18px; }
+  .rmp { margin: 12px 4px 0; }
+  .pz { padding: 12px 12px 10px 16px; display: grid; gap: 8px; }
+  .pz .cab { display: flex; gap: 10px; align-items: center; }
+  .cod { min-width: 3.6rem; font-size: .8125rem; font-weight: 700; color: var(--tx2); font-variant-numeric: tabular-nums; }
+  .st { margin-left: auto; font-size: .8125rem; font-weight: 700; padding: 2px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--tx2); white-space: nowrap; }
+  .st.dominado { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
+  .st.divida, .st.atrasado { background: var(--al-bg); border-color: var(--al); color: var(--al); }
+  .st.bloqueado, .st.hoje { background: var(--warn-bg); border-color: var(--warn); color: var(--warn); }
+  .avi { color: var(--warn); }
+  .peso { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .peso button { min-height: 44px; border-radius: 10px; border: 1px solid var(--line); font-size: .85rem; font-weight: 600; color: var(--tx2); }
+  .peso .on { background: var(--ac-bg); border-color: var(--ac); color: var(--ac); }
   .grp { margin-top: 12px; }
   .grp summary { cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; padding: 0 4px; font-weight: 600; }
   .grp summary small { color: var(--tx2); font-weight: 500; }

@@ -2,7 +2,9 @@
   import { app, avisar } from '../stores/app.svelte.js';
   import { limitesCota, linksDoBloco } from '../lib/tarefas.js';
   import { fichaDoTopico } from '../lib/erros.js';
+  import { fmtBR, diaNome } from '../lib/dates.js';
   let { tarefa, materia } = $props();
+  const diaCurto = (d) => `${diaNome(d).slice(0, 3)} ${fmtBR(d).slice(0, 5)}`;
   const lim = $derived(limitesCota(app.cfg));
   // ficha de revisão rápida: seus últimos erros neste tópico, para reler antes de começar
   const ficha = $derived(tarefa?.topico ? fichaDoTopico(Object.values(app.errors), tarefa.materia ?? materia, tarefa.topico) : null);
@@ -14,7 +16,19 @@
   }
 </script>
 
-{#if tarefa && !tarefa.semTopico}
+{#if tarefa?.resgateLivre}
+  <p class="sub">Resgate do sábado: nenhum tópico da semana ficou sem matar. Faça uma prova antiga (ou questões) e anote os erros no caderno.</p>
+{:else if tarefa && !tarefa.semTopico}
+  {#if tarefa.prazo}
+    <p class="prazo">
+      {#if tarefa.matar}<span class="matar">MATAR HOJE</span>{/if}
+      <strong>{tarefa.prazo.codigo ? `${tarefa.prazo.codigo} · ` : ''}{tarefa.topico}</strong>
+      <span class="sub">{tarefa.prazo.resgate ? 'Resgate do sábado' : tarefa.prazo.pagandoDivida ? 'Pagando dívida' : tarefa.prazo.reforco ? 'Reforço' : `bloco ${tarefa.prazo.k} de ${tarefa.prazo.de}`} · prazo {diaCurto(tarefa.prazo.data)}{tarefa.prazo.atrasado && !tarefa.prazo.resgate ? ' (atrasado)' : ''}</span>
+      {#if tarefa.matar}<span class="sub">Sem aula nova: feche a teoria e faça questões até acertar 8 de 10.</span>{/if}
+      {#if tarefa.prazo.aviso}<span class="sub aviso">{tarefa.prazo.aviso}</span>{/if}
+      {#if tarefa.prazo.lista?.length > 1}<span class="sub">Na fila do resgate: {tarefa.prazo.lista.slice(1).map((x) => x.nome).join(', ')}.</span>{/if}
+    </p>
+  {/if}
   {#if ficha?.total}
     <details class="ficha">
       <summary>Antes de começar: {ficha.total === 1 ? '1 erro seu' : `${ficha.total} erros seus`} neste tópico{ficha.abertos ? '' : ' (já dominados)'}</summary>
@@ -37,7 +51,7 @@
     {:else if tarefa.semPaginas && tarefa.temLivro}<li><span class="tx"><strong>Sem páginas cadastradas</strong><span class="sub">O bloco usa vídeo e questões.</span></span><a class="abrir" href="#/livros">Cadastrar páginas</a></li>{/if}
     <li><span class="tx"><strong>{tarefa.zero ? 'Exercícios' : 'Questões'} · {tarefa.questoes.n} do tópico</strong>
       <span class="sub">~{tarefa.questoes.min} min{tarefa.zero ? ' · sem consultar, com correção na hora' : ''}</span>
-      {#if tarefa.zero}<span class="sub meta">Meta: 8 de 10 para liberar o próximo tópico{tarefa.repeticao ? `. Repetição ${tarefa.tentativa} de ${tarefa.maxTentativas}: exercícios novos, não os mesmos` : ''}.</span>{/if}
+      {#if tarefa.zero || tarefa.matar}<span class="sub meta">Meta: 8 de 10 para liberar o próximo tópico{tarefa.repeticao ? `. Repetição ${tarefa.tentativa} de ${tarefa.maxTentativas}: exercícios novos, não os mesmos` : ''}.</span>{/if}
       {#if tarefa.questoes.semLinks && !tarefa.questoes.buscas?.length}<span class="sub">Cole os links das listas no tópico, na <a class="lk" href="#/trilha">Trilha</a>.</span>{/if}
       {#each tarefa.questoes.fontes as f}
         <a class="fonte" class:esg={f.esgotada} href={f.url} target="_blank" rel="noopener">{f.rotulo}{f.limite != null ? (f.esgotada ? ' · cota de hoje acabou' : ` · restam ${f.restante}`) : ''} ↗</a>
@@ -52,6 +66,9 @@
 
 <style>
   .meta { color: var(--ac); }
+  .prazo { margin: 0 0 8px; display: grid; gap: 2px; }
+  .prazo strong { font-size: .95rem; }
+  .matar { justify-self: start; font-size: .8125rem; font-weight: 800; letter-spacing: .06em; color: var(--al); background: var(--al-bg); border: 1px solid var(--al); border-radius: 8px; padding: 2px 10px; margin-bottom: 2px; }
   .passos { list-style: none; padding: 0; display: grid; gap: 8px; counter-reset: passo; margin: 0; }
   .passos li { counter-increment: passo; display: flex; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
   .passos li::before { content: counter(passo); width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--ac); color: var(--ac-tx); font-weight: 700; font-size: .85rem; }

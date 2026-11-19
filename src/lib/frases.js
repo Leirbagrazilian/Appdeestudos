@@ -21,7 +21,10 @@ export function escolherFrase(frases, contexto, dia, passo = 0) {
   return lista[(semente(`${dia}|${contexto}`) + passo) % lista.length];
 }
 
-export function fraseDoDia(frases, estado, dia) {
+/** Banco de frases do tom: 'sargento' usa `frases.sargento` (se existir); qualquer outro usa o padrão. */
+export const bancoDoTom = (frases, tom) => (tom === 'sargento' && frases?.sargento ? frases.sargento : frases);
+
+export function fraseDoDia(frases, estado, dia, tom = 'padrao') {
   const c = contextoFrase(estado);
-  return escolherFrase(frases, c, dia, c === 'bloco' ? estado.feitos : 0);
+  return escolherFrase(bancoDoTom(frases, tom), c, dia, c === 'bloco' ? estado.feitos : 0);
 }

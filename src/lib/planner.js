@@ -6,6 +6,13 @@ import { ESTUDO, QUESTOES_DIA_MINIMO } from './tarefas.js';
 const ESTUDO_MATERIAS = new Set(['Matemática', 'Física', 'Química', 'Português', 'Inglês', 'Hist/Geo']);
 const COM_ASSUNTO = ['mat', 'fis', 'qui', 'por', 'ing', 'hg', 'red'];
 
+/** Texto da prova do sábado: EFOMM em junho e julho, Escola Naval em agosto (Ano 2 e 3); nas outras fases, o da fase. */
+function provaDoSabado(cfg, fase, dia) {
+  const ps = cfg.provaSabado ?? {}, mes = +dia.slice(5, 7);
+  if (fase.id === 'ano2' || fase.id === 'ano3') return mes === 8 ? ps.ago ?? ps[fase.id] : mes >= 6 ? ps.junJul ?? ps[fase.id] : ps[fase.id];
+  return ps[fase.id] ?? '';
+}
+
 /** Monta o checklist de um dia (não é salvo: só o que você marca é salvo).
  *  ctx = { exams } (resultados de simulados, para as regras dos 50% e do inglês). */
 export function blocosDoDia(cfg, fases, dia, ctx = {}) {
@@ -30,11 +37,12 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
   let blocos = d.blocos;
 
   // Última semana antes da prova: revisão leve (só ~60% do estudo do dia).
-  const leve = revisaoLeve(cfg, dia);
+  // semana leve (23–29/08) e a semana antes de cada prova: só ~60% do estudo do dia
+  const leve = revisaoLeve(cfg, dia) ?? (fase.id === 'leve' ? { nome: 'Escola Naval' } : null);
   if (leve) {
     const total = blocos.filter((b) => b.sessoes).reduce((a, b) => a + b.min, 0);
     let acum = 0;
-    blocos = blocos.filter((b) => { if (!b.sessoes) return true; if (acum >= total * 0.6) return false; acum += b.min; return true; });
+    blocos = blocos.filter((b) => { if (!b.sessoes) return true; if (acum > 0 && acum + b.min > total * 0.62) return false; acum += b.min; return true; }); // ~60%, sem passar do teto
   }
 
   const cont = {};
@@ -43,7 +51,7 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
     cont[b.cat] = (cont[b.cat] ?? 0) + 1;
     let titulo = c.titulo ?? c.materia;
     if (b.cat === 'prova' && b.sessoes) titulo = 'Questões de provas antigas (cronometradas)'; // excedente durante a semana
-    else if (b.cat === 'prova') titulo = leve ? 'Revisão leve: refazer erros da última prova (sem prova nova)' : `Prova antiga: ${cfg.provaSabado[fase.id]}`;
+    else if (b.cat === 'prova') titulo = leve ? 'Revisão leve: refazer erros da última prova (sem prova nova)' : `Prova antiga: ${provaDoSabado(cfg, fase, dia)}`;
     return {
       id: `${dia}:${b.cat}@${toHHMM(b.ini).replace(':', '')}`, chave: `${b.cat}${cont[b.cat]}`, cat: b.cat,
       materia: c.materia, titulo, min: b.min, bruto: b.bruto, ini: toHHMM(b.ini), fim: toHHMM(b.fim), sessoes: b.sessoes,

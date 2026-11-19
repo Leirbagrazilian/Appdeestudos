@@ -68,7 +68,10 @@ export function coberturaGeral(cfg, lacunas) {
   return todos.length ? todos.reduce((a, b) => a + b, 0) / (3 * todos.length) : 0;
 }
 
-/** Aproveita as notas dadas antes da trilha (tópicos com outros nomes). Usa a menor nota dos antigos. */
+/**
+ * Aproveita as notas dadas antes da trilha (tópicos com outros nomes). Usa a menor nota dos antigos.
+ * Nada se perde: notas de tópicos antigos sem correspondência ficam guardadas (órfãs) e as matérias que o seed novo não tem também.
+ */
 export function migrarLacunas(lacunas, topicos) {
   const novo = {};
   for (const [materia, lista] of Object.entries(topicos ?? {})) {
@@ -80,5 +83,39 @@ export function migrarLacunas(lacunas, topicos) {
       if (antigas.length) novo[materia][t.nome] = Math.min(...antigas);
     }
   }
-  return novo;
+  const out = {};
+  for (const materia of new Set([...Object.keys(lacunas ?? {}), ...Object.keys(novo)])) out[materia] = { ...(lacunas?.[materia] ?? {}), ...(novo[materia] ?? {}) };
+  return out;
+}
+
+/** Tópicos novos que herdam de um nome antigo: { 'Matéria|Antigo': [nomeNovo, ...] } (só nomes que mudaram). */
+function mapaAntigos(topicos) {
+  const m = new Map();
+  for (const [materia, lista] of Object.entries(topicos ?? {}))
+    for (const t of lista) for (const a of t.antigos ?? []) { if (a === t.nome) continue; const k = `${materia}|${a}`; m.set(k, [...(m.get(k) ?? []), t.nome]); }
+  return m;
+}
+/**
+ * Estado do modo domínio (chaves 'Matéria|tópico'): copia o estado de cada nome antigo para as chaves novas (se ainda não existem),
+ * sem apagar a chave antiga. Com vários antigos para o mesmo novo, vale o que tem mais tentativas.
+ */
+export function migrarDominio(dominio, topicos) {
+  const out = { ...(dominio ?? {}) }, mapa = mapaAntigos(topicos), peso = (e) => Object.keys(e?.regs ?? {}).length;
+  const origem = {};
+  for (const [k, novos] of mapa) {
+    if (!dominio?.[k]) continue;
+    const [materia] = k.split('|');
+    for (const n of novos) { const nk = `${materia}|${n}`; if (dominio[nk]) continue; if (!origem[nk] || peso(dominio[k]) > peso(origem[nk])) origem[nk] = dominio[k]; }
+  }
+  for (const [nk, e] of Object.entries(origem)) out[nk] = structuredClone(e);
+  return out;
+}
+/** Blocos feitos (`done`) com tópico antigo: devolve { id: registroAtualizado } com o tópico novo (o nome antigo fica em `topicoAntigo`). */
+export function migrarDone(done, topicos) {
+  const mapa = mapaAntigos(topicos), mud = {};
+  for (const [id, v] of Object.entries(done ?? {})) {
+    const novos = v?.topico && v.materia ? mapa.get(`${v.materia}|${v.topico}`) : null;
+    if (novos?.length) mud[id] = { ...v, topico: novos[0], topicoAntigo: v.topico };
+  }
+  return mud;
 }

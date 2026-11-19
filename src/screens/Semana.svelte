@@ -3,8 +3,10 @@
   import { blocosDaSemana } from '../lib/planner.js';
   import { addDays, startOfWeek, diaNome, fmtMin, parse } from '../lib/dates.js';
   import Ring from '../components/Ring.svelte';
+  import SonoSemana from '../components/SonoSemana.svelte';
   import { planoSemanaCorrida, kmDaSemana } from '../lib/treino.js';
   import { fmtCurta } from '../lib/dates.js';
+  import { placar, textoSaldo } from '../lib/avisos.js';
 
   const fs = $derived(fases());
   const diaDe = (k, v) => v.dia ?? k.slice(0, 10);
@@ -16,6 +18,8 @@
   });
   const ini = $derived(startOfWeek(app.dia));
   const dias = $derived(semana(ini));
+  const agoraMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const pl = $derived(placar(dias.map((d) => ({ dia: d.dia, blocos: d.plan, feito: d.feito })), app.dia, agoraMin));
   const feitoTotal = $derived(dias.reduce((s, d) => s + d.feito, 0));
   const metaTotal = $derived(dias.reduce((s, d) => s + d.meta, 0));
   // matéria -> minutos feitos
@@ -60,6 +64,7 @@
   <p class="data">Semana · {fmtCurta(ini)} a {fmtCurta(addDays(ini, 6))}</p>
   <h1>{hm(feitoTotal)}<span> de {hm(metaTotal)}</span></h1>
   <div class="bar" role="progressbar" aria-label="Meta semanal" aria-valuenow={Math.round(feitoTotal / metaTotal * 100)} aria-valuemin="0" aria-valuemax="100"><i style="width:{Math.min(100, feitoTotal / metaTotal * 100)}%"></i></div>
+  {#if app.cfg.tom !== 'padrao' && pl.semana.meta}<p class="sub placar" class:atras={pl.semana.saldo < 0}>Contra o concorrente: {textoSaldo(pl.semana.saldo)} na semana.</p>{/if}
   <p class="sub">{Math.round(feitoTotal / metaTotal * 100)}% da meta semanal{corrida ? ` · corrida: ${kmTxt(km.feitos)} de ${kmTxt(km.meta)} km` : ''}</p>
 </header>
 
@@ -74,6 +79,9 @@
     </div>
   {/each}
 </section>
+
+<h2>Sono</h2>
+<SonoSemana seg={ini} />
 
 <h2>Constância</h2>
 <section class="card cons">
@@ -110,6 +118,8 @@
   header .bar { margin-top: 12px; }
   .bar i, .b i { display: block; height: 100%; background: var(--ac); border-radius: 99px; transition: width .5s ease; }
   .sub { color: var(--tx2); font-size: .85rem; }
+  .sub.placar { font-weight: 700; color: var(--ac); }
+  .sub.placar.atras { color: var(--al); }
   header .sub { margin-top: 8px; }
   .aneis { display: grid; grid-template-columns: repeat(7, 1fr); padding: 20px 0 8px; margin-top: 12px; text-align: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
   .dia { display: grid; justify-items: center; gap: 2px; padding: 6px 0; border-radius: 12px; }

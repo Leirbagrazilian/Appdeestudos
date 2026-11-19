@@ -86,26 +86,27 @@ describe('treino de corrida: dia e regras', () => {
 });
 
 describe('treino e planner', () => {
-  it('segunda: 1º bloco de estudo é uma sessão curta de Matemática 6h40–7h10', () => {
+  it('segunda: o estudo começa às 6h30, depois da corrida das 5h30', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
-    const b = dias[0].blocos[0];
-    expect(b).toMatchObject({ cat: 'mat', ini: 400, fim: 430, min: 30, sessoes: 1 });
+    expect(dias[0].blocos[0]).toMatchObject({ ini: 390, sessoes: 2 });
+    expect(dias[0].blocos.some((b) => b.curta)).toBe(false);
   });
   it('nenhum bloco de estudo começa antes das 6h30 nem cruza a corrida de 5h30 a 6h15', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
     for (const d of dias) for (const b of d.blocos) expect(b.ini >= 390 || b.fim <= 330).toBe(true);
   });
-  it('a semana continua perto de 43 h líquidas com a sessão curta', () => {
+  it('a semana fica perto de 55 h líquidas (sem as orações)', () => {
     const c = cfg(); const dias = planoSemana(c, gerarFases(c), '2026-11-23');
     const t = dias.flatMap((d) => d.blocos).filter((b) => b.sessoes).reduce((a, b) => a + b.min, 0);
-    expect(t).toBeGreaterThanOrEqual(43 * 60 - 60); expect(t).toBeLessThanOrEqual(43 * 60 + 30);
+    expect(t).toBeGreaterThanOrEqual(52 * 60); expect(t).toBeLessThanOrEqual(58 * 60);
   });
-  it('migração v9 -> v10: segunda sem edição vira 6h30–7h10 e o plano de treino entra', () => {
+  it('migração v9 -> v12: janelas passam a ser calculadas, meta padrão vira 56 h, aulas e treino novos entram e o plano de treino continua', () => {
     const v = cfg(); v.versaoSeed = 9; delete v.treinoPlano; delete v.treino;
-    v.rotina.janelas[1] = [{ ini: '06:00', fim: '07:00' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }];
+    v.rotina.janelas = { 1: [{ ini: '06:00', fim: '07:00' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }] };
+    v.rotina.metaLiquida = 43; v.rotina.metaNominal = 43;
     const m = migrarCfg(v, seed);
-    expect(m.rotina.janelas[1][0]).toEqual({ ini: '06:40', fim: '07:10' });
-    expect(m.treinoPlano.inicio).toBe('2026-11-17'); expect(m.treino.corrida).toBe('05:30');
+    expect(m.rotina.janelas).toBeUndefined(); expect(m.rotina.metaLiquida).toBe(56); expect(m.rotina.metaNominal).toBeUndefined();
+    expect(m.treinoPlano.inicio).toBe('2026-11-17'); expect(m.treino.corrida).toBe('05:30'); expect(m.treino.corridaSab).toBe('07:00');
   });
 });
 
@@ -154,7 +155,7 @@ describe('revisão da 7a: provas, polimento e choques', () => {
 });
 
 describe('revisão do treino: choque real, prova travada, polimento e musculação', () => {
-  const dias = (c, wd, js) => { c.rotina.janelas[wd] = js; return c; };
+  const dias = (c, wd, js) => { c.rotina.janelas = { ...(c.rotina.janelas ?? {}), [wd]: js }; return c; }; // janelas à mão valem no lugar das calculadas
   it('choque: janela que começou antes da corrida e ainda está aberta é detectada', () => {
     const c = dias(cfg(), 4, [{ ini: '05:00', fim: '06:00' }, { ini: '12:30', fim: '18:30' }]);
     const t = treinoDoDia(c, '2026-11-19'); // 4 km: 5h30 a ~6h08

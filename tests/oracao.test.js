@@ -135,6 +135,7 @@ describe('revisão da etapa 2', () => {
   });
   it('sobras do recorte não viram bloco curto de Matemática', () => {
     const c = cfg(); const res = { 1: [{ ini: 12 * 60 + 55, fim: 13 * 60 + 15 }] };
+    c.rotina.janelas = { 1: [{ ini: '06:40', fim: '07:10' }, { ini: '12:30', fim: '18:30' }, { ini: '20:00', fim: '21:00' }] }; // janela curta feita à mão
     const dias = planoSemana(c, gerarFases(c), '2026-11-23', { reservas: res });
     expect(dias[0].blocos.filter((b) => b.curta)).toHaveLength(1); // só a de 6h40
   });

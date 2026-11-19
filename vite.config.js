@@ -27,8 +27,9 @@ export default defineConfig({
     precarregarRota(),
     VitePWA({
       registerType: 'autoUpdate',
+      strategies: 'injectManifest', srcDir: 'src', filename: 'sw.js', // service worker próprio: precache + aviso com o app fechado
       includeAssets: ['fonts/inter.woff2', 'icon.svg'],
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2,png,json}'] },
+      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,woff2,png,json}'] },
       manifest: {
         name: 'Estuda Gabriel', short_name: 'Estuda Gabriel', lang: 'pt-BR',
         description: 'Checklist diário de estudos para Escola Naval, EFOMM, ENEM e ITA.',

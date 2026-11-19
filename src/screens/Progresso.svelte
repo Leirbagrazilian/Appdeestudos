@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, fases, registrarCheckpoint, apagarCheckpoint, salvarKhan, prorrogarZero } from '../stores/app.svelte.js';
+  import { app, fases, registrarCheckpoint, apagarCheckpoint, salvarKhan, prorrogarZero, passarPortao, desfazerPortao } from '../stores/app.svelte.js';
   import { serieCheckpoints, checkpointPendente, portaoZero, primeiroSabado } from '../lib/portao.js';
   import { faseDoDia } from '../lib/phases.js';
   import { semanaZero } from '../lib/trilha.js';
@@ -71,10 +71,10 @@
 </ul>
 <p class="sub leg">Próximo aviso: {fmtBR(proximoAviso)} (primeiro sábado do mês).</p>
 
-{#if emZero || app.cfg.perfil.extraZero}
+{#if emZero || app.cfg.perfil.extraZero || app.cfg.perfil.portaoEm}
   <h2>Portão da Fase 0</h2>
   <section class="card pt">
-    <p class="sub">Para passar para a Fase 1 (ensino médio) você precisa das duas coisas:</p>
+    <p class="sub">Para passar para o Ano 1 você precisa das duas coisas:</p>
     <p class="cond" class:ok={p.khan.ok}><span aria-hidden="true">{p.khan.ok ? '✓' : '○'}</span>
       <span>Teste de saída do Khan (9º ano) com {p.khan.min}% ou mais{p.khan.valor != null ? `: você fez ${p.khan.valor}%` : ''}</span></p>
     <label>Seu resultado no teste de saída (%)
@@ -82,7 +82,9 @@
     <p class="cond" class:ok={p.checkpoint.ok}><span aria-hidden="true">{p.checkpoint.ok ? '✓' : '○'}</span>
       <span>Checkpoint de Matemática melhor que o diagnóstico ({p.checkpoint.base?.acertos ?? 0} de {c.questoes}) e com pelo menos {p.checkpoint.min} acertos{p.checkpoint.ultimo ? `: último ${p.checkpoint.ultimo.acertos} de ${p.checkpoint.ultimo.feitas}` : ''}</span></p>
     {#if p.ok}
-      <p class="aviso ok" role="status"><strong>Portão aberto.</strong> Quando a Fase 0 terminar, a Fase 1 começa sozinha.</p>
+      <p class="aviso ok" role="status"><strong>Portão aberto.</strong> {app.cfg.perfil.portaoEm ? `Você passou em ${fmtBR(app.cfg.perfil.portaoEm)}: o Ano 1 e o Ano 2 já se adiantaram.` : 'Passou antes da previsão? Toque abaixo e o Ano 1 e o Ano 2 se adiantam; senão, o Ano 1 começa na data prevista.'}</p>
+      {#if app.cfg.perfil.portaoEm}<button class="sec" onclick={desfazerPortao}>Desfazer: voltar à data prevista</button>
+      {:else}<button class="pri" onclick={() => confirm('Passei no portão hoje: adiantar o Ano 1 e o Ano 2?') && passarPortao()}>Passei no portão hoje</button>{/if}
     {:else if ultimaSemana}
       <p class="aviso" role="status"><strong>Ainda não passou.</strong> Dá para prorrogar a Fase 0 em {p.extras} semanas, só com os tópicos fracos{p.fracos.length ? ` (${p.fracos.length} agora)` : ''}.</p>
       <button class="sec" onclick={() => confirm(`Prorrogar a Fase 0 em ${p.extras} semanas?`) && prorrogarZero()}>Prorrogar a Fase 0 em {p.extras} semanas</button>

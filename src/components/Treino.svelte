@@ -3,8 +3,8 @@
   import { treinoDoDia, treinoFeito } from '../lib/treino.js';
   import Linha from './Linha.svelte';
 
-  let { dia, aberto = false, onAbrir } = $props();
-  const t = $derived(treinoDoDia(app.cfg, dia, { treinos: app.treinos, editadas: app.treinoSemanas }));
+  let { dia, aberto = false, onAbrir, curta = false } = $props();
+  const t = $derived(treinoDoDia(app.cfg, dia, { treinos: app.treinos, editadas: app.treinoSemanas, noiteCurta: curta }));
   const reg = $derived(app.treinos[dia] ?? {});
   const feito = $derived(treinoFeito(reg));
   let km = $state(null);

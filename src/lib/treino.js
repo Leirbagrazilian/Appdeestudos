@@ -5,6 +5,7 @@
 import { addDays, diffDays, startOfWeek, weekday } from './dates.js';
 import { toMin, toHHMM, janelasValidas } from './semana.js';
 import { minimoOracao } from './oracao.js';
+import { janelasDoDia, diaLivre } from './rotina.js';
 
 export const r05 = (x) => Math.round(x * 2) / 2;
 const plano = (cfg) => cfg.treinoPlano ?? {};
@@ -92,18 +93,20 @@ export function treinoDoDia(cfg, dia, ctx = {}) {
   const dor = (reg.dor ?? 0) > DOR_LIMITE || (reg.tornozelo ?? 0) > DOR_LIMITE || !!reg.inchaco;
   let tipo = P.tipos?.[wd] ?? 'leve';
   if (sem.prova) tipo = dia === sem.prova.data ? 'prova' : dia > sem.prova.data ? 'descanso' : ['qualidade', 'strides', 'longao'].includes(tipo) ? 'leve' : tipo;
+  const curta = !!ctx.noiteCurta; // dormiu pouco: corrida leve ou caminhada
+  if (curta && ['qualidade', 'strides', 'longao'].includes(tipo)) tipo = 'leve';
   if (dor) tipo = 'caminhada';
   const km = dor ? 0 : sem.dias[wd] ?? 0;
   // musculação some nos 2 dias antes de uma prova, no dia e no resto da semana dela
   const pertoDeProva = (P.provas ?? []).some((p) => dia >= addDays(p.data, -2) && dia <= addDays(startOfWeek(p.data), 6));
   const musCfg = T.musculacao?.[wd] ?? null, mus = pertoDeProva ? null : musCfg;
-  const hora = wd === 0 ? T.longao : T.corrida;
+  const hora = wd === 0 ? T.longao : wd === 6 ? T.corridaSab ?? T.corrida : T.corrida;
   // duração estimada (ritmo leve + 10 min de aquecimento) e se cruza alguma janela de estudo do dia (sobreposição real)
   const min = km ? Math.round(km * (T.ritmoMinKm ?? 7) + 10) : T.corridaMin ?? 45;
   const horaOk = typeof hora === 'string' && /^\d{1,2}:\d{2}$/.test(hora);
   const ini = horaOk ? toMin(hora) : null, fim = horaOk ? ini + min : null;
   const temCorrida = km > 0 && !['prova', 'descanso', 'caminhada'].includes(tipo);
-  const janela = horaOk && temCorrida ? janelasValidas(cfg.rotina?.janelas?.[wd]).find((j) => j.ini < fim && j.fim > ini) : null;
+  const janela = horaOk && temCorrida ? janelasValidas(janelasDoDia(cfg, wd)).find((j) => j.ini < fim && j.fim > ini) : null;
   const choque = !janela ? null
     : janela.ini >= ini ? `A corrida termina por volta de ${toHHMM(fim)} e o estudo começa às ${toHHMM(janela.ini)}: saia mais cedo ou encurte o aquecimento.`
     : `A corrida termina por volta de ${toHHMM(fim)} e cai dentro da janela de estudo das ${toHHMM(janela.ini)}: mude o horário da corrida ou da janela.`;
@@ -114,7 +117,8 @@ export function treinoDoDia(cfg, dia, ctx = {}) {
     dica: `${musCfg && !mus ? 'Sem musculação: semana de prova. ' : ''}Descidas íngremes: caminhando.`,
     musculacao: mus ? { ...mus, correrAntes: mus.tipo === 'lower' && wd === 2 } : null,
     fortalecimento: (T.fortalecimentoDias ?? []).includes(wd) ? P.fortalecimento : null,
-    dor, alerta: dor ? 'Dor acima de 3/10 ou inchaço: hoje é só caminhada. Ajuste o plano de corrida.' : null,
+    noiteCurta: curta,
+    dor, alerta: dor ? 'Dor acima de 3/10 ou inchaço: hoje é só caminhada. Ajuste o plano de corrida.' : curta ? 'Noite curta: corrida leve (ou caminhada), sem forçar.' : null,
     fase: sem.fase, semanaLeve: sem.leve, metaSemana: sem.km,
   };
 }
@@ -152,8 +156,9 @@ export function sequencia(cfg, { cumpridos = {}, treinos = {}, oracoes = {} }, h
   const inicio = plano(cfg).inicio, iniOr = cfg.oracaoPlano?.inicio;
   // estudo + treino (mínimo: 20 min de caminhada) + oração (mínimo: manhã e noite)
   const ok = (d) => !!cumpridos[d] && (!inicio || d < inicio || treinoFeito(treinos[d])) && (!iniOr || d < iniOr || minimoOracao(oracoes[d]));
-  let d = ok(hoje) ? hoje : addDays(hoje, -1), n = 0;
-  while (ok(d) && n < 4000) { n++; d = addDays(d, -1); }
+  const livre = (x) => diaLivre(cfg, x) && !cumpridos[x]; // dia livre de estudo (24–25/12, 31/12–01/01) não quebra a sequência nem soma
+  let d = ok(hoje) || livre(hoje) ? hoje : addDays(hoje, -1), n = 0, guarda = 0;
+  while ((ok(d) || livre(d)) && guarda++ < 4000) { if (!livre(d)) n++; d = addDays(d, -1); }
   return n;
 }
 
