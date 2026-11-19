@@ -36,8 +36,8 @@
   const REV_MIN = 10;
   const diaCurto = (d) => `${diaNome(d).slice(0, 3)} ${fmtBR(d).slice(0, 5)}`;
   let aberto = $state(null), assuntos = $state({}), verCarta = $state(false), fotoAberta = $state(null);
-  let hora = $state(new Date().getHours());
-  $effect(() => { const i = setInterval(() => (hora = new Date().getHours()), 60000); return () => clearInterval(i); });
+  let hora = $state(new Date().getHours()), agoraMin = $state(new Date().getHours() * 60 + new Date().getMinutes());
+  $effect(() => { const i = setInterval(() => { const d = new Date(); hora = d.getHours(); agoraMin = hora * 60 + d.getMinutes(); }, 60000); return () => clearInterval(i); });
 
   const EMB = { en: 'en', efomm: 'efomm', esa: 'esa', ita: 'ita', ime: 'ime' }; // emblema do concurso na contagem regressiva
   const fs = $derived(fases());
@@ -117,7 +117,7 @@
 
   // Placar contra o concorrente (modo Sargento): ele cumpre 100% da meta todo dia; saldo = feito - meta.
   const sargento = $derived(app.cfg.tom !== 'padrao');
-  const pl = $derived(placar(semana.map((plan, i) => ({ dia: addDays(startOfWeek(app.dia), i), meta: plan.reduce((s, b) => s + b.min, 0), feito: plan.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) })), app.dia));
+  const pl = $derived(placar(semana.map((plan, i) => ({ dia: addDays(startOfWeek(app.dia), i), blocos: plan, feito: plan.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) })), app.dia, agoraMin));
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
@@ -177,10 +177,10 @@
   <section class="card placar" aria-label="Placar contra o concorrente">
     <p class="data">Placar · você × concorrente</p>
     <div class="pl">
-      <div><strong class:atras={pl.dia.saldo < 0}>{textoSaldo(pl.dia.saldo)}</strong><span>no dia · {fmtMin(pl.dia.feito)} de {fmtMin(pl.dia.meta)}</span></div>
-      <div><strong class:atras={pl.semana.saldo < 0}>{textoSaldo(pl.semana.saldo)}</strong><span>na semana · {fmtMin(pl.semana.feito)} de {fmtMin(pl.semana.meta)}</span></div>
+      <div><strong class:atras={pl.dia.saldo < 0}>{textoSaldo(pl.dia.saldo)}</strong><span>no dia · você {fmtMin(pl.dia.feito)}, ele {fmtMin(pl.dia.devido)}</span></div>
+      <div><strong class:atras={pl.semana.saldo < 0}>{textoSaldo(pl.semana.saldo)}</strong><span>na semana · você {fmtMin(pl.semana.feito)}, ele {fmtMin(pl.semana.devido)}</span></div>
     </div>
-    <p class="sub">O concorrente cumpre 100% da meta todo dia.</p>
+    <p class="sub">O concorrente cumpre 100% do plano, no horário. Meta do dia {fmtMin(pl.dia.meta)}.</p>
   </section>
 {/if}
 

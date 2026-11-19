@@ -18,7 +18,8 @@
   });
   const ini = $derived(startOfWeek(app.dia));
   const dias = $derived(semana(ini));
-  const pl = $derived(placar(dias, app.dia));
+  const agoraMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const pl = $derived(placar(dias.map((d) => ({ dia: d.dia, blocos: d.plan, feito: d.feito })), app.dia, agoraMin));
   const feitoTotal = $derived(dias.reduce((s, d) => s + d.feito, 0));
   const metaTotal = $derived(dias.reduce((s, d) => s + d.meta, 0));
   // matéria -> minutos feitos

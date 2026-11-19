@@ -21,7 +21,7 @@ import { planoPrazos, dividasAtuais, contarBlocos, temPrazo, chave as chavePrazo
 import { horasEntre, noiteDe, validarNoite, horariosNoite, acordarDe } from '../lib/sono.js';
 import { blocosAjustados } from '../lib/planner.js';
 import { diaLivre } from '../lib/rotina.js';
-import { resumoDoDia } from '../lib/avisos.js';
+import { resumoDoDia, RESUMO_DIAS } from '../lib/avisos.js';
 import { agendarTelas, registrarPeriodico } from '../lib/notify.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
@@ -83,11 +83,11 @@ const MEXE_NO_RESUMO = ['adiados', 'dificeis', 'sono', 'sonoNoites'];
 export const salvarKV = (k) => { if (MEXE_NO_RESUMO.includes(k)) agendarResumo(); return db.put('kv', k, snap(app[k])); };
 
 // ---------- resumo para os avisos com o app fechado ----------
-/** Grava em kv 'resumoAvisos' o plano dos próximos 4 dias (blocos, dormir/acordar, meta): é o que o service worker lê. */
+/** Grava em kv 'resumoAvisos' o plano dos próximos 14 dias (blocos, dormir/acordar, meta): é o que o service worker lê. */
 export async function gravarResumo() {
   try {
     const fs = fases(), planos = new Map(), ctx = { noites: app.sonoNoites, sono: app.sono }, dias = {};
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < RESUMO_DIAS; i++) {
       const d = addDays(app.dia, i), livre = diaLivre(app.cfg, d);
       const blocos = livre ? [] : blocosAjustados(app.cfg, fs, d, { ...ajustes(), planos });
       dias[d] = resumoDoDia({ dia: d, blocos, dormir: horariosNoite(app.cfg, d, ctx).dormir, acordar: acordarDe(app.cfg, d, ctx), livre });

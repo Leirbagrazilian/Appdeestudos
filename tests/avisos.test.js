@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import seed from '../src/data/seed.json';
 import { migrarCfg } from '../src/lib/migracao.js';
 import { fraseDoDia, bancoDoTom } from '../src/lib/frases.js';
-import { resumoDoDia, devidoAte, situacaoDoDia, feitoDoResumo, janelaDe, emSilencio, decidirAviso, placar, textoSaldo, textoAviso, LIMIAR_MIN } from '../src/lib/avisos.js';
+import { resumoDoDia, devidoAte, situacaoDoDia, feitoDoResumo, janelaDe, emSilencio, decidirAviso, placar, textoSaldo, textoAviso, LIMIAR_MIN, RESUMO_DIAS } from '../src/lib/avisos.js';
 
 const h = (s) => { const [a, b] = s.split(':').map(Number); return a * 60 + b; };
 // 06:30–08:20 (100 min), 08:30–10:20 (100 min), 14:00–15:40 (100 min)
@@ -12,23 +12,25 @@ const blocos = [
 const resumo = (extra = {}) => resumoDoDia({ dia: '2027-01-18', blocos, dormir: '22:00', acordar: '05:00', ...extra });
 
 describe('atraso do dia', () => {
-  it('devido = blocos cujo horário de fim já passou', () => {
+  it('devido = blocos terminados mais a fração do bloco em andamento', () => {
     const r = resumo();
     expect(devidoAte(r.blocos, h('06:00'))).toBe(0);
-    expect(devidoAte(r.blocos, h('09:00'))).toBe(100);
+    expect(devidoAte(r.blocos, h('08:30'))).toBe(100);
+    expect(devidoAte(r.blocos, h('07:25'))).toBe(50); // metade do 1º bloco
     expect(devidoAte(r.blocos, h('10:30'))).toBe(200);
     expect(devidoAte(r.blocos, h('16:00'))).toBe(300);
     expect(r.meta).toBe(300);
   });
   it('zerado: nenhum bloco feito depois do fim do primeiro', () => {
-    const s = situacaoDoDia(resumo(), 0, h('10:00'));
-    expect(s).toMatchObject({ cobra: true, atrasado: true, zerado: true, falta: 100, inicio1: h('06:30') });
+    const s = situacaoDoDia(resumo(), 0, h('10:30'));
+    expect(s).toMatchObject({ cobra: true, atrasado: true, zerado: true, falta: 200, inicio1: h('06:30') });
   });
   it('atrasado sem zerar, em dia e dentro do limiar', () => {
     const r = resumo();
     expect(situacaoDoDia(r, 100, h('10:30'))).toMatchObject({ atrasado: true, zerado: false, falta: 100 });
     expect(situacaoDoDia(r, 200, h('10:30')).atrasado).toBe(false);
     expect(situacaoDoDia(r, 100, h('08:00')).atrasado).toBe(false);
+    expect(situacaoDoDia(r, 110, h('09:00')).atrasado).toBe(false); // devido 127, falta 17 (abaixo do limiar)
     expect(LIMIAR_MIN).toBeGreaterThan(0);
   });
   it('feito vem dos blocos marcados do resumo', () => {
@@ -71,6 +73,7 @@ describe('janela, silêncio e aviso', () => {
     expect(a.titulo).toBe('Sargento');
     expect(a.corpo).toContain('10h. Zero blocos. Seu concorrente começou às 6h30.');
     expect(decidirAviso({ resumo: r, feito: 0, agora: h('11:00'), notificados: { [a.chave]: 1 } })).toBeNull(); // mesma janela
+    expect(decidirAviso({ resumo: undefined, feito: 0, agora: h('11:00') })).toBeNull(); // resumo vencido: silêncio
     expect(decidirAviso({ resumo: r, feito: 0, agora: h('16:00'), notificados: { [a.chave]: 1 } }).janela).toBe('tarde'); // outra janela
     expect(decidirAviso({ resumo: resumo({ acordar: '10:30' }), feito: 0, agora: h('10:00') })).toBeNull(); // ainda dormindo
     expect(decidirAviso({ resumo: resumo({ dormir: '19:00' }), feito: 0, agora: h('20:00') })).toBeNull(); // já deitado
@@ -84,17 +87,22 @@ describe('janela, silêncio e aviso', () => {
 });
 
 describe('placar contra o concorrente', () => {
-  const semana = [
-    { dia: '2027-01-18', meta: 300, feito: 200 }, { dia: '2027-01-19', meta: 300, feito: 0 }, { dia: '2027-01-20', meta: 300, feito: 0 },
-  ];
-  it('dia e semana (só até hoje): saldo = feito - meta', () => {
-    expect(placar(semana, '2027-01-18')).toEqual({ dia: { meta: 300, feito: 200, saldo: -100 }, semana: { meta: 300, feito: 200, saldo: -100 } });
-    const p = placar([{ dia: '2027-01-18', meta: 300, feito: 360 }, { dia: '2027-01-19', meta: 300, feito: 200 }], '2027-01-19');
-    expect(p.dia.saldo).toBe(-100); expect(p.semana.saldo).toBe(-40);
+  const dia = (d, feito) => ({ dia: d, blocos, feito }); // meta 300 por dia
+  it('compara com o que o concorrente já fez até agora, não com o dia inteiro', () => {
+    const p = placar([dia('2027-01-18', 250)], '2027-01-18', h('10:30'));
+    expect(p.dia).toEqual({ meta: 300, devido: 200, feito: 250, saldo: 50 });
+    expect(placar([dia('2027-01-18', 0)], '2027-01-18', h('06:00')).dia.saldo).toBe(0);
+    expect(placar([dia('2027-01-18', 100)], '2027-01-18', h('07:25')).dia.saldo).toBe(50); // fração do bloco em andamento
+  });
+  it('semana: dias anteriores inteiros + hoje até agora; futuros não contam', () => {
+    const p = placar([dia('2027-01-18', 300), dia('2027-01-19', 100), dia('2027-01-20', 0)], '2027-01-19', h('10:30'));
+    expect(p.semana).toEqual({ meta: 600, devido: 500, feito: 400, saldo: -100 });
+    expect(p.dia.saldo).toBe(-100);
   });
   it('texto: atrás, à frente e empatado', () => {
     expect(textoSaldo(-150)).toBe('2h30 atrás'); expect(textoSaldo(60)).toBe('1h à frente'); expect(textoSaldo(0)).toBe('empatado');
   });
+  it('o resumo cobre 14 dias', () => { expect(RESUMO_DIAS).toBe(14); });
 });
 
 describe('modo Sargento: frases e migração', () => {

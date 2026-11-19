@@ -21,8 +21,9 @@ async function cobrar() {
   const [geral, notificados, done] = await Promise.all([db.get('kv', 'resumoAvisos'), db.get('kv', 'notificados'), db.all('done')]);
   if (!geral?.ativo) return;
   const agora = new Date(), dia = iso(agora);
-  const resumo = geral.dias?.[dia];
-  const aviso = decidirAviso({ resumo, feito: feitoDoResumo(resumo, done), agora: agora.getHours() * 60 + agora.getMinutes(), notificados: notificados ?? {}, tom: geral.tom });
+  const resumo = geral.dias?.[dia], min = agora.getHours() * 60 + agora.getMinutes();
+  // resumo vencido (14 dias sem abrir o app): fica em silêncio
+  const aviso = decidirAviso({ resumo, feito: feitoDoResumo(resumo, done), agora: min, notificados: notificados ?? {}, tom: geral.tom });
   if (!aviso) return;
   await db.put('kv', 'notificados', { ...(notificados ?? {}), [aviso.chave]: 1 });
   await self.registration.showNotification(aviso.titulo, { body: aviso.corpo, tag: 'cobranca', icon: 'icon-192.png', data: { url: urlHoje() } });
