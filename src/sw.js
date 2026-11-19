@@ -4,7 +4,7 @@ import { NavigationRoute, registerRoute } from 'workbox-routing';
 import { clientsClaim } from 'workbox-core';
 import * as db from './lib/db.js';
 import { iso } from './lib/dates.js';
-import { decidirAviso, feitoDoResumo } from './lib/avisos.js';
+import { decidirAviso, decidirAcordar, feitoDoResumo } from './lib/avisos.js';
 
 // autoUpdate: a versão nova assume sem esperar
 self.skipWaiting();
@@ -23,10 +23,12 @@ async function cobrar() {
   const agora = new Date(), dia = iso(agora);
   const resumo = geral.dias?.[dia], min = agora.getHours() * 60 + agora.getMinutes();
   // resumo vencido (14 dias sem abrir o app): fica em silêncio
-  const aviso = decidirAviso({ resumo, feito: feitoDoResumo(resumo, done), agora: min, notificados: notificados ?? {}, tom: geral.tom });
+  // à noite, primeiro a hora de acordar amanhã (1 por noite); a cobrança de atraso fica para a próxima rodada
+  const aviso = decidirAcordar({ resumo, agora: min, notificados: notificados ?? {}, tom: geral.tom })
+    ?? decidirAviso({ resumo, feito: feitoDoResumo(resumo, done), agora: min, notificados: notificados ?? {}, tom: geral.tom });
   if (!aviso) return;
   await db.put('kv', 'notificados', { ...(notificados ?? {}), [aviso.chave]: 1 });
-  await self.registration.showNotification(aviso.titulo, { body: aviso.corpo, tag: 'cobranca', icon: 'icon-192.png', data: { url: urlHoje() } });
+  await self.registration.showNotification(aviso.titulo, { body: aviso.corpo, tag: aviso.chave.endsWith(':acordar') ? 'acordar' : 'cobranca', icon: 'icon-192.png', data: { url: urlHoje() } });
 }
 
 self.addEventListener('periodicsync', (e) => { if (e.tag === 'cobranca') e.waitUntil(cobrar()); });

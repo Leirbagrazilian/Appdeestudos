@@ -29,9 +29,9 @@ export function normalizarBlocos(blocos = []) {
     return { id: b.id, ini, fim, min: b.min };
   }).sort((x, y) => x.fim - y.fim);
 }
-export function resumoDoDia({ dia, blocos = [], dormir, acordar, livre = false }) {
+export function resumoDoDia({ dia, blocos = [], dormir, acordar, livre = false, acordarAmanha = null }) {
   const lista = normalizarBlocos(blocos);
-  return { dia, blocos: lista, dormir, acordar, meta: lista.reduce((s, b) => s + b.min, 0), livre: !!livre };
+  return { dia, blocos: lista, dormir, acordar, meta: lista.reduce((s, b) => s + b.min, 0), livre: !!livre, acordarAmanha };
 }
 
 /** Minutos feitos hoje: soma dos blocos do resumo que estão marcados em `done` (objeto id -> registro). */
@@ -104,4 +104,31 @@ export function placar(dias, hoje, agora) {
 export function textoSaldo(saldo) {
   const m = Math.round(Math.abs(saldo));
   return m === 0 ? 'empatado' : `${fmtMin(m)} ${saldo < 0 ? 'atrás' : 'à frente'}`;
+}
+
+// ---------- aviso da noite: a que horas acordar amanhã ----------
+export const NOITE_ACORDAR_INI = 19 * 60; // a partir das 19h e antes da hora de dormir
+
+/** Texto da notificação da noite. `acordar`/`dormir` em HH:MM. */
+export function textoAcordar(tom, acordar, dormir) {
+  if (tom === 'padrao') return { titulo: 'Estuda Gabriel', corpo: `Amanhã você acorda às ${acordar}. Boa noite: cama às ${dormir}.` };
+  return { titulo: 'Sargento', corpo: `Amanhã: de pé às ${acordar}. Cama às ${dormir}. Sem desculpa.` };
+}
+
+/** Janela da noite: das 19h até a hora de dormir (dormir depois da meia-noite vale até 24h). */
+export function naJanelaAcordar(agora, dormir) {
+  const d = dormir == null ? 22 * 60 : typeof dormir === 'string' ? hm(dormir) : dormir;
+  return agora >= NOITE_ACORDAR_INI && agora < (d > NOITE_ACORDAR_INI ? d : 1440);
+}
+
+/**
+ * Decide o aviso "acordar amanhã" (SW, app fechado). Devolve null ou { chave, titulo, corpo }.
+ * Vale também na noite antes do início (resumo `livre`). No máximo 1 por noite (`notificados[chave]`).
+ */
+export function decidirAcordar({ resumo, agora, notificados = {}, tom = 'sargento' }) {
+  const a = resumo?.acordarAmanha;
+  if (!a?.acordar || !naJanelaAcordar(agora, resumo.dormir)) return null;
+  const chave = `${resumo.dia}:acordar`;
+  if (notificados[chave]) return null;
+  return { chave, ...textoAcordar(tom, a.acordar, resumo.dormir) };
 }

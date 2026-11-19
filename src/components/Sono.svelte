@@ -1,6 +1,6 @@
 <script>
   import { app, registrarSono, apagarSono, conferirNoite, planejarNoite, limparNoite } from '../stores/app.svelte.js';
-  import { noiteDe, horariosNoite, registroDaManha, fmtH, estadoDoDia } from '../lib/sono.js';
+  import { noiteDe, horariosNoite, registroDaManha, fmtH, estadoDoDia, acordarAmanha } from '../lib/sono.js';
   import { addDays } from '../lib/dates.js';
   import Linha from './Linha.svelte';
 
@@ -12,6 +12,7 @@
   const reg = $derived(registroDaManha(app.sono, dia));
   const hoje = $derived(horariosNoite(app.cfg, dia, ctx));
   const estado = $derived(estadoDoDia(app.cfg, dia, ctx));
+  const amanha = $derived(acordarAmanha(app.cfg, dia, ctx));
 
   // formulário da manhã: horas pré-preenchidas com o plano da noite
   let dormiu = $state(null), acordou = $state(null), q = $state(null);
@@ -50,14 +51,15 @@
 {:else if tipo === 'noite'}
   <li class="noite">
     <button class="cab" aria-expanded={aberto} onclick={onAbrir}>
-      <span class="tit">Dormir às {hoje.dormir} · acordar às {hoje.acordar}</span>
+      <span class="tit">{amanha.linha}</span>
+      <span class="tit">Dormir às {hoje.dormir}</span>
       <span class="sub">{fmtH(hoje.horas)} de sono · terço {hoje.terco} · oração {hoje.oracao} · telas off {hoje.telas}{hoje.maisCedo ? ' · 30 min mais cedo (noite curta ontem)' : ''}</span>
       {#if hoje.curta}<span class="av">Noite curta planejada (6 a 7 h)</span>{/if}
     </button>
     {#if aberto}
       <div class="det">
         <ul class="info">
-          <li>Terço às {hoje.terco}</li><li>Oração da noite às {hoje.oracao}</li><li>Telas desligadas às {hoje.telas} (notificação, com o app aberto)</li>
+          <li>{amanha.linha}</li><li>Terço às {hoje.terco}</li><li>Oração da noite às {hoje.oracao}</li><li>Telas desligadas às {hoje.telas} (notificação com a hora de acordar amanhã)</li>
         </ul>
         <p class="mut">Planejar esta noite de outro jeito (noite curta: 6 a 7 h, no máximo 1 por semana, nunca 2 seguidas, nunca na véspera de longão, simulado ou prova):</p>
         <div class="duas">

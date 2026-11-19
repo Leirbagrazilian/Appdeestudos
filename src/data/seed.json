@@ -3,6 +3,7 @@
     "nome": "Gabriel",
     "nascimento": "2005-11-25",
     "inicioPlano": "2026-11-10",
+    "inicioReal": "2026-11-20",
     "inicioZero": "2026-11-16",
     "fimZero": "2027-01-10",
     "extraZero": 0,
@@ -2512,7 +2513,7 @@
       }
     ]
   },
-  "versaoSeed": 13,
+  "versaoSeed": 14,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -5388,7 +5389,7 @@
     "questoes": 70
   },
   "treinoPlano": {
-    "inicio": "2026-11-17",
+    "inicio": "2026-11-20",
     "meta": {
       "nome": "100 km",
       "data": "2027-11-25"
@@ -5409,7 +5410,7 @@
       {
         "n": 1,
         "nome": "Retomada diária",
-        "inicio": "2026-11-17",
+        "inicio": "2026-11-20",
         "fim": "2027-01-10",
         "kmIni": 20,
         "kmFim": 33
@@ -5541,7 +5542,7 @@
     "musculacaoMin": 60
   },
   "oracaoPlano": {
-    "inicio": "2026-11-17",
+    "inicio": "2026-11-20",
     "diasMes": 30,
     "diasMeta": 27,
     "niveis": [

@@ -29,8 +29,8 @@
   import { fraseDoDia } from '../lib/frases.js';
   import { placar, textoSaldo } from '../lib/avisos.js';
   import Sono from '../components/Sono.svelte';
-  import { horariosNoite, estadoDoDia, alertaSono, noiteDe } from '../lib/sono.js';
-  import { presencaPorAula, aulasDoDia } from '../lib/rotina.js';
+  import { horariosNoite, estadoDoDia, alertaSono, noiteDe, acordarAmanha } from '../lib/sono.js';
+  import { presencaPorAula, aulasDoDia, antesDoInicio } from '../lib/rotina.js';
   import { ritmo as ritmoPrazos, contarBlocos, dividasAtuais } from '../lib/prazos.js';
 
   const REV_MIN = 10;
@@ -148,9 +148,21 @@
     ...PERIODOS.map(([nome, a, z]) => ({ nome, lista: itens.filter((i) => i.m != null && i.m >= a && i.m < z).sort((x, y) => x.m - y.m) })),
     { nome: 'Sem horário', lista: itens.filter((i) => i.m == null) },
   ].filter((g) => g.lista.length));
+  // Antes do início real: só o cartão "Começa amanhã", sem checklist.
+  const antes = $derived(antesDoInicio(app.cfg, app.dia));
+  const faltam = $derived(antes ? diffDays(app.dia, app.cfg.perfil.inicioReal) : 0);
+  const vespera = $derived(antes ? acordarAmanha(app.cfg, app.dia, sonoCtx) : null);
   const SEDES = ['mat', 'fis', 'qui', 'por', 'ing', 'hg', 'red', 'prova', 'diag', 'minimo'];
   const abrir = (id) => (aberto = aberto === id ? null : id);
 </script>
+{#if antes}
+  <section class="card antes" aria-label="Antes do início">
+    <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
+    <h1>{faltam === 1 ? 'Começa amanhã' : `Começa em ${faltam} dias`} · {diaNome(app.cfg.perfil.inicioReal)} {fmtBR(app.cfg.perfil.inicioReal).slice(0, 5)}</h1>
+    <p class="acordar">Acordar amanhã às <strong>{vespera.acordar}</strong> · dormir às <strong>{vespera.dormir}</strong></p>
+    <p class="sub">Hoje não tem nada para fazer. Descanse: o plano começa de verdade no primeiro dia.</p>
+  </section>
+{:else}
 <header>
   <div class="mini-farol" aria-hidden="true"><Farol {pct} {noite} /></div>{#if pct >= 1}<Esquadrilha festa />{/if}
   <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
@@ -370,6 +382,7 @@
   {#if app.cfg.carta}<button class="lk" onclick={() => (verCarta = !verCarta)}>{verCarta ? 'Fechar minha carta' : 'Ler minha carta'}</button>
   {:else}<a class="lk" href="#/ajustes">Escreva sua carta: por que você quer a farda?</a>{/if}
 </p>
+{/if}
 
 <style>
   .pz { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .85rem; color: var(--tx2); font-weight: 600; }
@@ -448,6 +461,11 @@
   .mini-foto { width: 44px; height: 44px; flex: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
   .mini-foto img { width: 100%; height: 100%; object-fit: cover; }
   .foto { display: block; width: calc(100% - 46px); margin: 0 0 12px 46px; border-radius: 12px; }
+  .antes { margin-top: 20px; padding: 20px 18px; display: grid; gap: 10px; border-color: var(--ac); }
+  .antes h1 { max-width: none; font-size: 1.6rem; }
+  .antes .acordar { font-size: 1.1rem; }
+  .antes .acordar strong { color: var(--ac); font-variant-numeric: tabular-nums; }
+  .antes .sub { color: var(--tx2); font-size: .9rem; margin: 0; }
   .placar { margin-top: 16px; padding: 14px 16px; }
   .pl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
   .pl div { display: grid; gap: 2px; }

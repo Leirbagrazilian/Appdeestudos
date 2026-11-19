@@ -6,7 +6,8 @@ import { idadeOk, idadeEm } from '../src/lib/age.js';
 import { blocosDoDia } from '../src/lib/planner.js';
 import { addDays, weekday } from '../src/lib/dates.js';
 
-const cfg = () => structuredClone(seed);
+import { legado } from './_legado.js';
+const cfg = () => legado(structuredClone(seed));
 /** Lacunas com todos os tópicos da Fase 0 em nota 3: a trilha segue a partir do ensino médio (use com faseId 'base'). */
 const dominarFase0 = (c) => Object.fromEntries(c.materias.filter((m) => c.topicos?.[m]).map((m) => [m, Object.fromEntries(c.topicos[m].filter((t) => t.fase === 0).map((t) => [t.nome, 3]))]));
 
@@ -281,7 +282,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(8);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(13);
+    expect(novo.versaoSeed).toBe(seed.versaoSeed);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 8 fases seguem a ordem e o ENEM vai do fim das discursivas até a prova', () => {
@@ -701,7 +702,7 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(13); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(seed.versaoSeed); expect(novo.ritmos.teoria).toBe(10);
   });
 });
 

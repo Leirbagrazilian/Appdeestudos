@@ -9,7 +9,8 @@ import { noiteDe, horariosNoite, validarNoite, estadoDoDia, resumoSono, alertaSo
 import { oracoesDoDia, reservasOracao } from '../src/lib/oracao.js';
 import { treinoDoDia } from '../src/lib/treino.js';
 
-const cfg = () => structuredClone(seed);
+import { legado } from './_legado.js';
+const cfg = () => legado(structuredClone(seed));
 const fases = gerarFases(cfg());
 const plano = planoPrazos(cfg(), fases);
 const item = (m, cod) => plano.porMateria[m].find((i) => i.codigo === cod);

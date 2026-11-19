@@ -9,7 +9,11 @@ const num = (h, pad) => (typeof h === 'string' && /^\d{1,2}:\d{2}$/.test(h) ? to
 /** Aulas da faculdade (as que entram no contador de presença e no "vou/não vou"). */
 export const aulasFaculdade = (cfg) => (R(cfg).aulas ?? []).map((a, i) => ({ ...a, i })).filter((a) => a.tipo === 'faculdade');
 /** Dia livre de estudo (24–25/12 e 31/12–01/01, por padrão). */
-export const diaLivre = (cfg, dia) => (R(cfg).diasLivres ?? ['12-24', '12-25', '12-31', '01-01']).includes(dia.slice(5));
+export const diaLivreFixo = (cfg, dia) => (R(cfg).diasLivres ?? ['12-24', '12-25', '12-31', '01-01']).includes(dia.slice(5));
+/** Dia antes do início real (`perfil.inicioReal`): sem estudo, treino, oração, revisão, checkpoint nem cobrança. */
+export const antesDoInicio = (cfg, dia) => !!cfg.perfil?.inicioReal && dia < cfg.perfil.inicioReal;
+/** Dia sem estudo: antes do início real ou dia livre fixo (24–25/12 e 31/12–01/01). */
+export const diaLivre = (cfg, dia) => antesDoInicio(cfg, dia) || diaLivreFixo(cfg, dia);
 
 /** Intervalos fixos do dia da semana `wd` (0 = domingo), em minutos: [{ ini, fim, nome }]. */
 export function fixosDoDia(cfg, wd) {

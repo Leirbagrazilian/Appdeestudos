@@ -6,7 +6,8 @@ import { gerarFases } from '../src/lib/phases.js';
 import { sequencia } from '../src/lib/treino.js';
 import { addDays } from '../src/lib/dates.js';
 
-const cfg = () => structuredClone(seed);
+import { legado } from './_legado.js';
+const cfg = () => legado(structuredClone(seed));
 const completos = (ini, n, nivel = 1, c = cfg()) => Object.fromEntries(Array.from({ length: n }, (_, i) => [addDays(ini, i), Object.fromEntries(itensDoNivel(c, nivel).map((x) => [x, true]))]));
 
 describe('oração: progressão mensal (27 de 30)', () => {

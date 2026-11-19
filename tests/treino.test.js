@@ -6,7 +6,8 @@ import { planoSemana } from '../src/lib/semana.js';
 import { migrarCfg } from '../src/lib/migracao.js';
 import { addDays } from '../src/lib/dates.js';
 
-const cfg = () => structuredClone(seed);
+import { legado } from './_legado.js';
+const cfg = () => legado(structuredClone(seed));
 const soma = (d) => Object.values(d).reduce((a, b) => a + b, 0);
 
 describe('treino de corrida: plano', () => {
@@ -106,7 +107,7 @@ describe('treino e planner', () => {
     v.rotina.metaLiquida = 43; v.rotina.metaNominal = 43;
     const m = migrarCfg(v, seed);
     expect(m.rotina.janelas).toBeUndefined(); expect(m.rotina.metaLiquida).toBe(56); expect(m.rotina.metaNominal).toBeUndefined();
-    expect(m.treinoPlano.inicio).toBe('2026-11-17'); expect(m.treino.corrida).toBe('05:30'); expect(m.treino.corridaSab).toBe('07:00');
+    expect(m.treinoPlano.inicio).toBe('2026-11-20'); expect(m.treino.corrida).toBe('05:30'); expect(m.treino.corridaSab).toBe('07:00');
   });
 });
 
@@ -114,7 +115,7 @@ import { textoResumoCorrida } from '../src/lib/treino.js';
 describe('revisão de domingo: resumo da corrida', () => {
   it('texto para colar: km, dias, dor, sono, cansaço e temperos', () => {
     const tr = { '2026-11-17': { feito: true, km: 3.2 }, '2026-11-19': { dor: 4 }, '2026-11-20': { minimo: true } };
-    const t = textoResumoCorrida(seed, '2026-11-16', tr, { joelho: 4, sono: '7 h', cansaco: 5, temperos: 'ok' });
+    const t = textoResumoCorrida(legado(structuredClone(seed)), '2026-11-16', tr, { joelho: 4, sono: '7 h', cansaco: 5, temperos: 'ok' });
     expect(t).toMatch(/Fase 1 Retomada diária, semana 1/);
     expect(t).toMatch(/Km: 3,2 de 18/);
     expect(t).toMatch(/Ter: 3,2 km de 3 km/);

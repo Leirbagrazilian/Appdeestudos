@@ -1,5 +1,6 @@
 // Checkpoint mensal (as mesmas 10 questões de Matemática da EFOMM do diagnóstico, cronometradas) e portão da Fase 0 -> Fase 1.
 import { addDays, weekday } from './dates.js';
+import { antesDoInicio } from './rotina.js';
 import { topicosDe, dominio } from './trilha.js';
 
 export const CHECKPOINT_PADRAO = { questoes: 10, minutos: 30, baseline: { data: '2026-11-15', acertos: 0 } };
@@ -25,7 +26,7 @@ export function serieCheckpoints(cfg, checkpoints) {
 export const checkpointDoMes = (cfg, checkpoints, dia) => serieCheckpoints(cfg, checkpoints).find((x) => x.data.slice(0, 7) === dia.slice(0, 7)) ?? null;
 
 /** Há checkpoint a fazer? Vale a partir do primeiro sábado do mês, até o fim do mês, se ainda não foi feito. */
-export const checkpointPendente = (cfg, checkpoints, dia) => dia >= primeiroSabado(dia) && !checkpointDoMes(cfg, checkpoints, dia);
+export const checkpointPendente = (cfg, checkpoints, dia) => !antesDoInicio(cfg, dia) && dia >= primeiroSabado(dia) && !checkpointDoMes(cfg, checkpoints, dia);
 
 /**
  * Portão da Fase 0: teste de saída do Khan (9º ano) com 80% ou mais E checkpoint melhor que o diagnóstico

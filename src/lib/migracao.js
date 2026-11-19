@@ -29,6 +29,7 @@ export function migrarCfg(salvo, seed) {
     for (const k of ['inicioFase2', 'semanasEspecifica']) delete cfg.perfil[k];
     cfg.sono = { ...structuredClone(seed.sono), ...(cfg.sono ?? {}) };
   }
+  if (v < 14 && seed.perfil?.inicioReal) cfg.perfil.inicioReal = seed.perfil.inicioReal; // v14: tudo começa em 20/11/2026 (treinoPlano e oracaoPlano já vêm do seed)
   cfg.biblioteca = mesclarBiblioteca(salvo.biblioteca, seed.biblioteca); // o que você cadastrou fica; recursos novos do seed entram
 
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));

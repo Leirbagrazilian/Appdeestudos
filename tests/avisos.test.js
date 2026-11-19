@@ -126,7 +126,7 @@ describe('modo Sargento: frases e migração', () => {
   it('migração para a v13 liga o Sargento e não perde dados', () => {
     const velho = structuredClone(seed); delete velho.tom; velho.versaoSeed = 12; velho.carta = 'minha carta'; velho.frases = { inicio: ['velha'] };
     const novo = migrarCfg(velho, seed);
-    expect(novo.versaoSeed).toBe(13); expect(novo.tom).toBe('sargento'); expect(novo.carta).toBe('minha carta');
+    expect(novo.versaoSeed).toBe(seed.versaoSeed); expect(novo.tom).toBe('sargento'); expect(novo.carta).toBe('minha carta');
     expect(novo.frases.sargento.inicio.length).toBeGreaterThan(0);
     const desligado = structuredClone(seed); desligado.versaoSeed = 13; desligado.tom = 'padrao';
     expect(migrarCfg(desligado, seed).tom).toBe('padrao');
