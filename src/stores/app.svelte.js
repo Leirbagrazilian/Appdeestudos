@@ -18,9 +18,9 @@ import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
 import { planoPrazos, dividasAtuais, contarBlocos, temPrazo, chave as chavePrazo } from '../lib/prazos.js';
-import { horasEntre, noiteDe, validarNoite, horariosNoite, acordarDe } from '../lib/sono.js';
+import { horasEntre, noiteDe, validarNoite, horariosNoite, acordarDe, acordarAmanha } from '../lib/sono.js';
 import { blocosAjustados } from '../lib/planner.js';
-import { diaLivre } from '../lib/rotina.js';
+import { diaLivre, antesDoInicio } from '../lib/rotina.js';
 import { resumoDoDia, RESUMO_DIAS } from '../lib/avisos.js';
 import { agendarTelas, registrarPeriodico } from '../lib/notify.js';
 
@@ -90,7 +90,7 @@ export async function gravarResumo() {
     for (let i = 0; i < RESUMO_DIAS; i++) {
       const d = addDays(app.dia, i), livre = diaLivre(app.cfg, d);
       const blocos = livre ? [] : blocosAjustados(app.cfg, fs, d, { ...ajustes(), planos });
-      dias[d] = resumoDoDia({ dia: d, blocos, dormir: horariosNoite(app.cfg, d, ctx).dormir, acordar: acordarDe(app.cfg, d, ctx), livre });
+      dias[d] = resumoDoDia({ dia: d, blocos, dormir: horariosNoite(app.cfg, d, ctx).dormir, acordar: acordarDe(app.cfg, d, ctx), livre, acordarAmanha: acordarAmanha(app.cfg, d, ctx) });
     }
     await db.put('kv', 'resumoAvisos', { gerado: Date.now(), ativo: !!app.cfg.notificacoes, tom: app.cfg.tom ?? 'sargento', dias });
   } catch {}
@@ -339,7 +339,7 @@ export async function destravarTopico(materia, topico) {
 // ---------- prazos e dívidas ----------
 /** Tópico que passou do prazo e do sábado de resgate sem ser dominado vira dívida: entra no caderno de erros (revisões 1/7/30). */
 export async function sincronizarDividas() {
-  if (!app.cfg.topicos) return;
+  if (!app.cfg.topicos || antesDoInicio(app.cfg, app.dia)) return;
   const plano = prazos(), st = { lacunas: app.lacunas, feitos: contarBlocos(app.done), dividas: app.dividas };
   let mudou = false;
   for (const d of dividasAtuais(plano, st, app.dia)) {

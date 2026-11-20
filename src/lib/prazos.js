@@ -98,16 +98,17 @@ export function planoPrazos(cfg, fases) {
         itens = fica;
       }
       if (!itens.length) continue;
-      const base = suprimento(cfg, f.id, f.inicio, f.fim, CAT[materia]);
+      const ini = cfg.perfil?.inicioReal && cfg.perfil.inicioReal > f.inicio ? cfg.perfil.inicioReal : f.inicio; // nada nasce atrasado: conta a partir do início real
+      const base = suprimento(cfg, f.id, ini, f.fim, CAT[materia]);
       const blocos = alocar(itens.map((i) => i.peso), base.length);
       const total = blocos.reduce((a, b) => a + b, 0);
-      const datas = suprimento(cfg, f.id, f.inicio, f.fim, CAT[materia], total);
+      const datas = suprimento(cfg, f.id, ini, f.fim, CAT[materia], total);
       itens.forEach((i, n) => { i.blocos = blocos[n]; });
       // ordem de colocação: o primeiro da fila que já está liberado na data do bloco; bloqueados ficam para depois
       const espera = [...itens];
       let p = 0;
       while (espera.length) {
-        const data = datas[Math.min(p, datas.length - 1)] ?? f.inicio;
+        const data = datas[Math.min(p, datas.length - 1)] ?? ini;
         let k = espera.findIndex((i) => !i.libera || i.libera <= data);
         if (k < 0) {
           // todos os que restam esperam a Matemática: pula para o 1º bloco depois do prazo dela; se não cabe na janela, vai para o ano seguinte
@@ -122,7 +123,7 @@ export function planoPrazos(cfg, fases) {
         }
         for (let j = 0; j < k; j++) espera[j].empurrado = true;
         const [i] = espera.splice(k, 1);
-        i.inicio = datas[Math.min(p, datas.length - 1)] ?? f.inicio;
+        i.inicio = datas[Math.min(p, datas.length - 1)] ?? ini;
         i.prazo = datas[Math.min(p + i.blocos - 1, datas.length - 1)] ?? f.fim;
         i.alem = i.prazo > f.fim;
         i.seq = seq++;

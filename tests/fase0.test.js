@@ -7,7 +7,8 @@ import { tarefasDoDia } from '../src/lib/tarefas.js';
 import { migrarCfg } from '../src/lib/migracao.js';
 import { migrarLacunas } from '../src/lib/trilha.js';
 
-const cfg = () => structuredClone(seed);
+import { legado } from './_legado.js';
+const cfg = () => legado(structuredClone(seed));
 const DIA = '2026-11-17'; // terça-feira da semana 1 da Fase 0
 const T1 = 'Divisibilidade, MMC e MDC', T2 = 'Frações e equações';
 const fases = gerarFases(cfg());

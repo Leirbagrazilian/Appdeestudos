@@ -11,7 +11,7 @@
 </script>
 
 <Linha {feito} label={it.titulo} onToggle={() => marcarOracao(dia, it.id, !feito)} {aberto} {onAbrir} icone="cruz" hora={it.hora ?? ''}
-  titulo={it.titulo} sub={`${it.sub ?? (it.min ? `~${it.min} min` : '')}${it.conta ? '' : `${it.sub || it.min ? ' · ' : ''}extra`}`}>
+  titulo={it.titulo} sub={`${it.sub ?? (it.min ? `~${it.min} min` : '')}${it.conta ? '' : `${it.sub || it.min ? ' · ' : ''}${it.bonus ? 'bônus' : 'extra'}`}`}>
   {#each it.partes as p}
     <p class="pn">{p.nome}{#if p.conferir}<span class="conf">conferir</span>{/if}</p>
     <p class="pt">{p.texto}</p>

@@ -156,6 +156,7 @@
 <section class="card bloco">
   <div class="duas">
     <label>Corrida (seg a sex)<input type="time" bind:value={app.cfg.treino.corrida} onchange={salvar} /></label>
+    <label>Corrida (sexta)<input type="time" bind:value={app.cfg.treino.corridaPorDia[5]} onchange={salvar} /></label>
     <label>Corrida (sábado)<input type="time" bind:value={app.cfg.treino.corridaSab} onchange={salvar} /></label>
     <label>Longão (domingo)<input type="time" bind:value={app.cfg.treino.longao} onchange={salvar} /></label>
   </div>
@@ -192,7 +193,7 @@
 </section>
 
 <h2>Janelas de estudo</h2>
-<p class="muted">Calculadas sozinhas: 6h30 às 21h menos a corrida, a musculação, o jiu-jitsu, as refeições (12–13 h e 18–19 h) e as aulas que você marcou "vou". O tempo de oração sai depois. Blocos de 50 min de foco e 10 de pausa. No sábado, a primeira janela é da prova antiga e o resgate; no domingo, revisão leve e planejamento.</p>
+<p class="muted">Calculadas sozinhas: 6h30 às 21h menos a corrida, a musculação, o jiu-jitsu, as refeições (12–13 h e 18–19 h; quinta janta 18–18h40), a Santa Missa (com o trajeto) e as aulas que você marcou "vou". O tempo de oração sai depois. Blocos de 50 min de foco e 10 de pausa. No sábado, a primeira janela é da prova antiga e o resgate; no domingo, revisão leve e planejamento.</p>
 {#each ordem as d}
   <section class="card bloco">
     <div class="cj"><strong>{DIAS[d]}</strong><span class="muted">{capacidade(d)}</span></div>

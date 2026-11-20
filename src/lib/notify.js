@@ -1,7 +1,8 @@
 import * as db from './db.js';
 import { alertasInscricao } from './alerts.js';
 import { vencidas } from './spaced.js';
-import { horariosNoite } from './sono.js';
+import { horariosNoite, acordarAmanha } from './sono.js';
+import { textoAcordar } from './avisos.js';
 
 export const suportado = () => typeof Notification !== 'undefined';
 export async function pedir() { return suportado() ? Notification.requestPermission() : 'denied'; }
@@ -50,5 +51,15 @@ export function agendarTelas(cfg, dia, ctx = {}) {
   const h = horariosNoite(cfg, dia, ctx), [hh, mm] = h.telas.split(':').map(Number);
   const alvo = new Date(); alvo.setHours(hh, mm, 0, 0);
   const falta = alvo.getTime() - Date.now();
-  if (falta > 0 && falta < 20 * 3600e3) timerTelas = setTimeout(() => mostrar('Telas desligadas', `Dormir às ${h.dormir}. Terço às ${h.terco}.`, 'telas'), falta);
+  if (falta > 0 && falta < 20 * 3600e3) timerTelas = setTimeout(async () => {
+    mostrar('Telas desligadas', `Dormir às ${h.dormir}. Terço às ${h.terco}.`, 'telas');
+    // junto das telas off: a hora de acordar amanhã, no máximo 1 por noite (o SW usa a mesma chave)
+    try {
+      const feitos = (await db.get('kv', 'notificados')) ?? {}, k = `${dia}:acordar`;
+      if (feitos[k]) return;
+      feitos[k] = 1; await db.put('kv', 'notificados', feitos);
+      const a = acordarAmanha(cfg, dia, ctx), t = textoAcordar(cfg.tom ?? 'sargento', a.acordar, a.dormir);
+      mostrar(t.titulo, t.corpo, 'acordar');
+    } catch {}
+  }, falta);
 }

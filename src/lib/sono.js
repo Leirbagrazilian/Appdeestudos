@@ -1,7 +1,7 @@
 // Sono: padrão editável por noite, horários da noite puxados da hora de dormir, regras da noite curta e resumo da semana.
 // "Noite de D" = a que começa na noite do dia D e termina na manhã de D+1. O registro da manhã fica em sono[D+1] (dia em que você acordou).
 // Tudo puro; o sono não entra na sequência de constância.
-import { addDays, startOfWeek, weekday, diffDays } from './dates.js';
+import { addDays, startOfWeek, weekday, diffDays, diaNome } from './dates.js';
 import { toMin, toHHMM } from './semana.js';
 
 export const MIN_H = 6; // abaixo disso: Dia mínimo
@@ -68,6 +68,12 @@ export function horariosPadrao(cfg, wd) {
 export const acordarDe = (cfg, dia, ctx = {}) => noiteDe(cfg, addDays(dia, -1), ctx).acordar;
 export const acordarPadrao = (cfg, wd) => padraoDe(cfg, (wd + 6) % 7).acordar;
 export const horaManha = (acordar) => toHHMM(toMin(acordar) + 10);
+
+/** O que a noite de `dia` pede para amanhã: { dia (amanhã), acordar, dormir, linha: 'Amanhã (sexta): acordar às 05:00' }. */
+export function acordarAmanha(cfg, dia, ctx = {}) {
+  const n = noiteDe(cfg, dia, ctx), amanha = addDays(dia, 1);
+  return { dia: amanha, acordar: n.acordar, dormir: n.dormir, linha: `Amanhã (${diaNome(amanha)}): acordar às ${n.acordar}` };
+}
 
 // ---------- noite curta planejada: regras ----------
 /** Vésperas em que não se planeja noite curta: longão (domingo), prova de concurso, sábado de prova antiga (jun–ago) ou simulado registrado. */

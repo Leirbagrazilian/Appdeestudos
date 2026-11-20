@@ -6,7 +6,8 @@ import { idadeOk, idadeEm } from '../src/lib/age.js';
 import { blocosDoDia } from '../src/lib/planner.js';
 import { addDays, weekday } from '../src/lib/dates.js';
 
-const cfg = () => structuredClone(seed);
+import { legado } from './_legado.js';
+const cfg = () => legado(structuredClone(seed));
 /** Lacunas com todos os tópicos da Fase 0 em nota 3: a trilha segue a partir do ensino médio (use com faseId 'base'). */
 const dominarFase0 = (c) => Object.fromEntries(c.materias.filter((m) => c.topicos?.[m]).map((m) => [m, Object.fromEntries(c.topicos[m].filter((t) => t.fase === 0).map((t) => [t.nome, 3]))]));
 
@@ -281,7 +282,7 @@ describe('conflito de provas e migração', () => {
     expect(Object.keys(novo.fases)).toHaveLength(8);
     expect(novo.carta).toBe('minha carta');
     expect(novo.links.Matemática).toBe('https://x');
-    expect(novo.versaoSeed).toBe(13);
+    expect(novo.versaoSeed).toBe(seed.versaoSeed);
     expect(migrarCfg(novo, cfg())).toBe(novo); // já migrada: não mexe
   });
   it('as 8 fases seguem a ordem e o ENEM vai do fim das discursivas até a prova', () => {
@@ -387,7 +388,7 @@ describe('planner v2: janelas, horas por fase e regras', () => {
     const a1 = orcamentoSemana(cfg(), 'ano1', '2027-01-18');
     expect(a1).toMatchObject({ mat: 1186, fis: 998, qui: 468, por: 187, red: 156, ing: 125, hg: 0 }); // 38/32/15/6/5/4 % de 3120
     const dias = semana('2026-11-23');
-    expect(liquido(dias)).toBeGreaterThan(52 * 60); expect(liquido(dias)).toBeLessThan(59 * 60);
+    expect(liquido(dias)).toBeGreaterThan(49.5 * 60); expect(liquido(dias)).toBeLessThan(59 * 60);
     const mat = dias.flatMap((d) => d.blocos).filter((b) => b.cat === 'mat').reduce((a, b) => a + b.min, 0);
     expect(Math.abs(mat - 1716)).toBeLessThanOrEqual(200);
   });
@@ -451,7 +452,9 @@ describe('planner v2: janelas, horas por fase e regras', () => {
   it('cada dia respeita a meta do dia (seg/qua/qui/sex ~9,5–10 h, ter ~8 h, sáb 8 h, dom 2 h)', () => {
     const dias = semana('2026-11-23');
     const h = (d) => d.blocos.reduce((a, b) => a + b.min, 0) / 60;
-    [0, 2, 3, 4].forEach((i) => { expect(h(dias[i])).toBeGreaterThanOrEqual(9.5); expect(h(dias[i])).toBeLessThanOrEqual(10); });
+    [0, 2].forEach((i) => { expect(h(dias[i])).toBeGreaterThanOrEqual(9.5); expect(h(dias[i])).toBeLessThanOrEqual(10); });
+    // com a Santa Missa: quinta (sem estudo depois da missa) ~8 h e sexta (missa + corrida às 7h30) ~7,7 h
+    [3, 4].forEach((i) => { expect(h(dias[i])).toBeGreaterThanOrEqual(7.5); expect(h(dias[i])).toBeLessThanOrEqual(8.6); });
     expect(h(dias[1])).toBeGreaterThanOrEqual(7.5); expect(h(dias[1])).toBeLessThanOrEqual(8.4);
     expect(h(dias[5])).toBeGreaterThanOrEqual(7.5); expect(h(dias[5])).toBeLessThanOrEqual(8.4);
     expect(h(dias[6])).toBeLessThanOrEqual(2);
@@ -701,7 +704,7 @@ describe('Meus livros', () => {
   it('configuração antiga ganha a biblioteca ao migrar', () => {
     const velho = cfg(); delete velho.biblioteca; velho.versaoSeed = 4;
     const novo = migrarCfg(velho, cfg());
-    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(13); expect(novo.ritmos.teoria).toBe(10);
+    expect(novo.biblioteca.recursos.length).toBeGreaterThan(20); expect(novo.versaoSeed).toBe(seed.versaoSeed); expect(novo.ritmos.teoria).toBe(10);
   });
 });
 

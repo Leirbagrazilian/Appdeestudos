@@ -2,6 +2,7 @@ import { diaNome, startOfWeek, addDays } from './dates.js';
 import { faseDoDia, revisaoLeve } from './phases.js';
 import { planoSemana, toHHMM } from './semana.js';
 import { ESTUDO, QUESTOES_DIA_MINIMO } from './tarefas.js';
+import { antesDoInicio } from './rotina.js';
 
 const ESTUDO_MATERIAS = new Set(['Matemática', 'Física', 'Química', 'Português', 'Inglês', 'Hist/Geo']);
 const COM_ASSUNTO = ['mat', 'fis', 'qui', 'por', 'ing', 'hg', 'red'];
@@ -60,7 +61,7 @@ export function blocosDoDia(cfg, fases, dia, ctx = {}) {
   });
 
   // Caderno de erros: 10 minutos de segunda a sexta, a qualquer hora (não entra nas sessões de foco).
-  if (d.wd >= 1 && d.wd <= 5) {
+  if (d.wd >= 1 && d.wd <= 5 && !antesDoInicio(cfg, dia)) { // antes do início real não há caderno de erros
     const c = cats.erros ?? { materia: 'Caderno de erros', metodo: 'espacada' };
     lista.push({ id: `${dia}:erros`, chave: 'erros', cat: 'erros', materia: c.materia, titulo: c.titulo ?? c.materia, min: 10, bruto: 10,
       metodo: c.metodo, dica: cfg.metodos[c.metodo], diagnostico: false, comAssunto: false });
