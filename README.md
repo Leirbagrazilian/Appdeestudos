@@ -86,7 +86,7 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 - **Modo domínio:** cada tópico da Fase 0 só avança com 8 acertos em 10. Abaixo disso o próximo bloco repete o tópico; depois de 3 tentativas ele fica **travado** (aviso na Hoje, botão de destravar na Trilha).
 - **Trilha da Fase 0:** tópicos pequenos (1 tópico ≈ 1 bloco de 2×50 min), agrupados por semana da tabela do SPEC.
 - **Bloco da Fase 0:** vídeo curto (até 20 min), exercícios (OBMEP e Toda Matéria) e livro, com no mínimo 10 exercícios.
-- **Aulas indicadas por tópico:** cada tópico de Matemática e Física traz as aulas grátis confirmadas do Universo Narrado, do Universo Narrado Militares e do Pedro Assaad (campo `aulas` no seed). A 1ª abre no passo do vídeo; as outras e a busca dentro de cada canal aparecem logo abaixo. O link que você colar no tópico continua na frente.
+- **Aulas indicadas por tópico:** cada tópico de Matemática e Física traz as aulas grátis confirmadas do Universo Narrado, do Universo Narrado Militares e do Pedro Assaad (Química e Português: aulas do Pedro Assaad) (campo `aulas` no seed). A 1ª abre no passo do vídeo; as outras e a busca dentro de cada canal aparecem logo abaixo. O link que você colar no tópico continua na frente.
 - **Progresso** (QG): checkpoint mensal (10 questões de Matemática da EFOMM em 30 min, aviso no primeiro sábado do mês), gráfico e o **portão da Fase 0**: teste de saída da base (9º ano) com 80% ou mais e checkpoint com pelo menos 5 acertos (e melhor que o diagnóstico). Se falhar, prorroga 2 semanas só com os tópicos fracos.
 
 ## Treino de corrida (SPEC v3 §13)

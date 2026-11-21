@@ -8,11 +8,12 @@ const cfg = () => structuredClone(seed);
 const CANAIS = ['Universo Narrado', 'Universo Narrado Militares', 'Pedro Assaad'];
 
 describe('aulas indicadas por tópico (v16)', () => {
-  it('só Matemática e Física, com canal conhecido, título e link https (YouTube ou Plataforma Assaad)', () => {
+  it('Matemática, Física, Química e Português, com canal conhecido, título e link https (YouTube ou Plataforma Assaad)', () => {
     let n = 0;
     for (const [m, ts] of Object.entries(seed.topicos)) for (const t of ts) for (const a of t.aulas ?? []) {
       n++;
-      expect(['Matemática', 'Física'], t.codigo).toContain(m);
+      expect(['Matemática', 'Física', 'Química', 'Português'], t.codigo).toContain(m);
+      if (['Química', 'Português'].includes(m)) expect(a.canal, t.nome).toBe('Pedro Assaad');
       expect(CANAIS, t.codigo).toContain(a.canal);
       expect(a.titulo.trim().length, t.codigo).toBeGreaterThan(3);
       expect(new URL(a.url).hostname, a.url).toMatch(/^(www\.youtube\.com|plataformaassaad\.com\.br)$/);
@@ -32,6 +33,12 @@ describe('aulas indicadas por tópico (v16)', () => {
     expect(videoDe(c, 'Matemática', 'Frações e equações')).toMatchObject({ url: a[0].url, origem: 'aula' });
     c.questoesLinks = { Matemática: { 'Frações e equações': { video: 'https://v/meu' } } };
     expect(videoDe(c, 'Matemática', 'Frações e equações')).toMatchObject({ url: 'https://v/meu', origem: 'topico' });
+  });
+  it('Química e Português: a 1ª aula do Assaad vira o vídeo do bloco', () => {
+    const c = cfg();
+    expect(videoDe(c, 'Química', 'Estequiometria')).toMatchObject({ origem: 'aula' });
+    expect(videoDe(c, 'Química', 'Estequiometria').url).toMatch(/estequiometria/);
+    expect(videoDe(c, 'Português', 'Semântica')).toMatchObject({ origem: 'aula' });
   });
   it('busca nos canais: Universo Narrado, Universo Militares e Pedro Assaad (Química fica na busca geral)', () => {
     const r = buscasDoTopico('Física', 'MU').video.map((x) => x.rotulo);

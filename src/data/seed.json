@@ -3128,6 +3128,18 @@
         "antigos": [
           "Matéria, substâncias e misturas",
           "Estados físicos e mudanças de estado"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Separação de misturas, 2h11 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/aula-magica-aprenda-quimica-agora-separacao-de-misturas-cai-pra-caramb/"
+          }
         ]
       },
       {
@@ -3138,6 +3150,18 @@
         "peso": 1,
         "antigos": [
           "Separação de misturas"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Separação de misturas, 2h11 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/aula-magica-aprenda-quimica-agora-separacao-de-misturas-cai-pra-caramb/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -3149,6 +3173,13 @@
           "Modelos atômicos",
           "Número atômico, número de massa e isótopos",
           "Íons e partículas do átomo"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -3158,6 +3189,13 @@
         "fase": 0,
         "antigos": [
           "Distribuição eletrônica (diagrama de Pauling)"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -3168,6 +3206,13 @@
         "antigos": [
           "Tabela periódica: famílias e períodos",
           "Propriedades periódicas"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -3177,6 +3222,13 @@
         "antigos": [
           "Ligação iônica",
           "Ligação covalente"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -3198,6 +3250,13 @@
         "ano": 1,
         "antigos": [
           "Ácidos e bases"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Química inorgânica, 1h10 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-quimica-inorganica-que-voce-ja-viu-amostra-gratis-pla/"
+          }
         ]
       },
       {
@@ -3207,6 +3266,13 @@
         "antigos": [
           "Sais",
           "Óxidos"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Química inorgânica, 1h10 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-quimica-inorganica-que-voce-ja-viu-amostra-gratis-pla/"
+          }
         ]
       },
       {
@@ -3215,6 +3281,13 @@
         "ano": 1,
         "antigos": [
           "Reações químicas e balanceamento"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Química inorgânica, 1h10 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-quimica-inorganica-que-voce-ja-viu-amostra-gratis-pla/"
+          }
         ]
       },
       {
@@ -3223,6 +3296,13 @@
         "ano": 1,
         "antigos": [
           "Reações químicas e balanceamento"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "NOX, 1h51 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-nox-da-sua-vida-desbloqueie-sua-inteligencia-quimica/"
+          }
         ]
       },
       {
@@ -3237,6 +3317,13 @@
           "Massa atômica e massa molecular",
           "Mol e constante de Avogadro",
           "Massa molar"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "O que é mol, 23 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/voce-realmente-sabe-o-que-e-mol-obrigatorio-pra-estequiometria-enem-20/"
+          }
         ]
       },
       {
@@ -3252,6 +3339,13 @@
         "antigos": [
           "Estequiometria simples: mol e massa",
           "Estequiometria e soluções"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Estequiometria + 100 questões, 8h04 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-estequiometria-para-o-enem-2026-didatica-magica-100-questoes/"
+          }
         ]
       },
       {
@@ -3448,12 +3542,31 @@
       {
         "nome": "Interpretação: tema, ideia central e inferência",
         "fase": 0,
-        "sem": 8
+        "sem": 8,
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Domine Linguagens, 1h12 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/domine-linguagens-para-o-enem-2026/"
+          }
+        ]
       },
       {
         "nome": "Interpretação de texto",
         "antigos": [
           "Interpretação de texto"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Domine Linguagens, 1h12 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/domine-linguagens-para-o-enem-2026/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Interpretação avançada de poemas, 2h09 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/interpretacao-avancada-de-poemas-linguagens-enem-2026/"
+          }
         ]
       },
       {
@@ -3469,6 +3582,13 @@
           "Regência",
           "Crase",
           "Pontuação"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Redação: Competência 1 (norma culta), 2h28 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/nunca-mais-perca-ponto-na-competencia-1-da-redacao-enem/"
+          }
         ]
       },
       {
@@ -3481,6 +3601,18 @@
         "nome": "Semântica",
         "antigos": [
           "Semântica"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Figuras de linguagem, 2h49 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/figuras-de-linguagem-pro-enem-2026-a-melhor-aula-do-youtube/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Funções da linguagem, 1h08 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-sobre-funcoes-da-linguagem-pro-enem-referencial-conativa-metaling/"
+          }
         ]
       }
     ],

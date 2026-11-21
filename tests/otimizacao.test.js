@@ -119,7 +119,7 @@ describe('busca automática por tópico', () => {
   });
   it('matéria sem vídeo cadastrado cai na busca do YouTube; outras matérias continuam sem vídeo', () => {
     const c = cfg(); c.biblioteca.recursos = c.biblioteca.recursos.filter((r) => r.tipo === 'livro'); c.links = {};
-    expect(videoDe(c, 'Química', 'Mol e massa molar')).toMatchObject({ origem: 'busca', auto: true, url: buscasDoTopico('Química', 'Mol e massa molar').video[0].url });
+    expect(videoDe(c, 'Química', 'Gases')).toMatchObject({ origem: 'busca', auto: true, url: buscasDoTopico('Química', 'Gases').video[0].url });
     expect(videoDe(c, 'Hist/Geo', 'Brasil Colônia')).toBe(null);
     expect(videoDe(cfg(), 'Matemática', 'MMC').origem).toBe('recurso'); // tópico sem aula indicada: o recurso cadastrado continua na frente
   });
