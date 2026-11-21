@@ -14,11 +14,10 @@
   const vinculoId = feito.vinculoId ?? tarefa?.vinculoId ?? null;
   const temPaginas = !!vinculoId || (feito.paginasPlan ?? tarefa?.paginas?.n ?? 0) > 0;
   const errosJa = res?.errosRegistrados ?? 0;
-  const zero = faseDoDia(fases(), app.dia).id === 'zero' && !!topico; // Fase 0: exercícios (Khan/OBMEP) e modo domínio
+  const zero = faseDoDia(fases(), app.dia).id === 'zero' && !!topico; // Fase 0: exercícios (OBMEP e listas) e modo domínio
   const matar = tarefa?.matar ?? feito.matar; // true: MATAR HOJE (tentativa que conta); false: bloco antes do prazo
   const dominio = !!topico && (zero || matar != null); // modo domínio: 8 em 10 domina o tópico
   const materiaReg = b.cat === 'resg' ? tarefa?.materia ?? feito.materia : tarefa?.materia;
-  let khan = $state(res?.khan ?? false);
 
   let feitas = $state(res?.feitas ?? feito.questoesPlan ?? tarefa?.questoes?.n ?? 0);
   let acertos = $state(res ? res.acertos : null);
@@ -27,7 +26,7 @@
   let linhas = $state([]), treme = $state(false), falta = $state('');
 
   const tipos = $derived(app.cfg.tiposErro);
-  const opcoesSite = $derived([...(app.cfg.sitesQuestoes ?? []).filter((s) => (zero ? !['qconcursos', 'estuda'].includes(s.id) : !['khan', 'obmep'].includes(s.id))).map((s) => ({ id: s.id, nome: s.nome })), { id: 'livro', nome: 'Livro' }]);
+  const opcoesSite = $derived([...(app.cfg.sitesQuestoes ?? []).filter((s) => (zero ? !['qconcursos', 'estuda'].includes(s.id) : !['obmep'].includes(s.id))).map((s) => ({ id: s.id, nome: s.nome })), { id: 'livro', nome: 'Livro' }]);
   const nErros = $derived(acertos == null ? 0 : Math.max(0, feitas - acertos - errosJa));
   const visiveis = $derived(Math.min(nErros, 8));
   const lim = $derived(limitesCota(app.cfg));
@@ -48,11 +47,11 @@
   };
   async function salvar(ev) {
     ev.preventDefault();
-    if (!soErros && !khan && feitas > 0 && acertos == null) {
+    if (!soErros && feitas > 0 && acertos == null) {
       falta = 'Diga quantas você acertou.'; vibrar(pf(), 'erro'); treme = false; requestAnimationFrame(() => (treme = true)); return;
     }
     await registrarResultado(b, {
-      feitas, acertos: acertos ?? 0, khan: zero && khan, site: feitas ? site : null, paginas: temPaginas ? +paginas || 0 : 0,
+      feitas, acertos: acertos ?? 0, site: feitas ? site : null, paginas: temPaginas ? +paginas || 0 : 0,
       erros: linhas.slice(0, visiveis), topico, vinculoId, matar, materia: materiaReg, minutosLeitura: feito.minLeitura ?? tarefa?.paginas?.min ?? 0,
     });
   }
@@ -85,9 +84,6 @@
       {/if}
     </section>
 
-    {#if zero}
-      <label class="khan"><input type="checkbox" bind:checked={khan} /> Marquei como dominado no Khan (vale como dominado)</label>
-    {/if}
     {#if temPaginas}
       <label class="pag">Páginas lidas<input type="number" inputmode="numeric" min="0" bind:value={paginas} /></label>
     {/if}
@@ -122,8 +118,6 @@
   .rot { margin-top: 4px; }
   .cota { margin-top: 6px; } .cota.fim { color: var(--warn); font-weight: 600; }
   .meta { color: var(--ac); }
-  .khan { display: flex; gap: 10px; align-items: center; min-height: 44px; font-size: .92rem; }
-  .khan input { width: 22px; height: 22px; min-height: 0; accent-color: var(--ac); flex: none; }
   .pag { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }
   input, select { width: 100%; min-height: 44px; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
   .erro { display: grid; grid-template-columns: 1fr 9.5rem; gap: 6px; margin-top: 6px; }

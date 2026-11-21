@@ -19,7 +19,7 @@ const bate = (a, b) => a[0] < b[1] && a[1] > b[0];
 describe('Santa Missa na rotina', () => {
   it('seed: 4 missas fixas (tipo missa) com 20 min de trajeto, fora da contagem da faculdade', () => {
     const c = cfg();
-    expect(seed.versaoSeed).toBe(15);
+    expect(seed.versaoSeed).toBeGreaterThanOrEqual(15);
     expect(c.rotina.aulas.filter((a) => a.tipo === 'missa').map((a) => [a.dia, a.inicio, a.fim])).toEqual([[5, '05:40', '07:20'], [6, '04:40', '06:20'], [0, '11:40', '13:20'], [4, '18:40', '20:20']]);
     expect(missasDoDia(c, 5)[0]).toMatchObject({ ini: min(5, 40), fim: min(7, 20), trajeto: 20, missa: min(6) });
     expect(aulasFaculdade(c).some((a) => a.tipo === 'missa')).toBe(false);
@@ -141,7 +141,7 @@ describe('migração v15', () => {
   it('acrescenta missas, corridaPorDia e o sono novo da sexta sem perder o que foi editado', () => {
     const salvo = antigo(); salvo.carta = 'minha'; salvo.rotina.aulas.push({ dia: 2, inicio: '10:00', fim: '11:00', nome: 'Meu curso', tipo: 'fixo' }); salvo.treino.corrida = '05:45'; salvo.sono.padrao[1] = { dormir: '21:45', acordar: '05:00' };
     const m = migrarCfg(salvo, seed);
-    expect(m.versaoSeed).toBe(15); expect(m.carta).toBe('minha'); expect(m.treino.corrida).toBe('05:45'); expect(m.sono.padrao[1].dormir).toBe('21:45');
+    expect(m.versaoSeed).toBe(seed.versaoSeed); expect(m.carta).toBe('minha'); expect(m.treino.corrida).toBe('05:45'); expect(m.sono.padrao[1].dormir).toBe('21:45');
     expect(m.rotina.aulas.filter((a) => a.tipo === 'missa')).toHaveLength(4); expect(m.rotina.aulas.some((a) => a.nome === 'Meu curso')).toBe(true);
     expect(m.treino.corridaPorDia).toEqual({ 5: '07:30' }); expect(horaCorrida(m, 1)).toBe('05:45');
     expect(m.sono.padrao[5]).toEqual({ dormir: '21:30', acordar: '04:30' });

@@ -84,12 +84,12 @@ describe('Fase 0: tarefa do dia', () => {
     const t = tarefasDoDia(c, [{ id: `${DIA}:mat@0700`, cat: 'mat', materia: 'Matemática', min: 30 }], { lacunas: {}, faseId: 'zero' })[`${DIA}:mat@0700`];
     expect(t.questoes.n).toBeGreaterThanOrEqual(10);
   });
-  it('fontes: Khan e OBMEP em vez de QConcursos e Estuda.com, mesmo com links colados', () => {
+  it('fontes: OBMEP e PDF em vez de QConcursos e Estuda.com, mesmo com links colados', () => {
     const c = cfg();
     const topico = T1;
-    c.questoesLinks = { Matemática: { [topico]: { khan: 'https://k/x', obmep: 'https://o/x', qconcursos: 'https://qc/x', estuda: 'https://es/x' } } };
+    c.questoesLinks = { Matemática: { [topico]: { obmep: 'https://o/x', pdf: 'https://p/x', qconcursos: 'https://qc/x', estuda: 'https://es/x' } } };
     const t = tarefaMat(c);
-    expect(t.questoes.fontes.map((f) => f.site)).toEqual(['khan', 'obmep']);
+    expect(t.questoes.fontes.map((f) => f.site)).toEqual(['obmep', 'pdf']);
     expect(t.questoes.fontes.every((f) => !f.curso)).toBe(true);
     expect(t.questoes.cotaEsgotada).toBe(false);
     for (const t2 of Object.values(tarefasDoDia(c, blocosAjustados(c, fases, DIA, {}), { lacunas: {}, faseId: 'zero' })))
@@ -107,7 +107,7 @@ describe('Fase 0: tarefa do dia', () => {
   });
   it('fora da Fase 0 (faseId ano1) as fontes continuam sendo QConcursos e Estuda.com', () => {
     const c = cfg();
-    c.questoesLinks = { Matemática: { 'Teoria de conjuntos': { qconcursos: 'https://qc/x', khan: 'https://k/x' } } };
+    c.questoesLinks = { Matemática: { 'Teoria de conjuntos': { qconcursos: 'https://qc/x', obmep: 'https://o/x' } } };
     const bls = blocosAjustados(c, fases, DIA, {});
     const b = bls.find((x) => x.cat === 'mat');
     const t = tarefasDoDia(c, bls, { lacunas: dominarZero(c), faseId: 'ano1' })[b.id];

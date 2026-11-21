@@ -614,7 +614,7 @@ describe('Meus livros', () => {
       expect(temPaginas(v)).toBe(false); // sem páginas: você cadastra
     }
     expect(b.vinculos.some((v) => v.recurso === 'feltre-1' && c.topicos.Química.find((t) => t.nome === v.topico)?.fase === 0)).toBe(true);
-    for (const id of ['khan-mat', 'quim-intro']) expect(rec(id), id).toBeTruthy();
+    expect(b.recursos.some((r) => /khanacademy/.test(r.link ?? ''))).toBe(false); // v16: sem Khan Academy
     for (const r of b.recursos) { expect(c.materias).toContain(r.materia); if (r.link) expect(r.link).toMatch(/^https:\/\//); }
     expect(b.recursos.filter((r) => r.link).every((r) => r.linkStatus === 'visto na busca')).toBe(true);
     for (const m of Object.keys(b.principal)) if (b.principal[m]) expect(series(c, m).some((s) => s.id === b.principal[m])).toBe(true);
@@ -822,7 +822,7 @@ describe('etapa 5: migração dos campos novos', () => {
     const novo = migrarCfg(velho, cfg());
     expect(novo.cotasGratis).toEqual({ qconcursos: 10, estuda: 5 });
     expect(novo.divisaoBloco).toEqual({ video: 25, teoria: 45, questoes: 30 });
-    expect(novo.sitesQuestoes.map((s) => s.id)).toEqual(['khan', 'obmep', 'qconcursos', 'estuda', 'pdf', 'outro']);
+    expect(novo.sitesQuestoes.map((s) => s.id)).toEqual(['obmep', 'qconcursos', 'estuda', 'pdf', 'outro']);
     expect(novo.questoesLinks).toEqual({});
     const comLinks = cfg(); comLinks.versaoSeed = 5; comLinks.questoesLinks = { Matemática: { 'Teoria de conjuntos': { qconcursos: 'https://qc/x' } } }; comLinks.cotasGratis = { qconcursos: 7, estuda: 3 };
     const n2 = migrarCfg(comLinks, cfg());

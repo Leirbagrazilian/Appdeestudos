@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { primeiroSabado, serieCheckpoints, checkpointDoMes, checkpointPendente, portaoZero } from '../src/lib/portao.js';
 
-const cfg = () => ({ checkpoint: { questoes: 10, minutos: 30, baseline: { data: '2026-11-15', acertos: 0 } }, fase0: { portao: { khanMin: 80, checkpointMin: 5, semanasExtras: 2 } }, concursos: [], topicos: { Matemática: [{ nome: 'A', fase: 0, sem: 1 }], Física: [], Química: [] }, materiasInfo: {} });
+const cfg = () => ({ checkpoint: { questoes: 10, minutos: 30, baseline: { data: '2026-11-15', acertos: 0 } }, fase0: { portao: { testeMin: 80, checkpointMin: 5, semanasExtras: 2 } }, concursos: [], topicos: { Matemática: [{ nome: 'A', fase: 0, sem: 1 }], Física: [], Química: [] }, materiasInfo: {} });
 
 describe('checkpoint mensal', () => {
   it('primeiro sábado do mês', () => {
@@ -29,19 +29,19 @@ describe('checkpoint mensal', () => {
 
 describe('portão da Fase 0', () => {
   const cps = (n) => ({ '2027-01-02': { data: '2027-01-02', acertos: n, feitas: 10 } });
-  it('passa com Khan >= 80% e checkpoint melhor que o diagnóstico (e >= mínimo)', () => {
-    expect(portaoZero(cfg(), { khan: { pct: 85 } }, cps(6)).ok).toBe(true);
+  it('passa com teste de saída >= 80% e checkpoint melhor que o diagnóstico (e >= mínimo)', () => {
+    expect(portaoZero(cfg(), { teste: { pct: 85 } }, cps(6)).ok).toBe(true);
   });
-  it('falha sem teste do Khan, com Khan baixo ou checkpoint baixo', () => {
+  it('falha sem teste de saída, com teste baixo ou checkpoint baixo', () => {
     expect(portaoZero(cfg(), null, cps(6)).ok).toBe(false);
-    expect(portaoZero(cfg(), { khan: { pct: 79 } }, cps(6)).ok).toBe(false);
-    expect(portaoZero(cfg(), { khan: { pct: 90 } }, cps(4)).ok).toBe(false);
-    expect(portaoZero(cfg(), { khan: { pct: 90 } }, {}).ok).toBe(false);
+    expect(portaoZero(cfg(), { teste: { pct: 79 } }, cps(6)).ok).toBe(false);
+    expect(portaoZero(cfg(), { teste: { pct: 90 } }, cps(4)).ok).toBe(false);
+    expect(portaoZero(cfg(), { teste: { pct: 90 } }, {}).ok).toBe(false);
   });
   it('checkpoint igual ao diagnóstico não conta como "melhor"', () => {
     const c = cfg(); c.checkpoint.baseline.acertos = 6; c.fase0.portao.checkpointMin = 0;
-    expect(portaoZero(c, { khan: { pct: 90 } }, cps(6)).checkpoint.ok).toBe(false);
-    expect(portaoZero(c, { khan: { pct: 90 } }, cps(7)).checkpoint.ok).toBe(true);
+    expect(portaoZero(c, { teste: { pct: 90 } }, cps(6)).checkpoint.ok).toBe(false);
+    expect(portaoZero(c, { teste: { pct: 90 } }, cps(7)).checkpoint.ok).toBe(true);
   });
   it('lista os tópicos fracos da Fase 0 (não dominados)', () => {
     expect(portaoZero(cfg(), null, {}, { Matemática: {} }).fracos).toEqual([{ materia: 'Matemática', topico: 'A' }]);

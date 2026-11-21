@@ -17,7 +17,7 @@ const min = (h, m = 0) => h * 60 + m;
 describe('início real (20/11/2026)', () => {
   it('seed: inicioReal, treino e oração começam em 20/11', () => {
     const c = cfg();
-    expect(seed.versaoSeed).toBe(15);
+    expect(seed.versaoSeed).toBeGreaterThanOrEqual(15);
     expect(c.perfil.inicioReal).toBe('2026-11-20');
     expect(c.treinoPlano.inicio).toBe('2026-11-20'); expect(c.treinoPlano.fases[0].inicio).toBe('2026-11-20');
     expect(c.oracaoPlano.inicio).toBe('2026-11-20');
@@ -34,7 +34,7 @@ describe('início real (20/11/2026)', () => {
     salvo.treinoPlano.inicio = '2026-11-17'; salvo.oracaoPlano.inicio = '2026-11-17';
     const m = migrarCfg(salvo, seed);
     expect(m.perfil.inicioReal).toBe('2026-11-20'); expect(m.perfil.nome).toBe('Outro'); expect(m.perfil.extraZero).toBe(2); expect(m.carta).toBe('minha');
-    expect(m.treinoPlano.inicio).toBe('2026-11-20'); expect(m.oracaoPlano.inicio).toBe('2026-11-20'); expect(m.versaoSeed).toBe(15);
+    expect(m.treinoPlano.inicio).toBe('2026-11-20'); expect(m.oracaoPlano.inicio).toBe('2026-11-20'); expect(m.versaoSeed).toBe(seed.versaoSeed);
     const velho = cfg(); velho.versaoSeed = 13; velho.perfil.inicioReal = '2026-11-18'; // valor antigo é atualizado
     expect(migrarCfg(velho, seed).perfil.inicioReal).toBe('2026-11-20');
   });

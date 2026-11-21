@@ -4,9 +4,14 @@ import { antesDoInicio } from './rotina.js';
 import { topicosDe, dominio } from './trilha.js';
 
 export const CHECKPOINT_PADRAO = { questoes: 10, minutos: 30, baseline: { data: '2026-11-15', acertos: 0 } };
-export const PORTAO_PADRAO = { khanMin: 80, checkpointMin: 5, semanasExtras: 2 };
+export const PORTAO_PADRAO = { testeMin: 80, checkpointMin: 5, semanasExtras: 2 };
 const cp = (cfg) => ({ ...CHECKPOINT_PADRAO, ...(cfg.checkpoint ?? {}) });
-export const regrasPortao = (cfg) => ({ ...PORTAO_PADRAO, ...(cfg.fase0?.portao ?? {}) });
+export const regrasPortao = (cfg) => {
+  const r = { ...PORTAO_PADRAO, ...(cfg.fase0?.portao ?? {}) };
+  if (cfg.fase0?.portao?.testeMin == null && r.khanMin != null) r.testeMin = r.khanMin; // config antiga
+  delete r.khanMin;
+  return r;
+};
 
 /** Primeiro sábado do mês de `dia` (AAAA-MM-DD). */
 export function primeiroSabado(dia) {
@@ -29,21 +34,21 @@ export const checkpointDoMes = (cfg, checkpoints, dia) => serieCheckpoints(cfg, 
 export const checkpointPendente = (cfg, checkpoints, dia) => !antesDoInicio(cfg, dia) && dia >= primeiroSabado(dia) && !checkpointDoMes(cfg, checkpoints, dia);
 
 /**
- * Portão da Fase 0: teste de saída do Khan (9º ano) com 80% ou mais E checkpoint melhor que o diagnóstico
- * (e com o mínimo de acertos definido). `portao` = { khan: { pct, data } | null }.
+ * Portão da Fase 0: teste de saída da base (9º ano) com 80% ou mais E checkpoint melhor que o diagnóstico
+ * (e com o mínimo de acertos definido). `portao` = { teste: { pct, data } | null } (aceita o antigo `khan`).
  */
 export function portaoZero(cfg, portao, checkpoints, lacunas = {}) {
   const r = regrasPortao(cfg), serie = serieCheckpoints(cfg, checkpoints);
   const base = serie.find((x) => x.base) ?? serie[0] ?? null;
   const depois = serie.filter((x) => !x.base && (!base || x.data > base.data));
   const ultimo = depois.at(-1) ?? null;
-  const khan = portao?.khan?.pct ?? null;
-  const khanOk = khan != null && khan >= r.khanMin;
+  const teste = (portao?.teste ?? portao?.khan)?.pct ?? null;
+  const testeOk = teste != null && teste >= r.testeMin;
   const cpOk = !!ultimo && ultimo.acertos > (base?.acertos ?? 0) && ultimo.acertos >= r.checkpointMin;
   const fracos = ['Matemática', 'Física', 'Química'].flatMap((m) => topicosDe(cfg, m).filter((t) => t.fase === 0 && dominio(lacunas, m, t.nome) < 3).map((t) => ({ materia: m, topico: t.nome })));
   return {
-    ok: khanOk && cpOk, fracos,
-    khan: { valor: khan, min: r.khanMin, ok: khanOk },
+    ok: testeOk && cpOk, fracos,
+    teste: { valor: teste, min: r.testeMin, ok: testeOk },
     checkpoint: { ultimo, base, min: r.checkpointMin, ok: cpOk },
     extras: r.semanasExtras,
   };
