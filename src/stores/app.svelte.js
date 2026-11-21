@@ -1,6 +1,6 @@
 import seed from '../data/seed.json';
 import * as db from '../lib/db.js';
-import { today, addDays } from '../lib/dates.js';
+import { today, addDays, precisaVirar } from '../lib/dates.js';
 import { gerarFases } from '../lib/phases.js';
 import { agendarRevisoes, avaliar } from '../lib/spaced.js';
 import { verificar } from '../lib/notify.js';
@@ -67,9 +67,23 @@ export async function iniciar() {
   gravarResumo();
   if (app.cfg.notificacoes) registrarPeriodico();
   app.pronto = true;
-  // atualiza o "hoje" se o app ficar aberto na virada do dia
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { app.dia = today(); sincronizarDividas(); agendarResumo(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono }); } });
+  // atualiza o "hoje" se o app ficar aberto na virada do dia ou for retomado sem visibilitychange
+  const voltou = () => { virarDia(); atualizarSW(); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) voltou(); });
+  window.addEventListener('pageshow', voltou);
+  window.addEventListener('focus', voltou);
+  setInterval(virarDia, 30000);
 }
+
+/** Se o dia mudou, atualiza `app.dia` e refaz o que depende dele. Idempotente. */
+export function virarDia() {
+  if (!precisaVirar(app.dia, new Date())) return false;
+  app.dia = today();
+  verificar(app.cfg, app.reviews, app.dia);
+  sincronizarDividas(); agendarResumo(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono });
+  return true;
+}
+function atualizarSW() { try { navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {}); } catch {} }
 
 /** Notas (lacunas), estado do domínio e blocos feitos: o que era de tópico antigo vale também no tópico novo; o antigo não é apagado. */
 async function migrarEstadosAntigos() {

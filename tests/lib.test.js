@@ -939,3 +939,12 @@ describe('etapa 1 (v3): fases e fim de semana', () => {
     expect(b.fim).toBe(addDays(b0.fim, 14));
   });
 });
+
+import { precisaVirar } from '../src/lib/dates.js';
+describe('precisaVirar', () => {
+  it('vira à meia-noite e é idempotente', () => {
+    expect(precisaVirar('2026-11-20', new Date(2026, 10, 20, 23, 59, 30))).toBe(false);
+    expect(precisaVirar('2026-11-20', new Date(2026, 10, 21, 0, 0, 40))).toBe(true);
+    expect(precisaVirar('2026-11-21', new Date(2026, 10, 21, 0, 0, 40))).toBe(false);
+  });
+});
