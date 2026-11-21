@@ -8,18 +8,18 @@ import { recursoPorId, recursosAtivos, vinculosDoTopico, temPaginas, ritmoDe, ri
 export const ESTUDO = ['mat', 'fis', 'qui', 'por', 'ing', 'hg'];
 export const REGISTRAVEL = [...ESTUDO, 'minimo', 'resg']; // blocos que abrem o registro de resultado
 export const QUESTOES_DIA_MINIMO = 20;
-export const CAMPOS_LINK = ['video', 'khan', 'obmep', 'qconcursos', 'estuda', 'pdf', 'outro'];
+export const CAMPOS_LINK = ['video', 'obmep', 'qconcursos', 'estuda', 'pdf', 'outro'];
 const SITES_COTA = ['qconcursos', 'estuda'];
 
-export const linksDe = (cfg, materia, topico) => ({ video: '', khan: '', obmep: '', qconcursos: '', estuda: '', pdf: '', outro: '', ...(cfg.questoesLinks?.[materia]?.[topico] ?? {}) });
+export const linksDe = (cfg, materia, topico) => ({ video: '', obmep: '', qconcursos: '', estuda: '', pdf: '', outro: '', ...(cfg.questoesLinks?.[materia]?.[topico] ?? {}) });
 export const limitesCota = (cfg) => ({ qconcursos: cfg.cotasGratis?.qconcursos ?? 10, estuda: cfg.cotasGratis?.estuda ?? 5 });
 const nomeSite = (cfg, id) => cfg.sitesQuestoes?.find((s) => s.id === id)?.nome ?? id;
 
 /** Links de questões do tópico, em ordem de uso, já com a situação da cota grátis do dia.
- *  Fase 0: só exercícios (Khan, OBMEP e o que você colou), sem questões de concurso; se o tópico não tem link, entra o curso da matéria. */
+ *  Fase 0: só exercícios (OBMEP e o que você colou), sem questões de concurso; se o tópico não tem link, entra o curso da matéria. */
 export function fontesQuestoes(cfg, materia, topico, cotasDia = {}, faseId = null) {
   const l = linksDe(cfg, materia, topico), lim = limitesCota(cfg), zero = faseId === 'zero';
-  const ordem = zero ? ['khan', 'obmep', 'pdf', 'outro'] : ['qconcursos', 'estuda', 'pdf', 'outro'];
+  const ordem = zero ? ['obmep', 'pdf', 'outro'] : ['qconcursos', 'estuda', 'pdf', 'outro'];
   const fontes = ordem.filter((s) => l[s]).map((s) => {
     const limite = SITES_COTA.includes(s) ? lim[s] : null, usadas = cotasDia[s] ?? 0;
     return { site: s, rotulo: nomeSite(cfg, s), url: l[s], usadas, limite, restante: limite != null ? Math.max(0, limite - usadas) : null, esgotada: limite != null && usadas >= limite };
@@ -49,36 +49,44 @@ export function divisaoBloco(cfg, minutos, { video, paginas }, faseId = null, ma
 }
 
 // ---------- busca automática ----------
-// Enquanto você não cola o link do tópico, o bloco já traz buscas prontas pelo nome dele (YouTube e Khan Academy).
+// Enquanto você não cola o link do tópico, o bloco já traz buscas prontas pelo nome dele (Universo Narrado, Universo Militares e Pedro Assaad).
 export const MATERIAS_BUSCA = ['Matemática', 'Física', 'Química'];
-const CANAL_BUSCA = { Matemática: ['Matemática Zero (Nerckie)', 'Matemática Zero Nerckie'], Física: ['Física Total', 'Física Total Ivys Urquiza'] };
+/** Canais do YouTube com busca dentro do canal (Matemática e Física). */
+export const CANAIS = [
+  { nome: 'Universo Narrado', handle: 'UniversoNarrado' },
+  { nome: 'Universo Narrado Militares', handle: 'UniversoMilitares' },
+];
 const consulta = (txt) => encodeURIComponent(String(txt).replace(/\s+/g, ' ').trim()).replace(/%20/g, '+');
 export const urlYouTube = (txt) => `https://www.youtube.com/results?search_query=${consulta(txt)}`;
-export const urlKhan = (txt) => `https://pt.khanacademy.org/search?page_search_query=${consulta(txt)}`;
+export const urlCanal = (handle, txt) => `https://www.youtube.com/@${handle}/search?query=${consulta(txt)}`;
+/** Aulas indicadas do tópico (seed): [{ canal, titulo, url }]. */
+export const aulasDe = (cfg, materia, topico) => (cfg.topicos?.[materia] ?? []).find((t) => t.nome === topico)?.aulas ?? [];
 /** Buscas prontas do tópico: { video: [...], exercicios: [...] }, cada item { site, rotulo, url, auto: true }. Só Matemática, Física e Química. */
 export function buscasDoTopico(materia, topico) {
   const nome = String(topico ?? '').replace(/\s+/g, ' ').trim();
   if (!MATERIAS_BUSCA.includes(materia) || !nome) return { video: [], exercicios: [] };
-  const curto = nome.replace(/\([^)]*\)/g, ' ').replace(/[:;,]/g, ' '); // a busca do Khan acha mais com o nome enxuto
+  const curto = nome.replace(/\([^)]*\)/g, ' ').replace(/[:;,]/g, ' ').replace(/\s+/g, ' ').trim(); // a busca no canal acha mais com o nome enxuto
   const item = (site, rotulo, url) => ({ site, rotulo, url, auto: true });
-  const canal = CANAL_BUSCA[materia];
+  const canais = materia === 'Química' ? [] : CANAIS;
   return {
     video: [
-      item('youtube', 'YouTube: aulas deste tópico', urlYouTube(`${nome} ${materia} aula`)),
-      ...(canal ? [item('youtube', `YouTube: ${canal[0]}`, urlYouTube(`${curto} ${canal[1]}`))] : []),
+      ...canais.map((c) => item('youtube', `${c.nome}: buscar no canal`, urlCanal(c.handle, curto))),
+      item('youtube', 'Pedro Assaad: buscar no YouTube', urlYouTube(`${curto} Pedro Assaad`)),
+      ...(materia === 'Química' ? [item('youtube', 'YouTube: aulas deste tópico', urlYouTube(`${nome} ${materia} aula`))] : []),
     ],
     exercicios: [
-      item('khan', 'Khan Academy: buscar este tópico', urlKhan(curto)),
       item('youtube', 'YouTube: exercícios resolvidos', urlYouTube(`${nome} ${materia} exercícios resolvidos`)),
     ],
   };
 }
 
-/** Vídeo do tópico: o link colado para ele; senão, o primeiro vídeo/site da matéria; senão, o link que você guardou na matéria;
- *  por último (Matemática, Física e Química), a busca automática do tópico no YouTube. */
+/** Vídeo do tópico: o link colado para ele; senão, a 1ª aula indicada (Universo Narrado, Assaad, Militares); senão, o primeiro
+ *  vídeo/site da matéria; senão, o link que você guardou na matéria; por último, a busca automática do tópico. */
 export function videoDe(cfg, materia, topico) {
   const l = linksDe(cfg, materia, topico).video;
   if (l) return { url: l, origem: 'topico' };
+  const a = aulasDe(cfg, materia, topico)[0];
+  if (a) return { url: a.url, origem: 'aula', rotulo: `${a.canal} · ${a.titulo}` };
   const rec = recursosAtivos(cfg, materia).find((r) => r.tipo !== 'livro' && r.link);
   if (rec) return { url: rec.link, origem: 'recurso', rotulo: rec.titulo };
   const m = cfg.links?.[materia];
@@ -86,8 +94,12 @@ export function videoDe(cfg, materia, topico) {
   const b = buscasDoTopico(materia, topico).video[0];
   return b ? { url: b.url, origem: 'busca', rotulo: 'Busca automática no YouTube', auto: true } : null;
 }
-/** Buscas que acompanham o passo do vídeo: só quando você não colou o vídeo do tópico (e sem repetir o link principal). */
-const buscasVideo = (video, materia, topico) => (video?.origem === 'topico' ? [] : buscasDoTopico(materia, topico).video.filter((x) => x.url !== video?.url));
+/** Outras aulas indicadas e buscas nos canais: só quando você não colou o vídeo do tópico (e sem repetir o link principal). */
+const buscasVideo = (cfg, video, materia, topico) => {
+  if (video?.origem === 'topico') return [];
+  const aulas = aulasDe(cfg, materia, topico).map((a) => ({ site: 'youtube', rotulo: `${a.canal} · ${a.titulo}`, url: a.url, auto: false }));
+  return [...aulas, ...buscasDoTopico(materia, topico).video].filter((x) => x.url !== video?.url);
+};
 /** Buscas de exercícios: só na Fase 0 e enquanto o tópico não tem link colado (as fontes são só as do curso, ou nenhuma). */
 const buscasExercicios = (zero, fontes, materia, topico) => (zero && fontes.every((f) => f.curso) ? buscasDoTopico(materia, topico).exercicios : []);
 
@@ -180,7 +192,7 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
     const cotaEsgotada = comCota.length > 0 && comCota.every((f) => f.esgotada);
     out[b.id] = {
       materia, topico: t.nome, concursos: t.concursos, min: b.min, partes: div,
-      video: video && div.video ? { ...video, min: div.video, buscas: buscasVideo(video, materia, t.nome) } : null,
+      video: video && div.video ? { ...video, min: div.video, buscas: buscasVideo(cfg, video, materia, t.nome) } : null,
       paginas, exercicios, concluidoLivro,
       temLivro: recursosAtivos(cfg, materia).some((r) => r.tipo === 'livro'),
       semPaginas: !usaPaginas && !concluidoLivro,

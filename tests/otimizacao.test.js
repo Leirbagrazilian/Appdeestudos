@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import seed from '../src/data/seed.json';
 import { gerarFases } from '../src/lib/phases.js';
 import { blocosAjustados, blocosDaSemana } from '../src/lib/planner.js';
-import { tarefasDoDia, buscasDoTopico, videoDe, linksDoBloco, urlYouTube, urlKhan, MATERIAS_BUSCA } from '../src/lib/tarefas.js';
+import { tarefasDoDia, buscasDoTopico, videoDe, linksDoBloco, urlYouTube, urlCanal, aulasDe, MATERIAS_BUSCA } from '../src/lib/tarefas.js';
 import { fichaDoTopico } from '../src/lib/erros.js';
 import { resumoSemana } from '../src/lib/revisao.js';
 import { addDays } from '../src/lib/dates.js';
@@ -53,34 +53,35 @@ describe('integridade do seed: links e ids', () => {
       expect(seed.topicos[v.materia]?.some((t) => t.nome === v.topico), v.id).toBe(true);
     }
   });
-  it('Fase 0: Matemática, Física e Química têm lista de exercícios direta (não a página inicial do Khan)', () => {
+  it('Fase 0: Matemática, Física e Química têm lista de exercícios direta (sem Khan Academy)', () => {
     for (const m of MATERIAS_BUSCA) {
       const l = seed.fase0.exercicios[m];
       expect(l.length, m).toBeGreaterThan(0);
-      for (const r of l) { expect(urlOk(r.url)).toBe(true); expect(new URL(r.url).pathname === '/' && r.site === 'khan', r.url).toBe(false); expect(r.rotulo.trim().length).toBeGreaterThan(3); }
+      for (const r of l) { expect(urlOk(r.url)).toBe(true); expect(new URL(r.url).pathname === '/' && r.site !== 'obmep', r.url).toBe(false); expect(r.url).not.toMatch(/khanacademy/); expect(r.rotulo.trim().length).toBeGreaterThan(3); }
     }
   });
 });
 
 describe('busca automática por tópico', () => {
-  it('todo tópico de Matemática, Física e Química ganha buscas válidas (YouTube e Khan)', () => {
+  it('todo tópico de Matemática, Física e Química ganha buscas válidas (canais e YouTube, sem Khan)', () => {
     let n = 0;
     for (const m of MATERIAS_BUSCA) for (const t of seed.topicos[m]) { // todos os tópicos (Fase 0 e Anos 1 a 3)
       const b = buscasDoTopico(m, t.nome); n++;
       expect(b.video.length).toBeGreaterThan(0); expect(b.exercicios.length).toBeGreaterThan(0);
       for (const f of [...b.video, ...b.exercicios]) { expect(urlOk(f.url), f.url).toBe(true); expect(f.auto).toBe(true); expect(f.rotulo).toBeTruthy(); }
-      expect(b.video[0].url.startsWith('https://www.youtube.com/results?search_query=')).toBe(true);
-      expect(b.exercicios[0].url.startsWith('https://pt.khanacademy.org/search?page_search_query=')).toBe(true);
+      if (m === 'Química') expect(b.video[0].url.startsWith('https://www.youtube.com/results?search_query=')).toBe(true);
+      else expect(b.video.map((x) => new URL(x.url).pathname.split('/')[1])).toEqual(['@UniversoNarrado', '@UniversoMilitares', 'results']);
+      for (const f of [...b.video, ...b.exercicios]) expect(f.url).not.toMatch(/khanacademy/);
     }
     expect(n).toBeGreaterThan(180);
   });
   it('a consulta leva o nome do tópico, codificada (acentos, dois-pontos, sinais)', () => {
     expect(urlYouTube('Frações: soma  e subtração')).toBe('https://www.youtube.com/results?search_query=Fra%C3%A7%C3%B5es%3A+soma+e+subtra%C3%A7%C3%A3o');
-    expect(urlKhan('MMC & MDC')).toBe('https://pt.khanacademy.org/search?page_search_query=MMC+%26+MDC');
+    expect(urlCanal('UniversoNarrado', 'MMC & MDC')).toBe('https://www.youtube.com/@UniversoNarrado/search?query=MMC+%26+MDC');
     const b = buscasDoTopico('Física', 'Movimento uniforme (MU): gráficos');
-    expect(new URL(b.video[0].url).searchParams.get('search_query')).toBe('Movimento uniforme (MU): gráficos Física aula');
-    expect(new URL(b.video[1].url).searchParams.get('search_query')).toMatch(/Física Total/);
-    expect(new URL(b.exercicios[0].url).searchParams.get('page_search_query')).toBe('Movimento uniforme gráficos');
+    expect(new URL(b.video[0].url).searchParams.get('query')).toBe('Movimento uniforme gráficos');
+    expect(new URL(b.video[2].url).searchParams.get('search_query')).toBe('Movimento uniforme gráficos Pedro Assaad');
+    expect(new URL(b.exercicios[0].url).searchParams.get('search_query')).toBe('Movimento uniforme (MU): gráficos Física exercícios resolvidos');
   });
   it('outras matérias e tópico vazio não geram busca', () => {
     expect(buscasDoTopico('Português', 'Crase')).toEqual({ video: [], exercicios: [] });
@@ -97,12 +98,15 @@ describe('busca automática por tópico', () => {
       expect(t.materia).toBe(m);
       expect(t.questoes.fontes.map((f) => f.url)).toEqual(c.fase0.exercicios[m].map((r) => r.url));
       expect(t.questoes.buscas).toEqual(buscasDoTopico(m, t.topico).exercicios);
-      expect(t.video.buscas).toEqual(buscasDoTopico(m, t.topico).video);
+      const aulas = aulasDe(c, m, t.topico);
+      if (aulas.length) expect(t.video).toMatchObject({ url: aulas[0].url, origem: 'aula' });
+      expect(t.video.buscas.filter((x) => x.auto)).toEqual(buscasDoTopico(m, t.topico).video.filter((x) => x.url !== t.video.url));
+      expect(t.video.buscas.filter((x) => !x.auto).map((x) => x.url)).toEqual(aulas.slice(1).map((a) => a.url).filter((u) => u !== t.video.url));
     }
   });
   it('quando você cola o link do tópico, a busca automática daquele passo some', () => {
     const c = cfg(), topico = blocoDe(c, 'mat').topico;
-    c.questoesLinks = { Matemática: { [topico]: { khan: 'https://k/x', video: 'https://v/x' } } };
+    c.questoesLinks = { Matemática: { [topico]: { obmep: 'https://o/x', video: 'https://v/x' } } };
     const t = blocoDe(c, 'mat');
     expect(t.questoes.buscas).toEqual([]);
     expect(t.video).toMatchObject({ url: 'https://v/x', origem: 'topico', buscas: [] });
@@ -117,7 +121,7 @@ describe('busca automática por tópico', () => {
     const c = cfg(); c.biblioteca.recursos = c.biblioteca.recursos.filter((r) => r.tipo === 'livro'); c.links = {};
     expect(videoDe(c, 'Química', 'Mol e massa molar')).toMatchObject({ origem: 'busca', auto: true, url: buscasDoTopico('Química', 'Mol e massa molar').video[0].url });
     expect(videoDe(c, 'Hist/Geo', 'Brasil Colônia')).toBe(null);
-    expect(videoDe(cfg(), 'Matemática', 'MMC').origem).toBe('recurso'); // o recurso cadastrado continua na frente
+    expect(videoDe(cfg(), 'Matemática', 'MMC').origem).toBe('recurso'); // tópico sem aula indicada: o recurso cadastrado continua na frente
   });
 });
 
@@ -129,7 +133,7 @@ describe('abrir tudo do bloco', () => {
   });
   it('sem link colado: prefere a busca do tópico ao curso inteiro; sem nada, o curso', () => {
     const curso = { rotulo: 'Curso', url: 'https://c/1', esgotada: false, curso: true };
-    expect(linksDoBloco({ video: null, questoes: { fontes: [curso], buscas: [{ rotulo: 'Khan', url: 'https://k/1' }] } })).toEqual([{ rotulo: 'Khan', url: 'https://k/1' }]);
+    expect(linksDoBloco({ video: null, questoes: { fontes: [curso], buscas: [{ rotulo: 'Busca', url: 'https://b/1' }] } })).toEqual([{ rotulo: 'Busca', url: 'https://b/1' }]);
     expect(linksDoBloco({ video: null, questoes: { fontes: [curso], buscas: [] } })).toEqual([{ rotulo: 'Curso', url: 'https://c/1' }]);
   });
   it('bloco sem tópico ou vazio não tem links', () => {

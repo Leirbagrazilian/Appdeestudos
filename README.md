@@ -83,10 +83,11 @@ Nascimento 25/11/2005; o ano da matrícula é o da prova + 1 e a idade é calcul
 ## Base do zero (SPEC v3)
 - **Fase 0 · Base do zero** (16/11/2026 a 10/01/2027, 8 semanas): 24 h Mat, 10 Fís, 5 Quím, 3 Port, 1 Ing por semana. Sem prova antiga, sem simulado e sem dia livre (Natal e Ano Novo também têm estudo). As fases seguintes: 1 Ensino médio, 2 EFOMM+ESA (maio), 3 Escola Naval, 4 ITA, 5 ENEM.
 - **Sábado e domingo mais cheios:** janelas novas e `peso do fim de semana` (Ajustes). O total semanal continua na meta.
-- **Modo domínio:** cada tópico da Fase 0 só avança com 8 acertos em 10 (ou "dominado no Khan"). Abaixo disso o próximo bloco repete o tópico; depois de 3 tentativas ele fica **travado** (aviso na Hoje, botão de destravar na Trilha).
+- **Modo domínio:** cada tópico da Fase 0 só avança com 8 acertos em 10. Abaixo disso o próximo bloco repete o tópico; depois de 3 tentativas ele fica **travado** (aviso na Hoje, botão de destravar na Trilha).
 - **Trilha da Fase 0:** tópicos pequenos (1 tópico ≈ 1 bloco de 2×50 min), agrupados por semana da tabela do SPEC.
-- **Bloco da Fase 0:** vídeo curto (até 20 min), exercícios (Khan/OBMEP) e livro, com no mínimo 10 exercícios.
-- **Progresso** (QG): checkpoint mensal (10 questões de Matemática da EFOMM em 30 min, aviso no primeiro sábado do mês), gráfico e o **portão da Fase 0**: teste de saída do Khan com 80% ou mais e checkpoint com pelo menos 5 acertos (e melhor que o diagnóstico). Se falhar, prorroga 2 semanas só com os tópicos fracos.
+- **Bloco da Fase 0:** vídeo curto (até 20 min), exercícios (OBMEP e Toda Matéria) e livro, com no mínimo 10 exercícios.
+- **Aulas indicadas por tópico:** cada tópico de Matemática e Física traz as aulas grátis confirmadas do Universo Narrado, do Universo Narrado Militares e do Pedro Assaad (campo `aulas` no seed). A 1ª abre no passo do vídeo; as outras e a busca dentro de cada canal aparecem logo abaixo. O link que você colar no tópico continua na frente.
+- **Progresso** (QG): checkpoint mensal (10 questões de Matemática da EFOMM em 30 min, aviso no primeiro sábado do mês), gráfico e o **portão da Fase 0**: teste de saída da base (9º ano) com 80% ou mais e checkpoint com pelo menos 5 acertos (e melhor que o diagnóstico). Se falhar, prorroga 2 semanas só com os tópicos fracos.
 
 ## Treino de corrida (SPEC v3 §13)
 - **Plano:** meta 100 km em 25/11/2027 (maratona preparatória em 07/10/2027). Fases: Retomada (17/11–10/01), Base ampliada, Construção, Específica + maratona, Bloco final. Na Fase 1 os km de cada dia vêm do plano (semana modelo e depois 2:3:2:4:2:2); nas outras, a meta semanal e os km que você ajusta no domingo (Revisão da semana).

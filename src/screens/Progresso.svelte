@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, fases, registrarCheckpoint, apagarCheckpoint, salvarKhan, prorrogarZero, passarPortao, desfazerPortao } from '../stores/app.svelte.js';
+  import { app, fases, registrarCheckpoint, apagarCheckpoint, salvarTeste, prorrogarZero, passarPortao, desfazerPortao } from '../stores/app.svelte.js';
   import { serieCheckpoints, checkpointPendente, portaoZero, primeiroSabado } from '../lib/portao.js';
   import { faseDoDia } from '../lib/phases.js';
   import { semanaZero } from '../lib/trilha.js';
@@ -21,7 +21,7 @@
   const ultimaSemana = $derived(semZ >= 8 || !emZero);
 
   let form = $state(false), data = $state(app.dia), acertos = $state(null), minutos = $state(c.minutos ?? 30), falta = $state('');
-  let khan = $state(app.portao?.khan?.pct ?? '');
+  let teste = $state((app.portao?.teste ?? app.portao?.khan)?.pct ?? '');
   async function salvar(ev) {
     ev.preventDefault();
     if (acertos == null) { falta = 'Diga quantas você acertou.'; vibrar(pf(), 'erro'); return; }
@@ -75,10 +75,10 @@
   <h2>Portão da Fase 0</h2>
   <section class="card pt">
     <p class="sub">Para passar para o Ano 1 você precisa das duas coisas:</p>
-    <p class="cond" class:ok={p.khan.ok}><span aria-hidden="true">{p.khan.ok ? '✓' : '○'}</span>
-      <span>Teste de saída do Khan (9º ano) com {p.khan.min}% ou mais{p.khan.valor != null ? `: você fez ${p.khan.valor}%` : ''}</span></p>
+    <p class="cond" class:ok={p.teste.ok}><span aria-hidden="true">{p.teste.ok ? '✓' : '○'}</span>
+      <span>Teste de saída da base (9º ano) com {p.teste.min}% ou mais{p.teste.valor != null ? `: você fez ${p.teste.valor}%` : ''}</span></p>
     <label>Seu resultado no teste de saída (%)
-      <input type="number" inputmode="numeric" min="0" max="100" bind:value={khan} onchange={() => salvarKhan(khan === '' ? null : +khan)} /></label>
+      <input type="number" inputmode="numeric" min="0" max="100" bind:value={teste} onchange={() => salvarTeste(teste === '' ? null : +teste)} /></label>
     <p class="cond" class:ok={p.checkpoint.ok}><span aria-hidden="true">{p.checkpoint.ok ? '✓' : '○'}</span>
       <span>Checkpoint de Matemática melhor que o diagnóstico ({p.checkpoint.base?.acertos ?? 0} de {c.questoes}) e com pelo menos {p.checkpoint.min} acertos{p.checkpoint.ultimo ? `: último ${p.checkpoint.ultimo.acertos} de ${p.checkpoint.ultimo.feitas}` : ''}</span></p>
     {#if p.ok}

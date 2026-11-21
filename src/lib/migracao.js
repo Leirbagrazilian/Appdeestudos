@@ -41,6 +41,15 @@ export function migrarCfg(salvo, seed) {
     cfg.sono = { ...(cfg.sono ?? {}), padrao: { ...(cfg.sono?.padrao ?? {}), 5: antigo ? structuredClone(seed.sono.padrao[5]) : s5 } };
   }
   cfg.biblioteca = mesclarBiblioteca(salvo.biblioteca, seed.biblioteca); // o que você cadastrou fica; recursos novos do seed entram
+  if (v < 16) {
+    // v16: sem Khan Academy. As aulas indicadas (Universo Narrado, Universo Militares, Pedro Assaad) vêm nos tópicos do seed.
+    const khan = (r) => /khanacademy\.org/.test(r.link ?? '');
+    const fora = new Set(cfg.biblioteca.recursos.filter(khan).map((r) => r.id));
+    cfg.biblioteca.recursos = cfg.biblioteca.recursos.filter((r) => !fora.has(r.id));
+    cfg.biblioteca.vinculos = cfg.biblioteca.vinculos.filter((x) => !fora.has(x.recurso));
+    for (const [m, porTopico] of Object.entries(cfg.questoesLinks ?? {}))
+      for (const t of Object.keys(porTopico ?? {})) { const { khan: _k, ...resto } = porTopico[t] ?? {}; cfg.questoesLinks[m][t] = resto; }
+  }
 
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));
   cfg.concursos = seed.concursos.map((novo) => {
