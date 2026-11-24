@@ -18,9 +18,9 @@
 </script>
 
 {#if t}
-  <Linha {feito} label="Treino feito" onToggle={marcar} {aberto} {onAbrir} icone="run" hora={t.hora ?? ''}
+  <Linha {feito} label="Treino feito" onToggle={marcar} {aberto} {onAbrir} icone="run" hora=""
     titulo={`Treino · ${t.prova ? t.prova.nome : NOME[t.tipo] ?? 'Corrida'}${t.km ? ` · ${kmTxt(t.km)} km` : ''}`}
-    sub={`${t.min ? `~${t.min} min` : t.intensidade}${t.musculacao ? ` · musculação ${t.musculacao.ini}` : ''}${t.semanaLeve ? ' · semana leve' : ''}`}
+    sub={`${t.musculacao ? `Musculação ${t.musculacao.ini} · ` : ''}corrida ${t.horaCorrida ?? ''}${t.min ? ` ~${t.min} min` : ''}`}
     aviso={t.alerta || t.choque || ''}>
     <p class="mut">{t.intensidade}</p>
     <ul class="info">

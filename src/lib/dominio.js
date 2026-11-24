@@ -24,6 +24,7 @@ export function resumo(estado) {
   const ent = Object.entries(estado?.regs ?? {}).sort((a, b) => (a[1].data ?? '').localeCompare(b[1].data ?? '') || a[0].localeCompare(b[0]));
   const regs = ent.map(([, r]) => r);
   let primeira = null, dominado = false;
+  if (estado?.legado && Object.values(estado.regs ?? {}).some((r) => vale(r) && passou(r))) dominado = true; // regra antiga: 1 aprovação já dominava (marcado na migração v17)
   for (const r of regs) {
     if (!vale(r)) continue;
     if (passou(r)) {
@@ -39,16 +40,18 @@ export function resumo(estado) {
     primeira: aguarda ? primeira : null, retesteEm: aguarda ? addDays(primeira, DIAS_RETESTE) : null };
 }
 
-/** O tópico passou uma vez e espera o reteste (ainda não é dominado). */
-export const aguardaReteste = (estado) => !!resumo(estado).retesteEm;
+/** O tópico passou uma vez e espera o reteste (ainda não é dominado). Nota 3 na Trilha (dominado) nunca espera reteste. */
+export const aguardaReteste = (estado, nota = 0) => (nota ?? 0) < 3 && !!resumo(estado).retesteEm;
+/** Migração v17: estados do modo domínio da regra antiga (1 aprovação bastava) ficam marcados como `legado` e continuam dominados. */
+export const marcarLegado = (dominio) => Object.fromEntries(Object.entries(dominio ?? {}).map(([k, e]) => [k, e && !e.legado && Object.values(e.regs ?? {}).some((r) => vale(r) && passou(r)) ? { ...e, legado: true } : e]));
 
 /** Retestes que valem hoje: [{ materia, topico, desde, em }] (a 1ª aprovação foi há 3 dias ou mais e o tópico ainda não foi dominado). */
-export const retestesDoDia = (dominio, dia) => Object.entries(dominio ?? {})
-  .map(([k, e]) => { const r = resumo(e); const [materia, topico] = k.split('|'); return r.retesteEm && r.retesteEm <= dia ? { materia, topico, desde: r.primeira, em: r.retesteEm } : null; })
+export const retestesDoDia = (dominio, dia, lacunas = {}) => Object.entries(dominio ?? {})
+  .map(([k, e]) => { const r = resumo(e); const [materia, topico] = k.split('|'); return r.retesteEm && r.retesteEm <= dia && (lacunas?.[materia]?.[topico] ?? 0) < 3 ? { materia, topico, desde: r.primeira, em: r.retesteEm } : null; })
   .filter(Boolean).sort((a, b) => a.em.localeCompare(b.em) || a.topico.localeCompare(b.topico));
 /** Retestes ainda por vir: o mesmo formato, para mostrar "reteste em dd/mm". */
-export const retestesAgendados = (dominio, dia) => Object.entries(dominio ?? {})
-  .map(([k, e]) => { const r = resumo(e); const [materia, topico] = k.split('|'); return r.retesteEm && r.retesteEm > dia ? { materia, topico, desde: r.primeira, em: r.retesteEm } : null; })
+export const retestesAgendados = (dominio, dia, lacunas = {}) => Object.entries(dominio ?? {})
+  .map(([k, e]) => { const r = resumo(e); const [materia, topico] = k.split('|'); return r.retesteEm && r.retesteEm > dia && (lacunas?.[materia]?.[topico] ?? 0) < 3 ? { materia, topico, desde: r.primeira, em: r.retesteEm } : null; })
   .filter(Boolean).sort((a, b) => a.em.localeCompare(b.em) || a.topico.localeCompare(b.topico));
 
 /**

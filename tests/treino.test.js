@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import seed from '../src/data/seed.json';
-import { planoSemanaCorrida, treinoDoDia, alertasTreino, sequencia, kmDaSemana, textoResumoCorrida, tiposDaSemana } from '../src/lib/treino.js';
+import { limparSemanasTreino, planoSemanaCorrida, treinoDoDia, alertasTreino, sequencia, kmDaSemana, textoResumoCorrida, tiposDaSemana } from '../src/lib/treino.js';
 import { addDays } from '../src/lib/dates.js';
 import { legado } from './_legado.js';
 
@@ -35,7 +35,11 @@ describe('treino (SPEC v2): sem prova como meta, volume estável', () => {
   });
   it('corrida curta de segunda termina até 6h50', () => {
     const t = treinoDoDia(cfg(), '2026-11-23', {}), [h, m] = t.horaCorrida.split(':').map(Number);
-    expect(h * 60 + m + t.min).toBeLessThanOrEqual(6 * 60 + 52);
+    expect(h * 60 + m + t.min).toBeLessThanOrEqual(6 * 60 + 50);
+  });
+  it('migração v17: semanas passadas de treinoSemanas ficam; atual e futuras (plano antigo) saem', () => {
+    const s = { '2026-11-16': { dias: { 1: 3 } }, '2026-11-23': { dias: { 1: 9 } }, '2026-11-30': { dias: { 1: 9 } } };
+    expect(limparSemanasTreino(s, '2026-11-25')).toEqual({ '2026-11-16': { dias: { 1: 3 } } });
   });
   it('antes do início não há treino', () => expect(treinoDoDia(cfg(), '2026-11-10', {})).toBeNull());
   it('dor > 3/10 ou inchaço vira caminhada com alerta; noite curta tira a corrida forte', () => {

@@ -112,8 +112,8 @@
   const tarefasOntem = $derived((app.fimDia[addDays(app.dia, -1)]?.tarefas ?? '').trim());
   const atual = $derived(!diag && !dificil ? blocoAtual(blocos, (b) => !!app.done[b.id], agoraMin) : null);
   const ctxPasso = (b) => ({ primeiroDoDia: b?.id === primeiroId, questaoDificil: questaoOntem });
-  const retestes = $derived(retestesDoDia(app.dominio, app.dia));
-  const retestesFuturos = $derived(retestesAgendados(app.dominio, app.dia));
+  const retestes = $derived(retestesDoDia(app.dominio, app.dia, app.lacunas));
+  const retestesFuturos = $derived(retestesAgendados(app.dominio, app.dia, app.lacunas));
   let resRet = $state({});
   const avisoCaderno = $derived(avisoCadernoAntesDaProva(Object.values(app.errors), prox?.dias ?? null));
 

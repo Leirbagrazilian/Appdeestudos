@@ -123,6 +123,9 @@ export function sequencia(cfg, { cumpridos = {}, treinos = {}, oracoes = {} }, h
   return n;
 }
 
+/** Migração v17: `treinoSemanas` só guarda km planejados no domingo. Semanas passadas ficam (histórico); a atual e as futuras, calculadas no plano antigo (ultra/maratona), saem. */
+export const limparSemanasTreino = (semanas, hoje) => Object.fromEntries(Object.entries(semanas ?? {}).filter(([seg]) => seg < startOfWeek(hoje)));
+
 /** Km feitos na semana (registros) e a meta. */
 export function kmDaSemana(cfg, seg, treinos = {}, editadas = {}) {
   const feitos = Array.from({ length: 7 }, (_, i) => addDays(seg, i)).reduce((a, d) => a + (+treinos[d]?.km || 0), 0);

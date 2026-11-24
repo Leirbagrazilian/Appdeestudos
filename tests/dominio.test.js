@@ -148,3 +148,16 @@ describe('revisão: correções e travados', () => {
     expect(r.nome).toBe('B');
   });
 });
+
+describe('regra antiga (1 aprovação) vira legado e nunca gera reteste', () => {
+  const est = { regs: { b: { feitas: 10, acertos: 9, data: '2026-10-01' } } };
+  it('9/10 em 01/10 com nota 3: dominado, sem reteste nem aguarda', async () => {
+    const { retestesDoDia, retestesAgendados, aguardaReteste, marcarLegado, resumo } = await import('../src/lib/dominio.js');
+    const dom = { 'Matemática|A': est }, lac = { Matemática: { A: 3 } };
+    expect(retestesDoDia(dom, '2026-12-01', lac)).toEqual([]); expect(retestesAgendados(dom, '2026-10-02', lac)).toEqual([]);
+    expect(aguardaReteste(est, 3)).toBe(false); expect(aguardaReteste(est, 2)).toBe(true);
+    const leg = marcarLegado(dom);
+    expect(leg['Matemática|A'].legado).toBe(true); expect(resumo(leg['Matemática|A'])).toMatchObject({ dominado: true, retesteEm: null });
+    expect(marcarLegado({ x: { regs: { b: { feitas: 10, acertos: 5, data: '2026-10-01' } } } }).x.legado).toBeUndefined(); // reprovado: não é legado
+  });
+});

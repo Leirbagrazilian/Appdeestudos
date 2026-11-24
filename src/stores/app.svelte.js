@@ -11,7 +11,7 @@ import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas, migrarDominio, migrarDone } from '../lib/trilha.js';
-import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
+import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar, marcarLegado } from '../lib/dominio.js';
 import { faseDoDia, maxExtraZero, proximaProva } from '../lib/phases.js';
 import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
@@ -22,6 +22,7 @@ import { blocosAjustados } from '../lib/planner.js';
 import { diaLivre, antesDoInicio } from '../lib/rotina.js';
 import { resumoDoDia, RESUMO_DIAS } from '../lib/avisos.js';
 import { agendarTelas, registrarPeriodico } from '../lib/notify.js';
+import { limparSemanasTreino } from '../lib/treino.js';
 import { agendarRefazer } from '../lib/provasantigas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
@@ -54,7 +55,7 @@ export async function iniciar() {
   aplicarPrefs(pf());
   Object.assign(app, { done, reviews, errors, exams });
   chaves.forEach((k, i) => { app[k] = extras[i] ?? structuredClone(EXTRAS[k]); });
-  if (antes < 17) { app.treinoSemanas = {}; await salvarKV('treinoSemanas'); } // km editados do plano antigo (ultra/maratona) não valem no volume estável
+  if (antes < 17) await migrarV17();
   if (antes < 12) await migrarEstadosAntigos(); // notas, domínio e blocos dos tópicos antigos passam para os novos (campo `antigos`)
   app.timer = timer ?? null;
   app.ultimoBackup = ultimoBackup ?? null;
@@ -84,6 +85,11 @@ export function virarDia() {
 }
 function atualizarSW() { try { navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {}); } catch {} }
 
+/** v17: domínio da regra antiga fica como legado (continua dominado) e só os km planejados de semanas atuais e futuras do plano antigo saem. */
+async function migrarV17() {
+  app.dominio = marcarLegado(app.dominio); await salvarKV('dominio');
+  app.treinoSemanas = limparSemanasTreino(app.treinoSemanas, app.dia); await salvarKV('treinoSemanas');
+}
 /** Notas (lacunas), estado do domínio e blocos feitos: o que era de tópico antigo vale também no tópico novo; o antigo não é apagado. */
 async function migrarEstadosAntigos() {
   app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas');
@@ -505,7 +511,7 @@ export async function importar(d) {
   const antes = d.cfg.versaoSeed ?? 1;
   app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
   if (antes < 12) await migrarEstadosAntigos();
-  if (antes < 17) { app.treinoSemanas = {}; await salvarKV('treinoSemanas'); }
+  if (antes < 17) await migrarV17();
 }
 export async function restaurarSeed() {
   const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema, tom: app.cfg.tom,
