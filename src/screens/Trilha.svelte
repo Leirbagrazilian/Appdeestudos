@@ -64,7 +64,7 @@
     return { m, total: l.length, dom: l.filter((t) => dominio(app.lacunas, m, t.nome) >= 3).length, pct: cobertura(app.cfg, app.lacunas, m), pag: coberturaPaginas(app.cfg, app.leitura, m) };
   }));
   const acerto = $derived(acertoPorTopico(app.done));
-  const ROTULOS = [['video', 'Vídeo ou aula do tópico'], ['khan', 'Khan Academy (exercícios do tópico)'], ['obmep', 'Portal da Matemática OBMEP'], ['qconcursos', 'QConcursos (lista filtrada)'], ['estuda', 'Estuda.com (lista)'], ['pdf', 'Prova em PDF'], ['outro', 'Outro (ex.: ENEM, enem.dev)']];
+  const ROTULOS = [['video', 'Vídeo ou aula do tópico'], ['obmep', 'Portal da Matemática OBMEP'], ['qconcursos', 'QConcursos (lista filtrada)'], ['estuda', 'Estuda.com (lista)'], ['pdf', 'Prova em PDF'], ['outro', 'Outro (ex.: ENEM, enem.dev)']];
   const nLinks = (t) => Object.values(linksDe(app.cfg, materia, t.nome)).filter(Boolean).length;
   function colar(t, campo, valor) {
     app.cfg.questoesLinks ??= {};

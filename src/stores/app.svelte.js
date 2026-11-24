@@ -329,9 +329,10 @@ export async function registrarCheckpoint({ data, acertos, minutos }) {
   avisar('Checkpoint salvo', null, `${app.checkpoints[data].acertos} de ${feitas} em Matemática.`);
 }
 export async function apagarCheckpoint(data) { delete app.checkpoints[data]; await salvarKV('checkpoints'); }
-/** Resultado do teste de saída do Khan (9º ano), em %. null apaga. */
-export async function salvarKhan(pct) {
-  app.portao = { ...app.portao, khan: pct == null ? null : { pct: Math.max(0, Math.min(100, Math.round(pct))), data: app.dia } };
+/** Resultado do teste de saída da base (9º ano), em %. null apaga. */
+export async function salvarTeste(pct) {
+  const { khan: _antigo, ...resto } = app.portao ?? {};
+  app.portao = { ...resto, teste: pct == null ? null : { pct: Math.max(0, Math.min(100, Math.round(pct))), data: app.dia } };
   await salvarKV('portao');
 }
 /** O portão não passou: mais 2 semanas de Fase 0, só com os tópicos fracos. */

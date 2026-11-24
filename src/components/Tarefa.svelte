@@ -42,7 +42,7 @@
   {/if}
   <ol class="passos" aria-label="Tarefa deste bloco">
     {#if tarefa.video}<li><span class="tx"><strong>Vídeo · ~{tarefa.video.min} min</strong>{#if tarefa.video.rotulo}<span class="sub">{tarefa.video.rotulo}</span>{/if}
-      {#each tarefa.video.buscas ?? [] as f}<a class="fonte" href={f.url} target="_blank" rel="noopener">{f.rotulo} ↗<small class="auto">busca automática</small></a>{/each}
+      {#each tarefa.video.buscas ?? [] as f}<a class="fonte" href={f.url} target="_blank" rel="noopener">{f.rotulo} ↗{#if f.auto}<small class="auto">busca automática</small>{/if}</a>{/each}
     </span><a class="abrir" href={tarefa.video.url} target="_blank" rel="noopener">Abrir ↗</a></li>{/if}
     {#if tarefa.paginas}
       <li><span class="tx"><strong>{tarefa.paginas.livro}</strong><span class="sub">págs {tarefa.paginas.de}–{tarefa.paginas.ate} · ~{tarefa.paginas.min} min{tarefa.paginas.restante ? ` · faltam ${tarefa.paginas.restante} págs do tópico` : ''}</span></span></li>

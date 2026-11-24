@@ -230,7 +230,7 @@
   <a class="nota" href="#/progresso"><Icon nome="clock" />Checkpoint do mês: 10 questões de Matemática da EFOMM em 30 min.</a>
 {/if}
 {#if portaoAberto}
-  <a class="nota" href="#/progresso"><Icon nome="clock" />Última semana da Fase 0: faça o teste de saída do Khan e o checkpoint para abrir o portão.</a>
+  <a class="nota" href="#/progresso"><Icon nome="clock" />Última semana da Fase 0: faça o teste de saída da base e o checkpoint para abrir o portão.</a>
 {/if}
 {#if alertaDeSono.alerta}
   <a class="nota alerta" href="#/semana"><Icon nome="moon" />{alertaDeSono.texto}</a>

@@ -332,7 +332,7 @@
     "zero": {
       "nome": "Base do zero",
       "numero": 0,
-      "foco": "Matemática, Física e Química do fundamental, do zero. Cada tópico tem prazo e só fecha com 8 acertos em 10. Fase 0 dura até o portão (Khan 9º ano ≥ 80% e melhora no checkpoint EFOMM)."
+      "foco": "Matemática, Física e Química do fundamental, do zero. Cada tópico tem prazo e só fecha com 8 acertos em 10. Fase 0 dura até o portão (teste de saída da base ≥ 80% e melhora no checkpoint EFOMM)."
     },
     "ano1": {
       "nome": "Ano 1",
@@ -785,6 +785,18 @@
           "MMC",
           "MDC",
           "Problemas com MMC e MDC"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "MMC e MDC (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=2754s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          }
         ]
       },
       {
@@ -801,6 +813,23 @@
           "Frações: problemas do dia a dia",
           "Equação do 1º grau: resolução",
           "Equação do 1º grau com frações"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Frações (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=274s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Frações e números decimais (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=1583s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          }
         ]
       },
       {
@@ -814,6 +843,13 @@
           "Potências com expoente negativo",
           "Raízes quadradas e cúbicas",
           "Raízes: propriedades e simplificação"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          }
         ]
       },
       {
@@ -830,6 +866,33 @@
           "Regra de três composta",
           "Divisão proporcional",
           "Problemas de razão e proporção"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Grandezas direta e inversamente proporcionais (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=8335s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Regra de três (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=10793s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Escalas (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=13460s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Tudo de Escalas, 2h06 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-escalas-para-o-enem-2026-melhor-didatica-do-brasil/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          }
         ]
       },
       {
@@ -841,6 +904,23 @@
           "Porcentagem: conceito e cálculo",
           "Porcentagem: aumento e desconto",
           "Porcentagem: problemas"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Porcentagem (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=6164s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Porcentagem, 18 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/porcentagem-para-enem-medicina-vire-uma-maquina/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Aumentos e descontos, 18 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/fundamentos-basicos-da-matematica-financeira-aumentos-e-descontos-enem/"
+          }
         ]
       },
       {
@@ -851,6 +931,18 @@
         "peso": 1,
         "antigos": [
           "Juros simples"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Juros (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=73020s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Amortização e parcelamento (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=75379s"
+          }
         ]
       },
       {
@@ -868,6 +960,13 @@
           "Fatoração: diferença de quadrados",
           "Fatoração: trinômio quadrado perfeito",
           "Simplificação de expressões com fatoração"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          }
         ]
       },
       {
@@ -880,6 +979,13 @@
           "Ângulos: tipos e medidas",
           "Ângulos entre paralelas e transversal",
           "Triângulos: classificação e soma dos ângulos"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          }
         ]
       },
       {
@@ -890,6 +996,18 @@
         "peso": 1,
         "antigos": [
           "Teorema de Pitágoras"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Matemática do Ensino Fundamental, 12 h (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-matematica-do-ensino-fundamental-pro-enem-2026-pra-quem-tem-mu/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -900,6 +1018,18 @@
         "antigos": [
           "Semelhança de triângulos",
           "Teorema de Tales"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Semelhança de triângulos (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=34378s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -911,6 +1041,18 @@
           "Razões trigonométricas: seno, cosseno e tangente",
           "Ângulos notáveis: 30°, 45° e 60°",
           "Problemas de trigonometria no triângulo retângulo"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Trigonometria, 2h53 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-trigonometria-pro-enem-2026-didatica-alucinante-melhor-aula-do/"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -943,6 +1085,18 @@
         "ano": 1,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Funções (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=15378s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Funções e raízes (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=16199s"
+          }
         ]
       },
       {
@@ -951,6 +1105,23 @@
         "ano": 1,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Função afim (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=16964s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Função afim e sistemas (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=18234s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Função do 1º grau, 7h23 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-funcao-do-primeiro-grau-pro-enem-2026-didatica-insana-e-muitas/"
+          }
         ]
       },
       {
@@ -959,6 +1130,18 @@
         "ano": 1,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Polígonos notáveis (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=38454s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -967,6 +1150,18 @@
         "ano": 1,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Circunferência (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=44140s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -975,6 +1170,18 @@
         "ano": 1,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Arcos e ângulos (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=24119s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -984,6 +1191,23 @@
         "peso": 3,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Função do 2º grau (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=19641s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Função do 2º grau: propriedades (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=21329s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Função do 2º grau, 1h17 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/aprenda-funcao-do-segundo-grau-de-uma-vez-por-todas-aula-super-didatic/"
+          }
         ]
       },
       {
@@ -1000,6 +1224,13 @@
         "ano": 1,
         "antigos": [
           "PA, PG, matrizes e sistemas"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Progressão aritmética (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=69732s"
+          }
         ]
       },
       {
@@ -1008,6 +1239,13 @@
         "ano": 1,
         "antigos": [
           "PA, PG, matrizes e sistemas"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Progressão geométrica (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=71258s"
+          }
         ]
       },
       {
@@ -1016,6 +1254,28 @@
         "ano": 1,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Gráficos e tabelas (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=94851s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Médias (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=97600s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Medidas de dispersão (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=100409s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Aulão de Estatística, 2h05 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/gratis-aulao-completo-de-estatistica-enem/"
+          }
         ]
       },
       {
@@ -1025,6 +1285,13 @@
         "peso": 1,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1034,6 +1301,13 @@
         "peso": 1,
         "antigos": [
           "Analítica, vetores, cônicas e quádricas"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Geometria analítica (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=66243s"
+          }
         ]
       },
       {
@@ -1042,6 +1316,13 @@
         "ano": 1,
         "antigos": [
           "Analítica, vetores, cônicas e quádricas"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Geometria analítica (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=66243s"
+          }
         ]
       },
       {
@@ -1051,6 +1332,23 @@
         "peso": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Seno e cosseno (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=25219s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Trigonometria, 2h53 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-trigonometria-pro-enem-2026-didatica-alucinante-melhor-aula-do/"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1072,23 +1370,51 @@
       {
         "codigo": "LOG01",
         "nome": "Exponencial",
-        "ano": 2
+        "ano": 2,
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Função exponencial (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=22770s"
+          }
+        ]
       },
       {
         "codigo": "LOG02",
         "nome": "Logaritmos",
         "ano": 2,
-        "peso": 3
+        "peso": 3,
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Logaritmo, 5h23 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-logaritmo-pro-enem-2026-didatica-insana-acertos-garantidos/"
+          }
+        ]
       },
       {
         "codigo": "LOG03",
         "nome": "Função logarítmica",
-        "ano": 2
+        "ano": 2,
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Logaritmo, 5h23 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-logaritmo-pro-enem-2026-didatica-insana-acertos-garantidos/"
+          }
+        ]
       },
       {
         "codigo": "LOG04",
         "nome": "Equações e inequações logarítmicas",
-        "ano": 2
+        "ano": 2,
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Logaritmo, 5h23 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-logaritmo-pro-enem-2026-didatica-insana-acertos-garantidos/"
+          }
+        ]
       },
       {
         "codigo": "GP08",
@@ -1096,6 +1422,18 @@
         "ano": 2,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Lei dos Senos",
+            "url": "https://www.youtube.com/watch?v=-aqfFvg49zs"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Lei dos Cossenos",
+            "url": "https://www.youtube.com/watch?v=CtOonrVQqbQ"
+          }
         ]
       },
       {
@@ -1104,6 +1442,18 @@
         "ano": 2,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Área de polígonos (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=41106s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1112,6 +1462,18 @@
         "ano": 2,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Área da circunferência (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=47702s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1136,6 +1498,13 @@
         "ano": 2,
         "antigos": [
           "PA, PG, matrizes e sistemas"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Sistemas, 2h08 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-sistemas-para-o-enem-2026-matematica-conteudo-obrigatorio/"
+          }
         ]
       },
       {
@@ -1144,6 +1513,23 @@
         "ano": 2,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Princípio fundamental da contagem (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=77553s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Análise combinatória, 1h15 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-analise-combinatoria-em-apenas-1-hora-enem-2026-didatica-lenda/"
+          },
+          {
+            "canal": "Universo Narrado Militares",
+            "titulo": "Curso completo de Análise Combinatória, do zero ao IME/ITA (57 vídeos)",
+            "url": "https://www.youtube.com/playlist?list=PLzvYXXKDUPquxp8QqYzd-_O5tzbC4HaJl"
+          }
         ]
       },
       {
@@ -1152,6 +1538,33 @@
         "ano": 2,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Arranjo e permutações (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=80230s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Permutação com repetição (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=82902s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Por que 0! = 1?",
+            "url": "https://www.youtube.com/watch?v=lXc6hH-9Hjw"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Análise combinatória, 1h15 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-analise-combinatoria-em-apenas-1-hora-enem-2026-didatica-lenda/"
+          },
+          {
+            "canal": "Universo Narrado Militares",
+            "titulo": "Curso completo de Análise Combinatória, do zero ao IME/ITA (57 vídeos)",
+            "url": "https://www.youtube.com/playlist?list=PLzvYXXKDUPquxp8QqYzd-_O5tzbC4HaJl"
+          }
         ]
       },
       {
@@ -1161,6 +1574,28 @@
         "peso": 3,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Combinação simples (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=85537s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Combinação com repetição (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=87786s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Análise combinatória, 1h15 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-analise-combinatoria-em-apenas-1-hora-enem-2026-didatica-lenda/"
+          },
+          {
+            "canal": "Universo Narrado Militares",
+            "titulo": "Curso completo de Análise Combinatória, do zero ao IME/ITA (57 vídeos)",
+            "url": "https://www.youtube.com/playlist?list=PLzvYXXKDUPquxp8QqYzd-_O5tzbC4HaJl"
+          }
         ]
       },
       {
@@ -1170,6 +1605,13 @@
         "peso": 3,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado Militares",
+            "titulo": "Curso completo de Análise Combinatória, do zero ao IME/ITA (57 vídeos)",
+            "url": "https://www.youtube.com/playlist?list=PLzvYXXKDUPquxp8QqYzd-_O5tzbC4HaJl"
+          }
         ]
       },
       {
@@ -1178,6 +1620,13 @@
         "ano": 2,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Probabilidade (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=89949s"
+          }
         ]
       },
       {
@@ -1187,6 +1636,13 @@
         "peso": 1,
         "antigos": [
           "Combinatória, probabilidade e estatística"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Probabilidade: aprofundamento (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=91961s"
+          }
         ]
       },
       {
@@ -1201,6 +1657,13 @@
         "peso": 1,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Projeção ortogonal (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=50436s"
+          }
         ]
       },
       {
@@ -1209,6 +1672,18 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Prismas (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=53247s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1217,6 +1692,18 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Pirâmides (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=56151s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1225,6 +1712,18 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Cilindro e esfera (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=52490s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1233,6 +1732,18 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Cones (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=59297s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1241,6 +1752,18 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Sólidos (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=63075s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1249,6 +1772,18 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Cilindro e esfera (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=52490s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Geometria plana e espacial, 3h22 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-geometria-plana-e-espacial-pro-enem-2026-ganhe-10-acertos-na-p/"
+          }
         ]
       },
       {
@@ -1274,6 +1809,13 @@
         "peso": 3,
         "antigos": [
           "Analítica, vetores, cônicas e quádricas"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Geometria analítica: circunferência (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=68096s"
+          }
         ]
       },
       {
@@ -1298,6 +1840,13 @@
         "ano": 3,
         "antigos": [
           "Geometria plana"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Triângulo e pontos notáveis (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=31371s"
+          }
         ]
       },
       {
@@ -1314,6 +1863,13 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1322,6 +1878,13 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1330,6 +1893,13 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1339,6 +1909,13 @@
         "peso": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1347,6 +1924,13 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1355,6 +1939,18 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Funções trigonométricas (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=ZhinYiA6TEw&t=28370s"
+          },
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1363,6 +1959,13 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
@@ -1371,13 +1974,27 @@
         "ano": 3,
         "antigos": [
           "Trigonometria"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Playlist de Trigonometria (Lições de Matemática): procure a aula do tema",
+            "url": "https://www.youtube.com/playlist?list=PLtjX2mCwXXQv0vXR8ekg3Y7eKk7NU7_Z2"
+          }
         ]
       },
       {
         "codigo": "BW01",
         "nome": "Binômio de Newton",
         "ano": 3,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "Universo Narrado Militares",
+            "titulo": "Aprofundamento de Binômio de Newton e Triângulo de Pascal",
+            "url": "https://www.youtube.com/watch?v=V3RKpMb7-VE"
+          }
+        ]
       },
       {
         "codigo": "NCP01",
@@ -1519,6 +2136,23 @@
           "Velocidade média",
           "Movimento uniforme: função horária",
           "Movimento uniforme: encontro e ultrapassagem"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Cinemática (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=289s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Movimento uniforme, 14 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/conceitos-fundamentais-do-movimento-uniforme-didatica-magica-enem-2026/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Curso completo de Cinemática, 11h29 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-de-cinematica-pro-enem-2026-didatica-muito-superior/"
+          }
         ]
       },
       {
@@ -1529,6 +2163,18 @@
         "antigos": [
           "Gráficos do movimento uniforme",
           "Gráficos do MUV"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Cinemática (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=289s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Curso completo de Cinemática, 11h29 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-de-cinematica-pro-enem-2026-didatica-muito-superior/"
+          }
         ]
       },
       {
@@ -1545,6 +2191,18 @@
           "MUV: função da velocidade",
           "MUV: função horária da posição",
           "Equação de Torricelli"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Cinemática (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=289s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Curso completo de Cinemática, 11h29 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-de-cinematica-pro-enem-2026-didatica-muito-superior/"
+          }
         ]
       },
       {
@@ -1558,6 +2216,13 @@
           "Lançamento vertical para cima",
           "Lançamento vertical: altura máxima e tempo de voo",
           "Problemas de queda e lançamento"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Curso completo de Cinemática, 11h29 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-de-cinematica-pro-enem-2026-didatica-muito-superior/"
+          }
         ]
       },
       {
@@ -1588,6 +2253,23 @@
           "3ª lei de Newton: ação e reação",
           "Peso e massa",
           "Força resultante"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Leis de Newton (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=3374s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Leis de Newton e dinâmica, 5h59 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/leis-de-newton-e-dinamica-didatica-que-gruda-na-mente/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Leis de Newton, 5h33 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/leis-de-newton-porem-ira-mudar-a-sua-vida/"
+          }
         ]
       },
       {
@@ -1601,6 +2283,18 @@
           "Força normal",
           "Tração em fios",
           "Blocos ligados por fio"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Leis de Newton (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=3374s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Leis de Newton e dinâmica, 5h59 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/leis-de-newton-e-dinamica-didatica-que-gruda-na-mente/"
+          }
         ]
       },
       {
@@ -1627,6 +2321,13 @@
         ],
         "antigos": [
           "Cinemática: lançamento oblíquo e movimento circular"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Curso completo de Cinemática, 11h29 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-de-cinematica-pro-enem-2026-didatica-muito-superior/"
+          }
         ]
       },
       {
@@ -1636,6 +2337,13 @@
         "peso": 1,
         "antigos": [
           "Dinâmica, energia, impulso e colisões"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Atrito, 1h25 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-tudo-de-atrito-para-o-enem-2026/"
+          }
         ]
       },
       {
@@ -1644,6 +2352,13 @@
         "ano": 1,
         "antigos": [
           "Dinâmica, energia, impulso e colisões"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Leis de Newton e dinâmica, 5h59 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/leis-de-newton-e-dinamica-didatica-que-gruda-na-mente/"
+          }
         ]
       },
       {
@@ -1652,6 +2367,13 @@
         "ano": 1,
         "antigos": [
           "Dinâmica, energia, impulso e colisões"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Trabalho e energia (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=11438s"
+          }
         ]
       },
       {
@@ -1661,6 +2383,13 @@
         "peso": 3,
         "antigos": [
           "Dinâmica, energia, impulso e colisões"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Trabalho e energia (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=11438s"
+          }
         ]
       },
       {
@@ -1681,6 +2410,18 @@
         ],
         "antigos": [
           "Cinemática: lançamento oblíquo e movimento circular"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Movimento circular (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=7086s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Curso completo de Cinemática, 11h29 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/curso-completo-de-cinematica-pro-enem-2026-didatica-muito-superior/"
+          }
         ]
       },
       {
@@ -1689,6 +2430,18 @@
         "ano": 1,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Introdução à Termologia, 18 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/introducao-a-termologia-para-o-enem-2026-didatica-magica-do-professor/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Revisão de Termologia, 36 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/revisao-de-termologia-enem-2026-muito-didatica/"
+          }
         ]
       },
       {
@@ -1705,6 +2458,18 @@
         "ano": 1,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Calorimetria (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=18549s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Introdução à Termologia, 18 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/introducao-a-termologia-para-o-enem-2026-didatica-magica-do-professor/"
+          }
         ]
       },
       {
@@ -1713,6 +2478,18 @@
         "ano": 1,
         "antigos": [
           "Eletrodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Circuitos elétricos (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=37729s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Fundamentos de Eletrodinâmica, 31 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/fundamentos-de-eletrodinamica-pro-enem-conceitos-obrigatorios-didatica/"
+          }
         ]
       },
       {
@@ -1721,6 +2498,13 @@
         "ano": 1,
         "antigos": [
           "Eletrodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Circuitos elétricos (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=37729s"
+          }
         ]
       },
       {
@@ -1729,6 +2513,13 @@
         "ano": 1,
         "antigos": [
           "Eletrodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Potência elétrica e efeito Joule (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=40689s"
+          }
         ]
       },
       {
@@ -1737,6 +2528,13 @@
         "ano": 1,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Ondulatória (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=30386s"
+          }
         ]
       },
       {
@@ -1745,6 +2543,13 @@
         "ano": 1,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Óptica geométrica, 1h08 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/optica-geometrica-para-o-enem-2026/"
+          }
         ]
       },
       {
@@ -1753,6 +2558,13 @@
         "ano": 2,
         "prereq": [
           "TG01"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Movimento circular (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=7086s"
+          }
         ]
       },
       {
@@ -1836,6 +2648,13 @@
         "ano": 2,
         "antigos": [
           "Fluidos"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Hidrostática (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=14459s"
+          }
         ]
       },
       {
@@ -1844,6 +2663,13 @@
         "ano": 2,
         "antigos": [
           "Fluidos"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Hidrostática (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=14459s"
+          }
         ]
       },
       {
@@ -1863,6 +2689,13 @@
         "ano": 2,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Gases e leis da termodinâmica (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=21694s"
+          }
         ]
       },
       {
@@ -1879,6 +2712,13 @@
         "ano": 2,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Termologia: isolamento térmico, 11 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/resumo-aprofundado-de-termologia-enem-casaco-e-isolamento-termico/"
+          }
         ]
       },
       {
@@ -1887,6 +2727,13 @@
         "ano": 2,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Gases e leis da termodinâmica (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=21694s"
+          }
         ]
       },
       {
@@ -1896,6 +2743,13 @@
         "peso": 3,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Gases e leis da termodinâmica (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=21694s"
+          }
         ]
       },
       {
@@ -1907,6 +2761,13 @@
         ],
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Ondulatória (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=30386s"
+          }
         ]
       },
       {
@@ -1919,6 +2780,13 @@
         ],
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Som, acústica e Doppler (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=47673s"
+          }
         ]
       },
       {
@@ -1930,6 +2798,13 @@
         ],
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Som, acústica e Doppler (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=47673s"
+          }
         ]
       },
       {
@@ -1938,6 +2813,18 @@
         "ano": 2,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Espelhos esféricos, lentes e refração (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=26370s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Óptica geométrica, 1h08 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/optica-geometrica-para-o-enem-2026/"
+          }
         ]
       },
       {
@@ -1946,6 +2833,18 @@
         "ano": 2,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Espelhos esféricos, lentes e refração (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=26370s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Refração em nível avançado, 1h27 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/refracao-em-nivel-avancado-para-o-enem-2026/"
+          }
         ]
       },
       {
@@ -1955,6 +2854,18 @@
         "peso": 1,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Espelhos esféricos, lentes e refração (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=26370s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Óptica geométrica, 1h08 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/optica-geometrica-para-o-enem-2026/"
+          }
         ]
       },
       {
@@ -1963,6 +2874,13 @@
         "ano": 2,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Fenômenos ondulatórios (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=32713s"
+          }
         ]
       },
       {
@@ -1971,6 +2889,13 @@
         "ano": 2,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Fenômenos ondulatórios (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=32713s"
+          }
         ]
       },
       {
@@ -1979,6 +2904,13 @@
         "ano": 3,
         "antigos": [
           "Eletrostática"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Eletrostática e eletrização, 20 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/eletrostatica-e-eletrizacao-por-atrito-para-o-enem-2026-professor-assa/"
+          }
         ]
       },
       {
@@ -2004,6 +2936,13 @@
         "ano": 3,
         "antigos": [
           "Eletrostática"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Condutores em equilíbrio eletrostático (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=35277s"
+          }
         ]
       },
       {
@@ -2045,6 +2984,18 @@
         "ano": 3,
         "antigos": [
           "Magnetismo e indução"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Magnetismo e fontes de campo (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=43272s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Eletromagnetismo, 2h41 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-eletromagnetismo-para-o-enem-2026-mas-tu-vai-entender/"
+          }
         ]
       },
       {
@@ -2053,6 +3004,18 @@
         "ano": 3,
         "antigos": [
           "Magnetismo e indução"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Magnetismo e fontes de campo (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=43272s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Eletromagnetismo, 2h41 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-eletromagnetismo-para-o-enem-2026-mas-tu-vai-entender/"
+          }
         ]
       },
       {
@@ -2061,6 +3024,13 @@
         "ano": 3,
         "antigos": [
           "Magnetismo e indução"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Magnetismo e fontes de campo (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=43272s"
+          }
         ]
       },
       {
@@ -2070,6 +3040,18 @@
         "peso": 3,
         "antigos": [
           "Magnetismo e indução"
+        ],
+        "aulas": [
+          {
+            "canal": "Universo Narrado",
+            "titulo": "Indução eletromagnética (revisão ENEM, base)",
+            "url": "https://www.youtube.com/watch?v=oqwFZCRApmA&t=45272s"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Eletromagnetismo, 2h41 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-eletromagnetismo-para-o-enem-2026-mas-tu-vai-entender/"
+          }
         ]
       },
       {
@@ -2146,6 +3128,18 @@
         "antigos": [
           "Matéria, substâncias e misturas",
           "Estados físicos e mudanças de estado"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Separação de misturas, 2h11 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/aula-magica-aprenda-quimica-agora-separacao-de-misturas-cai-pra-caramb/"
+          }
         ]
       },
       {
@@ -2156,6 +3150,18 @@
         "peso": 1,
         "antigos": [
           "Separação de misturas"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Separação de misturas, 2h11 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/aula-magica-aprenda-quimica-agora-separacao-de-misturas-cai-pra-caramb/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -2167,6 +3173,13 @@
           "Modelos atômicos",
           "Número atômico, número de massa e isótopos",
           "Íons e partículas do átomo"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -2176,6 +3189,13 @@
         "fase": 0,
         "antigos": [
           "Distribuição eletrônica (diagrama de Pauling)"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -2186,6 +3206,13 @@
         "antigos": [
           "Tabela periódica: famílias e períodos",
           "Propriedades periódicas"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -2195,6 +3222,13 @@
         "antigos": [
           "Ligação iônica",
           "Ligação covalente"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Química geral, 5h52 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-quimica-geral-pro-enem-2026-ganhe-muitos-acertos/"
+          }
         ]
       },
       {
@@ -2216,6 +3250,13 @@
         "ano": 1,
         "antigos": [
           "Ácidos e bases"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Química inorgânica, 1h10 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-quimica-inorganica-que-voce-ja-viu-amostra-gratis-pla/"
+          }
         ]
       },
       {
@@ -2225,6 +3266,13 @@
         "antigos": [
           "Sais",
           "Óxidos"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Química inorgânica, 1h10 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-quimica-inorganica-que-voce-ja-viu-amostra-gratis-pla/"
+          }
         ]
       },
       {
@@ -2233,6 +3281,13 @@
         "ano": 1,
         "antigos": [
           "Reações químicas e balanceamento"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Química inorgânica, 1h10 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-quimica-inorganica-que-voce-ja-viu-amostra-gratis-pla/"
+          }
         ]
       },
       {
@@ -2241,6 +3296,13 @@
         "ano": 1,
         "antigos": [
           "Reações químicas e balanceamento"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "NOX, 1h51 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/a-melhor-aula-de-nox-da-sua-vida-desbloqueie-sua-inteligencia-quimica/"
+          }
         ]
       },
       {
@@ -2255,6 +3317,13 @@
           "Massa atômica e massa molecular",
           "Mol e constante de Avogadro",
           "Massa molar"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "O que é mol, 23 min (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/voce-realmente-sabe-o-que-e-mol-obrigatorio-pra-estequiometria-enem-20/"
+          }
         ]
       },
       {
@@ -2270,6 +3339,13 @@
         "antigos": [
           "Estequiometria simples: mol e massa",
           "Estequiometria e soluções"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "TUDO de Estequiometria + 100 questões, 8h04 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-de-estequiometria-para-o-enem-2026-didatica-magica-100-questoes/"
+          }
         ]
       },
       {
@@ -2466,12 +3542,31 @@
       {
         "nome": "Interpretação: tema, ideia central e inferência",
         "fase": 0,
-        "sem": 8
+        "sem": 8,
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Domine Linguagens, 1h12 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/domine-linguagens-para-o-enem-2026/"
+          }
+        ]
       },
       {
         "nome": "Interpretação de texto",
         "antigos": [
           "Interpretação de texto"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Domine Linguagens, 1h12 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/domine-linguagens-para-o-enem-2026/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Interpretação avançada de poemas, 2h09 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/interpretacao-avancada-de-poemas-linguagens-enem-2026/"
+          }
         ]
       },
       {
@@ -2487,6 +3582,13 @@
           "Regência",
           "Crase",
           "Pontuação"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Redação: Competência 1 (norma culta), 2h28 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/nunca-mais-perca-ponto-na-competencia-1-da-redacao-enem/"
+          }
         ]
       },
       {
@@ -2499,6 +3601,18 @@
         "nome": "Semântica",
         "antigos": [
           "Semântica"
+        ],
+        "aulas": [
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Figuras de linguagem, 2h49 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/figuras-de-linguagem-pro-enem-2026-a-melhor-aula-do-youtube/"
+          },
+          {
+            "canal": "Pedro Assaad",
+            "titulo": "Funções da linguagem, 1h08 (ENEM, base)",
+            "url": "https://plataformaassaad.com.br/assaadflix-catalogo/tudo-sobre-funcoes-da-linguagem-pro-enem-referencial-conativa-metaling/"
+          }
         ]
       }
     ],
@@ -2566,7 +3680,7 @@
       }
     ]
   },
-  "versaoSeed": 15,
+  "versaoSeed": 16,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -3273,29 +4387,6 @@
         "serie": "murphy",
         "obs": "O link é a página do livro na editora (venda), não conteúdo gratuito.",
         "editora": "Cambridge"
-      },
-      {
-        "id": "khan-mat",
-        "tipo": "site",
-        "materia": "Matemática",
-        "titulo": "Khan Academy (Matemática 6º ao 9º ano)",
-        "autor": "Khan Academy",
-        "link": "https://pt.khanacademy.org/math/brazil-math-grades",
-        "linkStatus": "visto na busca",
-        "volume": "",
-        "assunto": "Vídeos e exercícios por habilidade, com \"dominado\" e testes de unidade",
-        "obs": "Página \"Matemática por ano\" vista na busca. Cursos vistos: /math/6-ano-matematica, /math/pt-8-ano e /math/pt-9-ano; o do 7º ano não apareceu (entre pela página por ano)."
-      },
-      {
-        "id": "quim-intro",
-        "tipo": "video",
-        "materia": "Química",
-        "titulo": "Khan Academy · Química (Ensino Médio)",
-        "autor": "Khan Academy",
-        "link": "https://pt.khanacademy.org/science/quimica-ensino-medio",
-        "linkStatus": "visto na busca",
-        "volume": "",
-        "assunto": "Matéria, átomo, tabela periódica, ligações e mol: vídeos e exercícios (troque pelo link da sua playlist se preferir)"
       }
     ],
     "vinculos": [
@@ -5352,10 +6443,6 @@
   },
   "sitesQuestoes": [
     {
-      "id": "khan",
-      "nome": "Khan Academy"
-    },
-    {
       "id": "obmep",
       "nome": "OBMEP"
     },
@@ -5382,47 +6469,52 @@
       "Inglês": "Manutenção: 1 hora por semana."
     },
     "portao": {
-      "khanMin": 80,
+      "testeMin": 80,
       "checkpointMin": 5,
       "semanasExtras": 2
     },
     "exercicios": {
       "Matemática": [
         {
-          "site": "khan",
-          "rotulo": "Khan Academy · Matemática por ano (6º ao 9º)",
-          "url": "https://pt.khanacademy.org/math/brazil-math-grades"
-        },
-        {
           "site": "obmep",
           "rotulo": "Portal da Matemática (OBMEP)",
           "url": "https://portaldaobmep.impa.br/"
+        },
+        {
+          "site": "outro",
+          "rotulo": "Toda Matéria · Exercícios de Matemática do 9º ano (com respostas)",
+          "url": "https://www.todamateria.com.br/exercicios-de-matematica-9-ano/"
         }
       ],
       "Física": [
         {
-          "site": "khan",
-          "rotulo": "Khan Academy · Biblioteca de Física",
-          "url": "https://pt.khanacademy.org/science/physics"
+          "site": "outro",
+          "rotulo": "Toda Matéria · Exercícios de Física do 9º ano (gabarito explicado)",
+          "url": "https://www.todamateria.com.br/exercicios/exercicios-de-fisica/9-ano/"
+        },
+        {
+          "site": "outro",
+          "rotulo": "Toda Matéria · Exercícios de Física do 1º ano do EM",
+          "url": "https://www.todamateria.com.br/exercicios/exercicios-de-fisica/1-ano-do-ensino-medio/"
         }
       ],
       "Química": [
         {
-          "site": "khan",
-          "rotulo": "Khan Academy · Química (Ensino Médio)",
-          "url": "https://pt.khanacademy.org/science/quimica-ensino-medio"
+          "site": "outro",
+          "rotulo": "Toda Matéria · Exercícios de química básica (respostas explicadas)",
+          "url": "https://www.todamateria.com.br/questoes-de-introducao-a-quimica/"
+        },
+        {
+          "site": "outro",
+          "rotulo": "Toda Matéria · Exercícios de Química do 1º ano do EM",
+          "url": "https://www.todamateria.com.br/exercicios/exercicios-de-quimica/1-ano-do-ensino-medio/"
         }
       ],
       "Português": [
         {
-          "site": "khan",
-          "rotulo": "Khan Academy · Português 6º ano (classes de palavras, concordância)",
-          "url": "https://pt.khanacademy.org/humanities/portugues-6-ano"
-        },
-        {
-          "site": "khan",
-          "rotulo": "Khan Academy · Português 7º ano (sujeito, predicado, vírgula)",
-          "url": "https://pt.khanacademy.org/humanities/portugues-7-ano"
+          "site": "outro",
+          "rotulo": "Toda Matéria · Exercícios do 9º ano (português e outras)",
+          "url": "https://www.todamateria.com.br/exercicios/9-ano/"
         }
       ],
       "Inglês": []
