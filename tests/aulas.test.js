@@ -5,21 +5,22 @@ import { videoDe, aulasDe, buscasDoTopico } from '../src/lib/tarefas.js';
 import { portaoZero, regrasPortao } from '../src/lib/portao.js';
 
 const cfg = () => structuredClone(seed);
-const CANAIS = ['Universo Narrado', 'Universo Narrado Militares', 'Pedro Assaad'];
 
 describe('aulas indicadas por tópico (v16)', () => {
-  it('Matemática, Física, Química e Português, com canal conhecido, título e link https (YouTube ou Plataforma Assaad)', () => {
+  it('toda aula indicada tem canal, título e link direto (vídeo do YouTube ou Plataforma Assaad)', () => {
     let n = 0;
     for (const [m, ts] of Object.entries(seed.topicos)) for (const t of ts) for (const a of t.aulas ?? []) {
       n++;
-      expect(['Matemática', 'Física', 'Química', 'Português'], t.codigo).toContain(m);
-      if (['Química', 'Português'].includes(m)) expect(a.canal, t.nome).toBe('Pedro Assaad');
-      expect(CANAIS, t.codigo).toContain(a.canal);
+      expect(a.canal?.trim().length, t.nome).toBeGreaterThan(0);
+      if (a.url.includes('youtube.com')) expect(a.url, t.nome).toMatch(/^https:\/\/www\.youtube\.com\/(watch\?v=[\w-]{11}(&t=\d+s)?|playlist\?list=[\w-]+)$/);
       expect(a.titulo.trim().length, t.codigo).toBeGreaterThan(3);
       expect(new URL(a.url).hostname, a.url).toMatch(/^(www\.youtube\.com|plataformaassaad\.com\.br)$/);
       if (a.canal === 'Pedro Assaad') expect(a.url).toMatch(/^https:\/\/plataformaassaad\.com\.br\/assaadflix-catalogo\/[a-z0-9-]+\/$/);
     }
-    expect(n).toBeGreaterThan(150);
+    expect(n).toBeGreaterThan(250);
+    // só 1 tópico de Matemática, Física, Química e Português fica sem aula (nenhum vídeo claro do tema)
+    const sem = ['Matemática', 'Física', 'Química', 'Português'].flatMap((m) => seed.topicos[m].filter((t) => !t.aulas?.length));
+    expect(sem.length).toBeLessThanOrEqual(1);
   });
   it('a base (Fase 0) de Matemática e Física tem aula indicada em quase todo tópico', () => {
     for (const m of ['Matemática', 'Física']) {

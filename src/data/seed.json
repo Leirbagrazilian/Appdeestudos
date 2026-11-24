@@ -1080,6 +1080,13 @@
         "peso": 1,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "Professor Ferretto",
+            "titulo": "Conjuntos: Introdução (Aula 1 de 4)",
+            "url": "https://www.youtube.com/watch?v=0aUEDxYjZg8"
+          }
         ]
       },
       {
@@ -1089,13 +1096,27 @@
         "peso": 1,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "Professor Ferretto",
+            "titulo": "Ferretto Prepara #9: Conjuntos Numéricos (Replay)",
+            "url": "https://www.youtube.com/watch?v=A8rEk8cqsnM"
+          }
         ]
       },
       {
         "codigo": "BN01",
         "nome": "Base de numeração",
         "ano": 1,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Sistemas de Numeração - Bases Numéricas - Conversão para uma base arbitrária - Aula 54",
+            "url": "https://www.youtube.com/watch?v=EYqZD1CYb0Q"
+          }
+        ]
       },
       {
         "codigo": "FX01",
@@ -1234,6 +1255,13 @@
         "ano": 1,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Funções - Função inversa e composta (Parte 1)",
+            "url": "https://www.youtube.com/watch?v=nMbGANJRjZ8"
+          }
         ]
       },
       {
@@ -1375,6 +1403,13 @@
         "ano": 2,
         "antigos": [
           "Conjuntos, lógica e funções"
+        ],
+        "aulas": [
+          {
+            "canal": "Professor Ferretto",
+            "titulo": "Função Modular: Módulo de um Número Real (Aula 1 de 5)",
+            "url": "https://www.youtube.com/watch?v=sXFdCZXzRT8"
+          }
         ]
       },
       {
@@ -1500,6 +1535,13 @@
         "ano": 2,
         "antigos": [
           "PA, PG, matrizes e sistemas"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "MATRIZES: Conceitos Iniciais.",
+            "url": "https://www.youtube.com/watch?v=lZ9onrdpusA"
+          }
         ]
       },
       {
@@ -1508,6 +1550,13 @@
         "ano": 2,
         "antigos": [
           "PA, PG, matrizes e sistemas"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 2 - Determinante - Determinante de 3 º ordem",
+            "url": "https://www.youtube.com/watch?v=POn3hzUSQz8"
+          }
         ]
       },
       {
@@ -1666,7 +1715,14 @@
       {
         "codigo": "TN03",
         "nome": "Aritmética modular",
-        "ano": 2
+        "ano": 2,
+        "aulas": [
+          {
+            "canal": "Prof. Gui",
+            "titulo": "Aritmética - Aula 8 - Congruências (Aritmética Modular) - Prof. Gui",
+            "url": "https://www.youtube.com/watch?v=qYqusyUOtF0"
+          }
+        ]
       },
       {
         "codigo": "GE07",
@@ -1810,6 +1866,13 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Sólidos de revolução - Introdução",
+            "url": "https://www.youtube.com/watch?v=OTsEwtgENsE"
+          }
         ]
       },
       {
@@ -1818,6 +1881,13 @@
         "ano": 2,
         "antigos": [
           "Geometria espacial"
+        ],
+        "aulas": [
+          {
+            "canal": "Prof. Naza",
+            "titulo": "Sólidos Inscritos e Circunscritos: Esfera e Cubo",
+            "url": "https://www.youtube.com/watch?v=GXzqqD07CZ0"
+          }
         ]
       },
       {
@@ -1842,6 +1912,13 @@
         "ano": 2,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 01: Definição, Grau, Valor Numérico e Raiz de um Polinômio.",
+            "url": "https://www.youtube.com/watch?v=rNY8nd0GGng"
+          }
         ]
       },
       {
@@ -1850,6 +1927,13 @@
         "ano": 2,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "BRIOT RUFFINI - DIVISÃO DE POLINÔMIOS (6/12)",
+            "url": "https://www.youtube.com/watch?v=wd8i0cxmS2c"
+          }
         ]
       },
       {
@@ -1873,6 +1957,13 @@
         "ano": 3,
         "antigos": [
           "Analítica, vetores, cônicas e quádricas"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Lugares Geométricos",
+            "url": "https://www.youtube.com/watch?v=Y9-WWYSSMAk"
+          }
         ]
       },
       {
@@ -2021,6 +2112,13 @@
         "peso": 1,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "COMPLEXOS: INTRODUÇÃO, UNIDADE IMAGINÁRIA E EQUAÇÕES DO 2° GRAU (AULA 1/14)",
+            "url": "https://www.youtube.com/watch?v=7E7mypyLyoM"
+          }
         ]
       },
       {
@@ -2029,6 +2127,13 @@
         "ano": 3,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "COMPLEXOS: FORMA ALGÉBRICA, CLASSIFICAÇÃO E IGUALDADE (AULA 3/14)",
+            "url": "https://www.youtube.com/watch?v=SeJ0eNKfxRg"
+          }
         ]
       },
       {
@@ -2038,6 +2143,13 @@
         "peso": 3,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Divisão e potenciação na forma trigonométrica",
+            "url": "https://www.youtube.com/watch?v=wiZgMzuyrIA"
+          }
         ]
       },
       {
@@ -2046,6 +2158,13 @@
         "ano": 3,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 1: Representação de subconjuntos (regiões) no plano complexo",
+            "url": "https://www.youtube.com/watch?v=PN9eHtBdjwQ"
+          }
         ]
       },
       {
@@ -2054,6 +2173,13 @@
         "ano": 3,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "Prof. Gui",
+            "titulo": "Equações Algébricas - Aula 2 - Relações de Girard - Prof. Gui",
+            "url": "https://www.youtube.com/watch?v=jNjN4stvU8M"
+          }
         ]
       },
       {
@@ -2063,13 +2189,27 @@
         "peso": 3,
         "antigos": [
           "Números complexos e polinômios"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "AULA 14: TEOREMA DAS RAÍZES RACIONAIS",
+            "url": "https://www.youtube.com/watch?v=374MLF0vD2U"
+          }
         ]
       },
       {
         "codigo": "SPG03",
         "nome": "Progressão harmônica",
         "ano": 3,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Progressão harmônica é uma sequência finita ou infinita de números diferentes de zero cujos inversos",
+            "url": "https://www.youtube.com/watch?v=UOQzepPj-GI"
+          }
+        ]
       },
       {
         "codigo": "GA05",
@@ -2080,6 +2220,13 @@
         ],
         "antigos": [
           "Analítica, vetores, cônicas e quádricas"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Vetores no Espaço R³: Operações Elementares, Produtos Escalar, Vetorial e Misto (Aula Completa)",
+            "url": "https://www.youtube.com/watch?v=Qz5tyioDh20"
+          }
         ]
       },
       {
@@ -2092,6 +2239,13 @@
         "peso": 1,
         "antigos": [
           "Cálculo (só Escola Naval)"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Cálculo (AULA 1): Limites",
+            "url": "https://www.youtube.com/watch?v=gDkvNDoh0nE"
+          }
         ]
       },
       {
@@ -2104,6 +2258,13 @@
         "peso": 3,
         "antigos": [
           "Cálculo (só Escola Naval)"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "🔥 Aula 1 - Derivadas - Fórmulas ou Regras de Derivação 🔥",
+            "url": "https://www.youtube.com/watch?v=mIV0_kCCm-A"
+          }
         ]
       },
       {
@@ -2115,6 +2276,13 @@
         ],
         "antigos": [
           "Cálculo (só Escola Naval)"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 19 Cálculo I - Máximos e Mínimos através da Derivada (Parte X de Derivada)",
+            "url": "https://www.youtube.com/watch?v=nvCtCnV7Wvo"
+          }
         ]
       },
       {
@@ -2127,6 +2295,13 @@
         "peso": 3,
         "antigos": [
           "Cálculo (só Escola Naval)"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Cálculo2 #1: Integrais-Introdução",
+            "url": "https://www.youtube.com/watch?v=yQ0hadzzyQc"
+          }
         ]
       }
     ],
@@ -2142,6 +2317,13 @@
           "Conversão de unidades: comprimento, massa e tempo",
           "Conversão de unidades: área, volume e velocidade",
           "Notação científica e ordem de grandeza"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Física - Aula 01 - Notação científica, Grandezas, Unidades de medida, Tabela de converção de unidad",
+            "url": "https://www.youtube.com/watch?v=1s2gc_g08SI"
+          }
         ]
       },
       {
@@ -2257,6 +2439,13 @@
           "Soma de vetores na mesma direção",
           "Soma de vetores perpendiculares (Pitágoras)",
           "Soma de vetores: regra do paralelogramo"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "VETORES - Soma e Decomposição - Aula X",
+            "url": "https://www.youtube.com/watch?v=NkB7PqNx3P4"
+          }
         ]
       },
       {
@@ -2322,13 +2511,27 @@
         "peso": 1,
         "antigos": [
           "Medidas e algarismos significativos"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Algarismos Significativos - Conceito e operações",
+            "url": "https://www.youtube.com/watch?v=HoqPqeow-hQ"
+          }
         ]
       },
       {
         "codigo": "F-MD03",
         "nome": "Análise dimensional",
         "ano": 1,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "(Física) Análise Dimensional - Equações Dimensionais",
+            "url": "https://www.youtube.com/watch?v=5X7-b1Yck9o"
+          }
+        ]
       },
       {
         "codigo": "F-CN05",
@@ -2417,6 +2620,13 @@
         "peso": 3,
         "antigos": [
           "Dinâmica, energia, impulso e colisões"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Impulso e Quantidade de Movimento - Introdução",
+            "url": "https://www.youtube.com/watch?v=GgrcgVWAn60"
+          }
         ]
       },
       {
@@ -2468,6 +2678,13 @@
         "ano": 1,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula IV - Dilatação Térmica - 2º Ano - Física",
+            "url": "https://www.youtube.com/watch?v=BgorY03q7kA"
+          }
         ]
       },
       {
@@ -2588,7 +2805,14 @@
       {
         "codigo": "F-DN06",
         "nome": "Referenciais acelerados e girantes",
-        "ano": 2
+        "ano": 2,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Referencial não-inercial",
+            "url": "https://www.youtube.com/watch?v=fR7p84ckTNk"
+          }
+        ]
       },
       {
         "codigo": "F-EN04",
@@ -2596,6 +2820,13 @@
         "ano": 2,
         "antigos": [
           "Dinâmica, energia, impulso e colisões"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Tipos de colisões, coeficiente de restituição e conservação da quantidade de movimento",
+            "url": "https://www.youtube.com/watch?v=s9odquXGzuQ"
+          }
         ]
       },
       {
@@ -2604,6 +2835,13 @@
         "ano": 2,
         "antigos": [
           "Gravitação e estática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Estática - Aula 01 (Equilíbrio do ponto material)",
+            "url": "https://www.youtube.com/watch?v=zCyKpcPCxnY"
+          }
         ]
       },
       {
@@ -2612,6 +2850,13 @@
         "ano": 2,
         "antigos": [
           "Gravitação e estática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Equilíbrio de Corpo Extenso e Torque",
+            "url": "https://www.youtube.com/watch?v=VYgt5svmR3Y"
+          }
         ]
       },
       {
@@ -2620,6 +2865,13 @@
         "ano": 2,
         "antigos": [
           "Gravitação e estática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula Tipos de Equilíbrio Estático.",
+            "url": "https://www.youtube.com/watch?v=lCXAaURkwFA"
+          }
         ]
       },
       {
@@ -2628,6 +2880,13 @@
         "ano": 2,
         "antigos": [
           "Gravitação e estática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Gravitação Universal e Leis de Kepler",
+            "url": "https://www.youtube.com/watch?v=Ll2DRwxzVv8"
+          }
         ]
       },
       {
@@ -2639,6 +2898,13 @@
         ],
         "antigos": [
           "Gravitação e estática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Energia potencial gravitacional - Velocidade de escape",
+            "url": "https://www.youtube.com/watch?v=AICVSGzkHYc"
+          }
         ]
       },
       {
@@ -2650,6 +2916,13 @@
         ],
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Movimento Harmônico Simples (MHS) - Aula Completa",
+            "url": "https://www.youtube.com/watch?v=oeCX9nwqsRg"
+          }
         ]
       },
       {
@@ -2658,6 +2931,13 @@
         "ano": 2,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "ENERGIAS E PERÍODO DO PÊNDULO SIMPLES (MHS)",
+            "url": "https://www.youtube.com/watch?v=Mz9PvJf7RV0"
+          }
         ]
       },
       {
@@ -2699,6 +2979,13 @@
         ],
         "antigos": [
           "Fluidos"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Hidrodinâmica - Equação de Bernoulli",
+            "url": "https://www.youtube.com/watch?v=UiG6jgGoyug"
+          }
         ]
       },
       {
@@ -2722,6 +3009,13 @@
         "ano": 2,
         "antigos": [
           "Termologia e termodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Teoria cinética dos gases",
+            "url": "https://www.youtube.com/watch?v=-EQUBU2Lxmc"
+          }
         ]
       },
       {
@@ -2937,6 +3231,13 @@
         "ano": 3,
         "antigos": [
           "Eletrostática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Campo Elétrico - Aula 01 (Conceitos Iniciais)",
+            "url": "https://www.youtube.com/watch?v=C8jgWisYAek"
+          }
         ]
       },
       {
@@ -2946,6 +3247,13 @@
         "peso": 3,
         "antigos": [
           "Eletrostática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "ELETROSTÁTICA (Aula 11): Potencial elétrico - Parte 1",
+            "url": "https://www.youtube.com/watch?v=jDhMHn3uS54"
+          }
         ]
       },
       {
@@ -2969,6 +3277,13 @@
         "ano": 3,
         "antigos": [
           "Eletrostática"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Associação de capacitores em série e em paralelo",
+            "url": "https://www.youtube.com/watch?v=CbWbQcMYe14"
+          }
         ]
       },
       {
@@ -2977,6 +3292,13 @@
         "ano": 3,
         "antigos": [
           "Eletrodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Geradores e Receptores - Física Elétrica/3 - Aula 10",
+            "url": "https://www.youtube.com/watch?v=f1EDRnUAJP8"
+          }
         ]
       },
       {
@@ -2986,6 +3308,13 @@
         "peso": 3,
         "antigos": [
           "Eletrodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 17 - Leis de Kirchhoff",
+            "url": "https://www.youtube.com/watch?v=hmVnRk--Px4"
+          }
         ]
       },
       {
@@ -2994,6 +3323,13 @@
         "ano": 3,
         "antigos": [
           "Eletrodinâmica"
+        ],
+        "aulas": [
+          {
+            "canal": "Heavy Física",
+            "titulo": "Medidas Elétricas: Voltímetro - Amperímetro - Ponte de Wheatstone - Heavy Física",
+            "url": "https://www.youtube.com/watch?v=KHbM5IEOH98"
+          }
         ]
       },
       {
@@ -3078,6 +3414,13 @@
         "ano": 3,
         "antigos": [
           "Magnetismo e indução"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Indução e indutância - Aula 9.1",
+            "url": "https://www.youtube.com/watch?v=T4OdIGtbIOA"
+          }
         ]
       },
       {
@@ -3086,6 +3429,13 @@
         "ano": 3,
         "antigos": [
           "Magnetismo e indução"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Transformadores, Indução eletromagnética e Gerador de corrente alternada",
+            "url": "https://www.youtube.com/watch?v=f7W-JAuol6A"
+          }
         ]
       },
       {
@@ -3094,46 +3444,102 @@
         "ano": 3,
         "antigos": [
           "MHS, ondas, som e luz"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Interferômetro de Michelson",
+            "url": "https://www.youtube.com/watch?v=IP2Z0Qd56GY"
+          }
         ]
       },
       {
         "codigo": "F-FM01",
         "nome": "Fotoelétrico e corpo negro",
-        "ano": 3
+        "ano": 3,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Física Moderna: corpo negro e efeito fotoelétrico",
+            "url": "https://www.youtube.com/watch?v=DQnsToG6dRA"
+          }
+        ]
       },
       {
         "codigo": "F-FM02",
         "nome": "Bohr",
         "ano": 3,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Átomo de Bohr: Níveis de Energia",
+            "url": "https://www.youtube.com/watch?v=igRErML5tI0"
+          }
+        ]
       },
       {
         "codigo": "F-FM03",
         "nome": "Dualidade e incerteza",
-        "ano": 3
+        "ano": 3,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Dualidade da Partícula-Onda e Princípio da Incerteza",
+            "url": "https://www.youtube.com/watch?v=HeMVIK0JlXU"
+          }
+        ]
       },
       {
         "codigo": "F-RL01",
         "nome": "Relatividade: postulados, tempo e comprimento",
-        "ano": 3
+        "ano": 3,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 12.3 - Teoria da Relatividade - Dilatação do tempo [HD]",
+            "url": "https://www.youtube.com/watch?v=HQfN0Qjxjt8"
+          }
+        ]
       },
       {
         "codigo": "F-RL02",
         "nome": "Relatividade: velocidades",
         "ano": 3,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Composição relativistica de velocidades",
+            "url": "https://www.youtube.com/watch?v=vmJrg3O16XE"
+          }
+        ]
       },
       {
         "codigo": "F-RL03",
         "nome": "Energia e momento relativísticos",
         "ano": 3,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Energia e quantidade de movimento na relatividade especial",
+            "url": "https://www.youtube.com/watch?v=2QvzUGn2c4I"
+          }
+        ]
       },
       {
         "codigo": "F-FN01",
         "nome": "Física nuclear",
         "ano": 3,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Fissão e Fusão Nuclear - A Energia do Núcleo do Átomo",
+            "url": "https://www.youtube.com/watch?v=Fow5Y4kLS84"
+          }
+        ]
       }
     ],
     "Química": [
@@ -3255,12 +3661,26 @@
         "ano": 1,
         "antigos": [
           "Ligação covalente"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Química Geral e Inorgânica -Aula 11: Geometria Molecular e Polaridade de Moléculas",
+            "url": "https://www.youtube.com/watch?v=fhgfdPQyqrc"
+          }
         ]
       },
       {
         "codigo": "Q-LG03",
         "nome": "Forças intermoleculares",
-        "ano": 1
+        "ano": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "FORÇAS INTERMOLECULARES - Dp-Dp - Ligações de Hidrogênio - Di-Di - Van Der Waals",
+            "url": "https://www.youtube.com/watch?v=eMijoZ0UljI"
+          }
+        ]
       },
       {
         "codigo": "Q-IG01",
@@ -3347,7 +3767,14 @@
       {
         "codigo": "Q-ES02",
         "nome": "Fórmulas químicas",
-        "ano": 1
+        "ano": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aula 12 - Fórmula Mínima, Percentual e Molecular - Extensivo Química - (parte 1 de 1)",
+            "url": "https://www.youtube.com/watch?v=6Nlr5vm_rXE"
+          }
+        ]
       },
       {
         "codigo": "Q-ES03",
@@ -3370,7 +3797,14 @@
         "codigo": "Q-GS01",
         "nome": "Gases",
         "ano": 1,
-        "peso": 1
+        "peso": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Equação geral dos gases e transformações gasosas",
+            "url": "https://www.youtube.com/watch?v=2oR9Z4vr7F4"
+          }
+        ]
       },
       {
         "codigo": "Q-SO01",
@@ -3378,6 +3812,13 @@
         "ano": 2,
         "antigos": [
           "Estequiometria e soluções"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Concentração comum (g/L), Molaridade (Concentração Molar, mol/L) - Estudo das soluções - Aula 5",
+            "url": "https://www.youtube.com/watch?v=dJAXQnF7BVI"
+          }
         ]
       },
       {
@@ -3386,12 +3827,26 @@
         "ano": 2,
         "antigos": [
           "Estequiometria e soluções"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Mistura, Diluição e Titulação de Soluções",
+            "url": "https://www.youtube.com/watch?v=aGUFLInKC3Y"
+          }
         ]
       },
       {
         "codigo": "Q-CL01",
         "nome": "Propriedades coligativas",
-        "ano": 2
+        "ano": 2,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "QUÍMICA -PROPRIEDADES COLIGATIVAS (TONOSCOPIA . EBULIOSCOPIA, CRIOSCOPIA. OSMOSE).",
+            "url": "https://www.youtube.com/watch?v=Cm-UuYVq-qI"
+          }
+        ]
       },
       {
         "codigo": "Q-TQ01",
@@ -3399,6 +3854,13 @@
         "ano": 2,
         "antigos": [
           "Termoquímica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Termoquímica - Lei de Hess e Entalpias de Combustão, Ligação e Formação",
+            "url": "https://www.youtube.com/watch?v=2gtQurdmsjo"
+          }
         ]
       },
       {
@@ -3407,6 +3869,13 @@
         "ano": 2,
         "antigos": [
           "Cinética"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Velocidade das Reações Químicas (Cinética Química) e Catalisadores",
+            "url": "https://www.youtube.com/watch?v=mG7Os64ucSk"
+          }
         ]
       },
       {
@@ -3415,6 +3884,13 @@
         "ano": 2,
         "antigos": [
           "Equilíbrio"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Equilíbrio Químico - Princípio de Le Chatelier -#2- Prof. Carlos André #euacredito",
+            "url": "https://www.youtube.com/watch?v=BqaZx5MObC8"
+          }
         ]
       },
       {
@@ -3427,6 +3903,13 @@
         ],
         "antigos": [
           "Equilíbrio"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "EQUILÍBRIO IÔNICO , Ka, Kb, pH E pOH. TEORIA E EXERCÍCIOS",
+            "url": "https://www.youtube.com/watch?v=_-Emp91IYZ8"
+          }
         ]
       },
       {
@@ -3436,6 +3919,13 @@
         "peso": 3,
         "antigos": [
           "Equilíbrio"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Intensivo UERJ Química Aula 50 - Equilíbrio Iônico: hidrolise salina e solução tampão",
+            "url": "https://www.youtube.com/watch?v=e04DurJXIeg"
+          }
         ]
       },
       {
@@ -3444,6 +3934,13 @@
         "ano": 2,
         "antigos": [
           "Eletroquímica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Eletroquímica - Pilhas #2 - Prof. Carlos André - Química do Sucesso",
+            "url": "https://www.youtube.com/watch?v=9882XYfSu0s"
+          }
         ]
       },
       {
@@ -3452,6 +3949,13 @@
         "ano": 2,
         "antigos": [
           "Eletroquímica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Eletrólise - Eletrólise Ígnea, Eletrólise Aquosa com Eletrodos Inertes - Parte 1",
+            "url": "https://www.youtube.com/watch?v=Rn0HbmhJiw4"
+          }
         ]
       },
       {
@@ -3460,6 +3964,13 @@
         "ano": 3,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "QUÍMICA ORGÂNICA - Classificação do Carbono e das Cadeias Carbônicas (aula 03)",
+            "url": "https://www.youtube.com/watch?v=JHXTzgcge3U"
+          }
         ]
       },
       {
@@ -3468,6 +3979,13 @@
         "ano": 3,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "QUÍMICA ORGÂNICA: Funções Orgânicas",
+            "url": "https://www.youtube.com/watch?v=Zas5EVi-ST4"
+          }
         ]
       },
       {
@@ -3477,6 +3995,13 @@
         "peso": 1,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Nomenclatura IUPAC de compostos orgânicos",
+            "url": "https://www.youtube.com/watch?v=bezfhthGTww"
+          }
         ]
       },
       {
@@ -3485,6 +4010,13 @@
         "ano": 3,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Isomeria Plana - Aula 01 |#quimicaorganica",
+            "url": "https://www.youtube.com/watch?v=BMyOHrZcIPc"
+          }
         ]
       },
       {
@@ -3493,6 +4025,13 @@
         "ano": 3,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "ISOMERIA ESPACIAL (GEOMÉTRICA E ÓPTICA)",
+            "url": "https://www.youtube.com/watch?v=K0hy5B7rCGs"
+          }
         ]
       },
       {
@@ -3501,6 +4040,13 @@
         "ano": 3,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Reações Orgânicas de Adição e Substituição",
+            "url": "https://www.youtube.com/watch?v=wKslffEnkFw"
+          }
         ]
       },
       {
@@ -3509,6 +4055,13 @@
         "ano": 3,
         "antigos": [
           "Química orgânica"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Polímeros - AULA 02 - Polímeros de adição",
+            "url": "https://www.youtube.com/watch?v=nTVkriFI87s"
+          }
         ]
       },
       {
@@ -3518,6 +4071,13 @@
         "peso": 1,
         "prereq": [
           "LOG01"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Radioatividade: Emissões, Leis de decaimento, Fissão e Fusão",
+            "url": "https://www.youtube.com/watch?v=jaArgiNfPGk"
+          }
         ]
       }
     ],
@@ -3525,37 +4085,86 @@
       {
         "nome": "Substantivo e adjetivo",
         "fase": 0,
-        "sem": 1
+        "sem": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Substantivo e Adjetivo - Língua Portuguesa - Ensino Médio",
+            "url": "https://www.youtube.com/watch?v=6IjReY03lL8"
+          }
+        ]
       },
       {
         "nome": "Artigo, numeral e pronome",
         "fase": 0,
-        "sem": 2
+        "sem": 2,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Classes Gramaticais 1- substantivo, adjetivo, verbo, artigo, pronome, numeral",
+            "url": "https://www.youtube.com/watch?v=JSuwkccXszI"
+          }
+        ]
       },
       {
         "nome": "Verbo: conceito e tempos verbais",
         "fase": 0,
-        "sem": 3
+        "sem": 3,
+        "aulas": [
+          {
+            "canal": "Professor Noslen",
+            "titulo": "Verbo - Aula 1 [Prof Noslen]",
+            "url": "https://www.youtube.com/watch?v=T8MB4vzTAv4"
+          }
+        ]
       },
       {
         "nome": "Advérbio, preposição e conjunção",
         "fase": 0,
-        "sem": 4
+        "sem": 4,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Classes Gramaticais 2- preposição, advérbio, conjunção, interjeição",
+            "url": "https://www.youtube.com/watch?v=Xx9aWEbtJ_w"
+          }
+        ]
       },
       {
         "nome": "Concordância nominal",
         "fase": 0,
-        "sem": 5
+        "sem": 5,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "CONCORDÂNCIA NOMINAL - Teoria e Questões para Concurso",
+            "url": "https://www.youtube.com/watch?v=WWk4ef_x_sw"
+          }
+        ]
       },
       {
         "nome": "Concordância verbal",
         "fase": 0,
-        "sem": 6
+        "sem": 6,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "CONCORDÂNCIA VERBAL - Teoria e Questões para Concurso",
+            "url": "https://www.youtube.com/watch?v=jdqhnVUvqOc"
+          }
+        ]
       },
       {
         "nome": "Acentuação e ortografia básica",
         "fase": 0,
-        "sem": 7
+        "sem": 7,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Acentuação gráfica: regras e exemplos",
+            "url": "https://www.youtube.com/watch?v=y33PwYLkHXU"
+          }
+        ]
       },
       {
         "nome": "Interpretação: tema, ideia central e inferência",
@@ -3591,6 +4200,13 @@
         "nome": "Sintaxe",
         "antigos": [
           "Sintaxe"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Sintaxe do Período Simples",
+            "url": "https://www.youtube.com/watch?v=bKJt1KBOm48"
+          }
         ]
       },
       {
@@ -3613,6 +4229,13 @@
         "nome": "Classes de palavras",
         "antigos": [
           "Classes de palavras"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Morfologia: Aprenda as 10 Classes de Palavras (Do Zero)",
+            "url": "https://www.youtube.com/watch?v=ircd16eaxYo"
+          }
         ]
       },
       {
@@ -3638,22 +4261,50 @@
       {
         "nome": "Vocabulário essencial: verbos e substantivos comuns",
         "fase": 0,
-        "sem": 1
+        "sem": 1,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Inglês Para Iniciantes: Verbos, Substantivos E Adjetivos",
+            "url": "https://www.youtube.com/watch?v=tD19O8lONak"
+          }
+        ]
       },
       {
         "nome": "Verbo to be e presente simples",
         "fase": 0,
-        "sem": 3
+        "sem": 3,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Verbo to be no Presente Simples",
+            "url": "https://www.youtube.com/watch?v=2R0Z1kfXoHM"
+          }
+        ]
       },
       {
         "nome": "Passado simples",
         "fase": 0,
-        "sem": 5
+        "sem": 5,
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Simple Past: O Passado em Inglês Fácil (Com Exercícios)",
+            "url": "https://www.youtube.com/watch?v=imeLCd6Re_M"
+          }
+        ]
       },
       {
         "nome": "Leitura de textos curtos",
         "fase": 0,
-        "sem": 7
+        "sem": 7,
+        "aulas": [
+          {
+            "canal": "Brasil Escola",
+            "titulo": "Técnicas de Leitura para Interpretação de Textos em Inglês - Brasil Escola",
+            "url": "https://www.youtube.com/watch?v=C-Mc6SlvrfM"
+          }
+        ]
       },
       {
         "nome": "Leitura e vocabulário",
@@ -3661,44 +4312,107 @@
           "Interpretação de texto",
           "Vocabulário",
           "Falsos cognatos"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Língua Inglesa - Aula 06 - Técnicas de Leitura Skimming e Scanning; Cognatos e Falsos cognatos;",
+            "url": "https://www.youtube.com/watch?v=mJNEu9XiFE4"
+          }
         ]
       },
       {
         "nome": "Tempos verbais e modais",
         "antigos": [
           "Tempos verbais"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Modal Verbs em Inglês - Aula Completa (Can, Could, May, Might, Should e Must)",
+            "url": "https://www.youtube.com/watch?v=X4Td7gAS5GM"
+          }
         ]
       },
       {
-        "nome": "Condicionais, voz passiva e discurso indireto"
+        "nome": "Condicionais, voz passiva e discurso indireto",
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Discurso Direto e Indireto - Inglês ENEM (Aula 14)",
+            "url": "https://www.youtube.com/watch?v=eV2i96M1jDo"
+          }
+        ]
       },
       {
         "nome": "Phrasal verbs, tags, causativos e comparativos",
         "antigos": [
           "Preposições",
           "Conectivos"
+        ],
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Aprenda usar os 20 PHRASAL VERBS mais úteis do inglês - Boa pronúncia americana - AULA DE INGLÊS",
+            "url": "https://www.youtube.com/watch?v=cLy4EK4UKw8"
+          }
         ]
       }
     ],
     "Hist/Geo": [
       {
-        "nome": "História: Colônia"
+        "nome": "História: Colônia",
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Brasil Colônia - Tudo que você precisa saber!",
+            "url": "https://www.youtube.com/watch?v=6xFgUphkggw"
+          }
+        ]
       },
       {
-        "nome": "História: Império"
+        "nome": "História: Império",
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "A Linha do Tempo do Brasil Império",
+            "url": "https://www.youtube.com/watch?v=7YA6iZZGkR4"
+          }
+        ]
       },
       {
-        "nome": "História: República"
+        "nome": "História: República",
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Primeira República (1889–1930) (Resumo Em Animação)",
+            "url": "https://www.youtube.com/watch?v=dOD1qZOKcek"
+          }
+        ]
       },
       {
-        "nome": "Geografia: relevo, clima e hidrografia"
+        "nome": "Geografia: relevo, clima e hidrografia",
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Geografia - 9º ano - O Espaço Brasileiro Relevo, Clima e mais",
+            "url": "https://www.youtube.com/watch?v=YGXtirS6ANU"
+          }
+        ]
       },
       {
-        "nome": "Geografia: geopolítica e meio ambiente"
+        "nome": "Geografia: geopolítica e meio ambiente",
+        "aulas": [
+          {
+            "canal": "YouTube",
+            "titulo": "Geopolítica e meio ambiente parte 01",
+            "url": "https://www.youtube.com/watch?v=RkuNMvsFpJk"
+          }
+        ]
       }
     ]
   },
-  "versaoSeed": 17,
+  "versaoSeed": 18,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",

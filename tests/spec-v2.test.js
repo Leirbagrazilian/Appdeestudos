@@ -148,7 +148,7 @@ describe('migração v17 sem perder dados', () => {
     velho.treinoPlano = { inicio: '2026-11-20', meta: { nome: '100 km' }, fases: [{ n: 1 }] };
     velho.sono = { padrao: { 0: { dormir: '22:00', acordar: '05:00' }, 5: { dormir: '21:30', acordar: '04:30' }, 6: { dormir: '21:00', acordar: '05:15' }, 3: { dormir: '23:00', acordar: '06:00' } } };
     const n = migrarCfg(velho, cfg());
-    expect(n.versaoSeed).toBe(17); expect(n.carta).toBe('minha carta'); expect(n.rotina.presencaMin).toBe(80);
+    expect(n.versaoSeed).toBe(seed.versaoSeed); expect(n.carta).toBe('minha carta'); expect(n.rotina.presencaMin).toBe(80);
     expect(n.rotina.aulas.map((a) => a.nome)).toEqual(['Faculdade seg', 'Faculdade qua', 'Faculdade qui']);
     expect(n.rotina.aulas[0]).toMatchObject({ fim: '11:00', vou: true });
     expect(n.rotina.janelas[5]).toHaveLength(3); expect(n.rotina.metaLiquida).toBe(41);
