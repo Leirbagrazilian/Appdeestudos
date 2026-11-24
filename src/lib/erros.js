@@ -1,6 +1,6 @@
 import { diffDays } from './dates.js';
 
-// Treino do caderno de erros: 2 acertos seguidos = dominado.
+// Treino do caderno de erros (refeito sem olhar a resolução): 2 acertos seguidos = sai do caderno.
 export const ACERTOS_PARA_DOMINAR = 2;
 export const situacao = (e) => e.status ?? 'novo'; // novo | treinando | dominado
 
@@ -68,3 +68,12 @@ export const COMPETENCIAS = [
 ];
 export const NIVEIS_RED = [0, 40, 80, 120, 160, 200];
 export const totalRedacao = (r) => (r.notas ?? []).reduce((a, b) => a + (+b || 0), 0);
+
+/** Antes de cada prova: o que sobrou no caderno (erros ainda não dominados), do mais antigo treino ao mais recente. */
+export const sobraNoCaderno = (erros, limite = 20) => filaTreino(erros ?? [], limite);
+/** Aviso "revise o caderno" nos `dias` antes da prova (padrão 3), com a contagem; null se não há prova perto ou nada sobrou. */
+export function avisoCadernoAntesDaProva(erros, diasParaProva, dias = 3) {
+  if (diasParaProva == null || diasParaProva < 0 || diasParaProva > dias) return null;
+  const n = (erros ?? []).filter((e) => situacao(e) !== 'dominado').length;
+  return n ? `Prova em ${diasParaProva === 0 ? 'poucas horas' : diasParaProva === 1 ? '1 dia' : `${diasParaProva} dias`}: revise o que sobrou no caderno (${n} ${n === 1 ? 'erro' : 'erros'}).` : null;
+}

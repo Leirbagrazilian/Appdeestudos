@@ -94,11 +94,12 @@ export function videoDe(cfg, materia, topico) {
   const b = buscasDoTopico(materia, topico).video[0];
   return b ? { url: b.url, origem: 'busca', rotulo: 'Busca automática no YouTube', auto: true } : null;
 }
-/** Outras aulas indicadas e buscas nos canais: só quando você não colou o vídeo do tópico (e sem repetir o link principal). */
+/** Só vale como aula o vídeo que você colou no tópico ou a aula indicada dos canais (Universo Narrado, Militares, Assaad). Sem isso: "sem aula dos canais". */
+export const videoDosCanais = (video) => (video && (video.origem === 'topico' || video.origem === 'aula') ? video : null);
+/** Outras aulas indicadas do tópico (sem busca nos canais e sem repetir o link principal); só quando você não colou o vídeo do tópico. */
 const buscasVideo = (cfg, video, materia, topico) => {
   if (video?.origem === 'topico') return [];
-  const aulas = aulasDe(cfg, materia, topico).map((a) => ({ site: 'youtube', rotulo: `${a.canal} · ${a.titulo}`, url: a.url, auto: false }));
-  return [...aulas, ...buscasDoTopico(materia, topico).video].filter((x) => x.url !== video?.url);
+  return aulasDe(cfg, materia, topico).map((a) => ({ site: 'youtube', rotulo: `${a.canal} · ${a.titulo}`, url: a.url, auto: false })).filter((x) => x.url !== video?.url);
 };
 /** Buscas de exercícios: só na Fase 0 e enquanto o tópico não tem link colado (as fontes são só as do curso, ou nenhuma). */
 const buscasExercicios = (zero, fontes, materia, topico) => (zero && fontes.every((f) => f.curso) ? buscasDoTopico(materia, topico).exercicios : []);
@@ -167,7 +168,7 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
     const vivo = (v) => temPaginas(v) && (virt[v.id] ?? proximaPagina(v, ctx.leitura?.[v.id])) <= +v.pagFim;
     const v = vincs.find(vivo) ?? vincs.find(temPaginas) ?? null;
     const concluidoLivro = !!v && !vivo(v) && vincs.filter(temPaginas).every((x) => !vivo(x));
-    const video = videoDe(cfg, materia, t.nome);
+    const video = videoDosCanais(videoDe(cfg, materia, t.nome));
     const usaPaginas = !!v && vivo(v);
     const matar = !!info?.matar;
     const div = divisaoBloco(cfg, b.min, { video, paginas: usaPaginas }, lim, matar);
@@ -192,7 +193,7 @@ export function tarefasDoDia(cfg, blocos, ctx = {}) {
     const cotaEsgotada = comCota.length > 0 && comCota.every((f) => f.esgotada);
     out[b.id] = {
       materia, topico: t.nome, concursos: t.concursos, min: b.min, partes: div,
-      video: video && div.video ? { ...video, min: div.video, buscas: buscasVideo(cfg, video, materia, t.nome) } : null,
+      video: video && div.video ? { ...video, min: div.video, buscas: buscasVideo(cfg, video, materia, t.nome) } : null, semAula: !video && !matar,
       paginas, exercicios, concluidoLivro,
       temLivro: recursosAtivos(cfg, materia).some((r) => r.tipo === 'livro'),
       semPaginas: !usaPaginas && !concluidoLivro,

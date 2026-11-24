@@ -1,19 +1,18 @@
 import seed from '../data/seed.json';
 import * as db from '../lib/db.js';
-import { today, addDays } from '../lib/dates.js';
+import { today, addDays, precisaVirar } from '../lib/dates.js';
 import { gerarFases } from '../lib/phases.js';
 import { agendarRevisoes, avaliar } from '../lib/spaced.js';
 import { verificar } from '../lib/notify.js';
 import { prefs, aplicarPrefs, vibrar } from '../lib/prefs.js';
 import { sino } from '../lib/audio.js';
-import { conquistas } from '../lib/conquistas.js';
 import * as foco from '../lib/foco.js';
 import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas, migrarDominio, migrarDone } from '../lib/trilha.js';
-import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
-import { faseDoDia, maxExtraZero } from '../lib/phases.js';
+import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar, marcarLegado } from '../lib/dominio.js';
+import { faseDoDia, maxExtraZero, proximaProva } from '../lib/phases.js';
 import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
@@ -23,13 +22,15 @@ import { blocosAjustados } from '../lib/planner.js';
 import { diaLivre, antesDoInicio } from '../lib/rotina.js';
 import { resumoDoDia, RESUMO_DIAS } from '../lib/avisos.js';
 import { agendarTelas, registrarPeriodico } from '../lib/notify.js';
+import { limparSemanasTreino } from '../lib/treino.js';
+import { agendarRefazer } from '../lib/provasantigas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { base: 1, dias: {}, proxima: 1 }, sono: {}, sonoNoites: {}, presenca: {}, dividas: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { base: 1, dias: {}, proxima: 1 }, sono: {}, sonoNoites: {}, presenca: {}, dividas: {}, fimDia: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
-  ...structuredClone(EXTRAS), timer: null, dia: today(), toast: null, insignia: null,
+  ...structuredClone(EXTRAS), timer: null, dia: today(), toast: null,
   ultimoBackup: null, lembreteAdiado: null, persistente: null, registroAberto: null,
 });
 export const fases = () => gerarFases(app.cfg);
@@ -54,23 +55,41 @@ export async function iniciar() {
   aplicarPrefs(pf());
   Object.assign(app, { done, reviews, errors, exams });
   chaves.forEach((k, i) => { app[k] = extras[i] ?? structuredClone(EXTRAS[k]); });
+  if (antes < 17) await migrarV17();
   if (antes < 12) await migrarEstadosAntigos(); // notas, domínio e blocos dos tópicos antigos passam para os novos (campo `antigos`)
   app.timer = timer ?? null;
   app.ultimoBackup = ultimoBackup ?? null;
   app.lembreteAdiado = lembreteAdiado ?? null;
   protegerDados();
-  // Primeira vez com insígnias: as já conquistadas entram como vistas, sem enxurrada de avisos.
-  if (!Object.keys(app.vistos.conquistas).length) { for (const c of conquistas(dadosConquistas())) if (c.ok) app.vistos.conquistas[c.id] = true; await salvarKV('vistos'); }
   verificar(app.cfg, app.reviews, app.dia);
   agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono });
   await sincronizarDividas();
   gravarResumo();
   if (app.cfg.notificacoes) registrarPeriodico();
   app.pronto = true;
-  // atualiza o "hoje" se o app ficar aberto na virada do dia
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { app.dia = today(); sincronizarDividas(); agendarResumo(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono }); } });
+  // atualiza o "hoje" se o app ficar aberto na virada do dia ou for retomado sem visibilitychange
+  const voltou = () => { virarDia(); atualizarSW(); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) voltou(); });
+  window.addEventListener('pageshow', voltou);
+  window.addEventListener('focus', voltou);
+  setInterval(virarDia, 30000);
 }
 
+/** Se o dia mudou, atualiza `app.dia` e refaz o que depende dele. Idempotente. */
+export function virarDia() {
+  if (!precisaVirar(app.dia, new Date())) return false;
+  app.dia = today();
+  verificar(app.cfg, app.reviews, app.dia);
+  sincronizarDividas(); agendarResumo(); agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono });
+  return true;
+}
+function atualizarSW() { try { navigator.serviceWorker?.getRegistration().then((r) => r?.update()).catch(() => {}); } catch {} }
+
+/** v17: domínio da regra antiga fica como legado (continua dominado) e só os km planejados de semanas atuais e futuras do plano antigo saem. */
+async function migrarV17() {
+  app.dominio = marcarLegado(app.dominio); await salvarKV('dominio');
+  app.treinoSemanas = limparSemanasTreino(app.treinoSemanas, app.dia); await salvarKV('treinoSemanas');
+}
 /** Notas (lacunas), estado do domínio e blocos feitos: o que era de tópico antigo vale também no tópico novo; o antigo não é apagado. */
 async function migrarEstadosAntigos() {
   app.lacunas = migrarLacunas(app.lacunas, app.cfg.topicos); await salvarKV('lacunas');
@@ -118,7 +137,6 @@ async function registrar(b, extra = {}) {
   agendarResumo();
   comemorar();
   avisar(`${b.titulo} concluído`, () => desmarcar(b.id), undefined, REGISTRAVEL.includes(b.cat) ? { rotulo: 'Registrar', fn: () => { app.toast = null; app.registroAberto = { id: b.id }; } } : null);
-  checarConquistas();
 }
 
 /** Marca/desmarca um bloco. Se tiver assunto, agenda revisões em 1, 7 e 30 dias. */
@@ -158,7 +176,6 @@ export async function salvarRevisao(seg, dados) {
   await salvarKV('revisoes');
   vibrar(pf(), 'ok');
   avisar('Revisão da semana salva', null, dados.foco?.trim() ? `Foco da próxima semana: ${dados.foco.trim()}` : 'Boa semana de estudo.');
-  checarConquistas();
 }
 export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
 
@@ -195,7 +212,6 @@ export async function salvarSemanaTreino(seg, dias) { app.treinoSemanas[seg] = {
 export async function marcarCumprido(dia) {
   if (app.cumpridos[dia]) return;
   app.cumpridos[dia] = true; await salvarKV('cumpridos');
-  checarConquistas();
 }
 
 // ---------- revisões ----------
@@ -210,7 +226,6 @@ export async function avaliarRevisao(r, nota) {
     for (const [k, v] of Object.entries(antes)) { app.reviews[k] = v; await db.put('reviews', k, v); }
     app.toast = null;
   }, sub);
-  checarConquistas();
 }
 export async function alternarRevisao(r) {
   if (!r.feita) return avaliarRevisao(r, 'ok');
@@ -227,7 +242,6 @@ export async function addErro({ materia, assunto, tipo, licao = '', foto = null 
   app.errors[id] = e; await db.put('errors', id, e);
   for (const r of agendarRevisoes({ origem: `erro:${id}`, assunto: e.assunto, materia, dia: app.dia })) { app.reviews[r.id] = r; await db.put('reviews', r.id, r); }
   comemorar();
-  checarConquistas();
 }
 export async function delErro(id) {
   delete app.errors[id]; await db.del('errors', id);
@@ -244,7 +258,6 @@ export async function treinarErro(id, acertou) {
   app.errors[id] = e; await db.put('errors', id, e);
   vibrar(pf(), acertou ? 'ok' : 'toque');
   if (e.status === 'dominado' && antes.status !== 'dominado') { if (pf().sons) sino(); avisar(`${e.assunto}: dominado`, null, 'Dois acertos seguidos. Esse vilão foi preso.'); }
-  checarConquistas();
   return e;
 }
 
@@ -295,7 +308,7 @@ export async function fazerBackup(modo = 'auto') {
 }
 export async function adiarLembreteBackup() { app.lembreteAdiado = app.dia; await db.put('kv', 'lembreteAdiado', app.dia); }
 
-export async function addExame(ex) { const id = novoId(); app.exams[id] = { id, ...ex }; await db.put('exams', id, { id, ...ex }); comemorar(); checarConquistas(); }
+export async function addExame(ex) { const id = novoId(); app.exams[id] = { id, ...ex }; await db.put('exams', id, { id, ...ex }); comemorar(); }
 export async function delExame(id) { delete app.exams[id]; await db.del('exams', id); }
 
 export async function setLacuna(materia, topico, nota) {
@@ -447,7 +460,8 @@ async function avaliarDominio(b, d) {
   return r.veredito;
 }
 const AVISO_DOMINIO = {
-  dominado: 'Tópico dominado. O próximo já está liberado.',
+  dominado: 'Tópico dominado: 8 em 10 no dia e de novo 3 dias depois. O próximo já está liberado.',
+  reteste: 'Passou! Falta o reteste, 3 dias depois: ele aparece como item na Hoje. Só então o tópico vira dominado.',
   repetir: 'Abaixo de 8 em 10: o próximo bloco repete este tópico com exercícios novos.',
   travado: 'Tópico travado depois de 3 tentativas. Peça ajuda (professor, colega ou outro vídeo) e destrave na Trilha.',
   parcial: 'Faça pelo menos 10 exercícios para o tópico ser avaliado (8 em 10).',
@@ -465,9 +479,8 @@ export async function registrarResultado(b, d) {
     app.done[b.id] = r; await db.put('done', b.id, r);
   }
   app.registroAberto = null;
-  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); checarConquistas(); return; }
+  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : veredito === 'reteste' ? 'Reteste agendado' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); return; }
   avisar('Resultado registrado', null, d.feitas ? `${d.acertos ?? 0} de ${d.feitas} questões${n ? ` · ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno` : ''}` : 'Páginas e tempo salvos.');
-  checarConquistas();
 }
 export const fecharRegistro = () => { app.registroAberto = null; };
 
@@ -487,19 +500,7 @@ export async function concluirFoco(b) {
   if ((r.feitas ?? 0) - (r.acertos ?? 0) > 0 && REGISTRAVEL.includes(t.chave?.replace(/\d+$/, ''))) app.registroAberto = { id: alvo.id, soErros: true };
 }
 
-// ---------- insígnias e capítulos ----------
-const dadosConquistas = () => ({ done: app.done, reviews: app.reviews, errors: app.errors, exams: app.exams, cumpridos: app.cumpridos });
-let timerInsignia;
-export async function checarConquistas() {
-  const novas = conquistas(dadosConquistas()).filter((c) => c.ok && !app.vistos.conquistas[c.id]);
-  if (!novas.length) return;
-  for (const c of novas) app.vistos.conquistas[c.id] = true;
-  await salvarKV('vistos');
-  clearTimeout(timerInsignia);
-  app.insignia = novas.length === 1 ? novas[0] : { nome: `${novas.length} condecorações novas`, desc: novas.map((c) => c.nome).join(' · ') };
-  timerInsignia = setTimeout(() => (app.insignia = null), 5000);
-}
-export const listaConquistas = () => conquistas(dadosConquistas());
+// ---------- capítulos ----------
 export async function verCapitulo(id) { app.vistos.capitulos[id] = true; await salvarKV('vistos'); }
 
 // ---------- backup ----------
@@ -510,9 +511,36 @@ export async function importar(d) {
   const antes = d.cfg.versaoSeed ?? 1;
   app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
   if (antes < 12) await migrarEstadosAntigos();
+  if (antes < 17) await migrarV17();
 }
 export async function restaurarSeed() {
   const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema, tom: app.cfg.tom,
     questoesLinks: app.cfg.questoesLinks, biblioteca: app.cfg.biblioteca, cotasGratis: app.cfg.cotasGratis };
   app.cfg = { ...structuredClone(seed), ...manter }; await salvarCfg();
+}
+
+// ---------- reteste, fim do dia e provas antigas ----------
+/** Reteste de domínio (3 dias depois da 1ª aprovação): `feitas` e `acertos` do dia. Entra no modo domínio como um registro a mais. */
+export async function registrarReteste(materia, topico, feitas, acertos) {
+  const k = chaveTopico(materia, topico), atual = app.lacunas[materia]?.[topico] ?? 0;
+  const r = avaliarTopico(app.dominio[k], atual, `${app.dia}:reteste:${k}`, { feitas, acertos, data: app.dia });
+  app.dominio[k] = r.estado; await salvarKV('dominio');
+  if (r.nota !== atual) { app.lacunas[materia] ??= {}; app.lacunas[materia][topico] = r.nota; await salvarKV('lacunas'); }
+  if (r.veredito === 'dominado') await sincronizarDividas();
+  vibrar(pf(), 'ok');
+  avisar(r.veredito === 'dominado' ? 'Dominado!' : 'Reteste registrado', null, AVISO_DOMINIO[r.veredito] ?? 'Abaixo de 8 em 10: o tópico volta ao resgate de sábado.');
+  return r.veredito;
+}
+/** Fim do dia: passos feitos, a questão difícil de amanhã e as tarefas de amanhã (por dia). */
+export async function salvarFimDia(dia, dados) {
+  app.fimDia[dia] = { ...(app.fimDia[dia] ?? {}), ...dados, passos: { ...(app.fimDia[dia]?.passos ?? {}), ...(dados.passos ?? {}) } };
+  await salvarKV('fimDia');
+}
+/** Prova antiga feita: agenda o refazer (1 semana depois e antes da prova) como revisões e guarda onde foi lento. */
+export async function registrarProvaFeita(b, nome, lento = '') {
+  const prox = proximaProva(app.cfg, app.dia);
+  const revs = agendarRefazer({ origem: `prova:${b.id}`, nome, dia: app.dia, provaData: prox?.evento?.inicio ?? null, lento });
+  for (const r of revs) { app.reviews[r.id] = r; await db.put('reviews', r.id, r); }
+  vibrar(pf(), 'ok');
+  avisar('Refazer agendado', null, `1ª vez em ${revs[0].due.split('-').reverse().join('/')} e a 2ª em ${revs[1].due.split('-').reverse().join('/')}.`);
 }

@@ -19,7 +19,7 @@ describe('início real (20/11/2026)', () => {
     const c = cfg();
     expect(seed.versaoSeed).toBeGreaterThanOrEqual(15);
     expect(c.perfil.inicioReal).toBe('2026-11-20');
-    expect(c.treinoPlano.inicio).toBe('2026-11-20'); expect(c.treinoPlano.fases[0].inicio).toBe('2026-11-20');
+    expect(c.treinoPlano.inicio).toBe('2026-11-20');
     expect(c.oracaoPlano.inicio).toBe('2026-11-20');
   });
   it('antes do início é dia livre; 20/11 não é; dia livre fixo continua', () => {
@@ -54,7 +54,7 @@ describe('início real (20/11/2026)', () => {
     const sexta = blocosDaSemana(c, fs, '2026-11-16', {})[4], proxima = blocosDaSemana(c, fs, '2026-11-23', {})[4];
     expect(sexta.reduce((s, b) => s + b.min, 0)).toBe(proxima.reduce((s, b) => s + b.min, 0));
     const t = treinoDoDia(c, '2026-11-20');
-    expect(t.km).toBe(2); expect(t.tipo).toBe('leve'); expect(t.fase.n).toBe(1);
+    expect(t.km).toBe(5); expect(t.tipo).toBe('leve');
     expect(nivelOracao(c, {}, '2026-11-20')).toBe(1);
     expect(oracoesDoDia(c, '2026-11-20').map((o) => o.id)).toEqual(expect.arrayContaining(['manha', 'terco1', 'noite']));
   });
@@ -79,8 +79,8 @@ describe('acordar amanhã', () => {
     const a = acordarAmanha(cfg(), '2026-11-19');
     expect(a).toMatchObject({ dia: '2026-11-20', acordar: '05:00', dormir: '22:00', linha: 'Amanhã (sexta): acordar às 05:00' });
   });
-  it('sexta à noite: sábado 04:30 (padrão da sexta)', () => {
-    expect(acordarAmanha(cfg(), '2026-11-20').linha).toBe('Amanhã (sábado): acordar às 04:30');
+  it('sexta à noite: sábado 05:00 (acordar 5h todos os dias)', () => {
+    expect(acordarAmanha(cfg(), '2026-11-20').linha).toBe('Amanhã (sábado): acordar às 05:00');
   });
   it('texto por tom', () => {
     expect(textoAcordar('sargento', '05:00', '22:00')).toEqual({ titulo: 'Sargento', corpo: 'Amanhã: de pé às 05:00. Cama às 22:00. Sem desculpa.' });

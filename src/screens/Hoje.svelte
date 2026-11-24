@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition';
-  import { app, fases, prazos, ajustes, registrarPresenca, fazerBackup, adiarLembreteBackup, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, verCapitulo } from '../stores/app.svelte.js';
+  import { app, fases, prazos, ajustes, registrarPresenca, fazerBackup, adiarLembreteBackup, alternarBloco, alternarRevisao, avaliarRevisao, adiar, diaDificil, marcarCumprido, iniciarFoco, salvarCfg, registrarReteste } from '../stores/app.svelte.js';
   import { blocosDaSemana } from '../lib/planner.js';
   import { faseDoDia, semanaDaFase, totalSemanas, proximaProva, revisaoLeve } from '../lib/phases.js';
   import { revisoesDoDia } from '../lib/spaced.js';
@@ -23,11 +23,14 @@
   import { semanaZero } from '../lib/trilha.js';
   import Check from '../components/Check.svelte';
   import Icon from '../components/Icon.svelte';
-  import Farol from '../components/Farol.svelte';
-  import Esquadrilha from '../components/Esquadrilha.svelte';
-  import Emblema from '../components/Emblema.svelte';
+  import BlocoAtual from '../components/BlocoAtual.svelte';
+  import BlocoEspecial from '../components/BlocoEspecial.svelte';
+  import FimDia from '../components/FimDia.svelte';
   import { fraseDoDia } from '../lib/frases.js';
-  import { placar, textoSaldo } from '../lib/avisos.js';
+  import { blocoAtual, tituloTarefa } from '../lib/bloco.js';
+  import { horaFimDia, mostrarFimDia, questaoDeOntem } from '../lib/fimdia.js';
+  import { retestesDoDia, retestesAgendados } from '../lib/dominio.js';
+  import { avisoCadernoAntesDaProva } from '../lib/erros.js';
   import Sono from '../components/Sono.svelte';
   import { horariosNoite, estadoDoDia, alertaSono, noiteDe, acordarAmanha } from '../lib/sono.js';
   import { presencaPorAula, aulasDoDia, antesDoInicio } from '../lib/rotina.js';
@@ -39,7 +42,6 @@
   let hora = $state(new Date().getHours()), agoraMin = $state(new Date().getHours() * 60 + new Date().getMinutes());
   $effect(() => { const i = setInterval(() => { const d = new Date(); hora = d.getHours(); agoraMin = hora * 60 + d.getMinutes(); }, 60000); return () => clearInterval(i); });
 
-  const EMB = { en: 'en', efomm: 'efomm', esa: 'esa', ita: 'ita', ime: 'ime' }; // emblema do concurso na contagem regressiva
   const fs = $derived(fases());
   const fase = $derived(faseDoDia(fs, app.dia));
   const plano = $derived(prazos());
@@ -61,7 +63,7 @@
   const diag = $derived(blocos.some((b) => b.diagnostico));
   // sequência única: dias seguidos com estudo E treino feitos
   const seq = $derived(sequencia(app.cfg, { cumpridos: app.cumpridos, treinos: app.treinos, oracoes: app.oracoes }, app.dia));
-  const avisosTreino = $derived(alertasTreino(app.cfg, app.dia));
+  const avisosTreino = $derived(alertasTreino(app.cfg, app.dia, app.treinos));
   // modo domínio (Fase 0): tópicos travados, checkpoint do mês e o portão da última semana
   const travados = $derived(listaTravados(app.dominio, app.lacunas));
   const cpPendente = $derived(!diag && checkpointPendente(app.cfg, app.checkpoints, app.dia));
@@ -92,32 +94,28 @@
     return { total, acesas };
   });
 
-  // Campanha: quando uma fase termina, mostra o resumo dela uma vez.
-  const capitulo = $derived.by(() => {
-    const f = fs.find((x) => x.fim < app.dia && x.inicio <= app.dia && !app.vistos.capitulos[x.id]);
-    if (!f || !Object.keys(app.done).length) return null;
-    const dentro = (d) => d >= f.inicio && d <= f.fim;
-    const regs = Object.entries(app.done).filter(([k, v]) => dentro(v.dia ?? k.slice(0, 10))).map(([, v]) => v);
-    return { f, blocos: regs.length, horas: Math.round(regs.reduce((s, v) => s + v.min, 0) / 60),
-      questoes: regs.reduce((s, v) => s + (v.questoes?.feitas ?? 0), 0),
-      erros: Object.values(app.errors).filter((e) => dentro(e.dia)).length,
-      simulados: Object.values(app.exams).filter((e) => dentro(e.data)).length };
-  });
-
   // Lembrete de backup: 7 dias depois do último (ou nunca feito depois de 3 dias de uso).
   const diasDeUso = $derived(new Set(Object.entries(app.done).map(([k, v]) => v.dia ?? k.slice(0, 10))).size);
   const lembrarBackup = $derived(app.lembreteAdiado !== app.dia && precisaBackup(app.ultimoBackup, app.dia, diasDeUso));
   const focoSemana = $derived(focoDaSemana(app.revisoes, app.dia));
-  const noite = $derived(hora >= 18 || hora < 6);
   const tarde = $derived(hora >= 22 || hora < 4);
   const mostrarCarta = $derived(verCarta || (app.cfg.carta && (dificil || (hora >= 19 && pct < 0.3))));
   // Frase por contexto (noite, dia cumprido, dia mínimo, bloco feito, prova próxima, domingo, início), estável ao longo do dia.
   const feitos = $derived(blocos.filter((b) => app.done[b.id]).length);
   const frase = $derived(fraseDoDia(app.cfg.frases, { hora, pct, feitos, dificil, diaSemana: new Date(app.dia + 'T12:00').getDay(), diasProva: prox?.dias ?? null }, app.dia, app.cfg.tom ?? 'sargento') || 'Disciplina hoje, farda amanhã.');
 
-  // Placar contra o concorrente (modo Sargento): ele cumpre 100% da meta todo dia; saldo = feito - meta.
-  const sargento = $derived(app.cfg.tom !== 'padrao');
-  const pl = $derived(placar(semana.map((plan, i) => ({ dia: addDays(startOfWeek(app.dia), i), blocos: plan, feito: plan.reduce((s, b) => s + (app.done[b.id] ? b.min : 0), 0) })), app.dia, agoraMin));
+  const wdHoje = $derived(new Date(app.dia + 'T12:00').getDay());
+  // bloco atual (pelo horário), questão difícil de ontem e retestes de domínio
+  const ordemEstudo = $derived(blocos.filter((b) => b.ini && ['mat', 'fis', 'qui', 'por', 'ing', 'hg'].includes(b.cat)).sort((x, y) => x.ini.localeCompare(y.ini)));
+  const primeiroId = $derived(ordemEstudo[0]?.id);
+  const questaoOntem = $derived(questaoDeOntem(app.fimDia, app.dia, addDays(app.dia, -1)));
+  const tarefasOntem = $derived((app.fimDia[addDays(app.dia, -1)]?.tarefas ?? '').trim());
+  const atual = $derived(!diag && !dificil ? blocoAtual(blocos, (b) => !!app.done[b.id], agoraMin) : null);
+  const ctxPasso = (b) => ({ primeiroDoDia: b?.id === primeiroId, questaoDificil: questaoOntem });
+  const retestes = $derived(retestesDoDia(app.dominio, app.dia, app.lacunas));
+  const retestesFuturos = $derived(retestesAgendados(app.dominio, app.dia, app.lacunas));
+  let resRet = $state({});
+  const avisoCaderno = $derived(avisoCadernoAntesDaProva(Object.values(app.errors), prox?.dias ?? null));
 
   function comecar(b) {
     if (app.timer && app.timer.id !== b.id && !confirm(`Já há um cronômetro de ${app.timer.titulo}. Trocar por ${b.titulo}?`)) return;
@@ -139,7 +137,8 @@
     ...blocos.map((b) => ({ k: 'e', id: 'e' + b.id, b, m: matarDepois(b) ? DEPOIS_ALMOCO : emMin(b.ini), feito: !!app.done[b.id], depois: matarDepois(b) })),
     { k: 's', id: 'sono-manha', tipo: 'manha', m: emMin(noiteAnterior.acordar), feito: !!app.sono[app.dia] },
     { k: 's', id: 'sono-noite', tipo: 'noite', m: emMin(noiteHoje.terco), feito: false },
-    ...(curta ? [{ k: 's', id: 'sono-cochilo', tipo: 'cochilo', m: 13 * 60 + 20, feito: false }] : []),
+    { k: 's', id: 'sono-cochilo', tipo: 'cochilo', m: 12 * 60 + 40, feito: false },
+    ...(mostrarFimDia(wdHoje, agoraMin) ? [{ k: 'f', id: 'fim-dia', m: emMin(horaFimDia(wdHoje)), feito: false }] : []),
     ...(trn ? [{ k: 't', id: 't', m: emMin(trn.hora), feito: treinoFeito(app.treinos[app.dia] ?? {}) }] : []),
     ...orac.map((o) => ({ k: 'o', id: 'o' + o.id, o, m: emMin(o.hora), feito: !!app.oracoes[app.dia]?.[o.id] })),
   ]);
@@ -164,7 +163,6 @@
   </section>
 {:else}
 <header>
-  <div class="mini-farol" aria-hidden="true"><Farol {pct} {noite} /></div>{#if pct >= 1}<Esquadrilha festa />{/if}
   <p class="data">{diaNome(app.dia)} · {fmtCurta(app.dia)}</p>
   <h1>{pct >= 1 ? 'Missão cumprida.' : `Avante, ${app.cfg.perfil.nome}.`}</h1>
   <p class="frase">{frase}</p>
@@ -185,40 +183,23 @@
   <p class="luzes"><span class="ponto" aria-hidden="true"></span>Base da semana: <strong>{base.acesas}</strong> de {base.total} luzes acesas</p>
 </section>
 
-{#if sargento && pl.dia.meta}
-  <section class="card placar" aria-label="Placar contra o concorrente">
-    <p class="data">Placar · você × concorrente</p>
-    <div class="pl">
-      <div><strong class:atras={pl.dia.saldo < 0}>{textoSaldo(pl.dia.saldo)}</strong><span>no dia · você {fmtMin(pl.dia.feito)}, ele {fmtMin(pl.dia.devido)}</span></div>
-      <div><strong class:atras={pl.semana.saldo < 0}>{textoSaldo(pl.semana.saldo)}</strong><span>na semana · você {fmtMin(pl.semana.feito)}, ele {fmtMin(pl.semana.devido)}</span></div>
-    </div>
-    <p class="sub">O concorrente cumpre 100% do plano, no horário. Meta do dia {fmtMin(pl.dia.meta)}.</p>
-  </section>
+{#if atual}
+  <BlocoAtual info={atual} tarefa={tarefas[atual.bloco.id]} ctx={ctxPasso(atual.bloco)} faseId={fase.id} onFoco={() => comecar(atual.bloco)} />
 {/if}
-
-{#if capitulo}
-  <section class="card cap entra" aria-label="Campanha concluída">
-    <p class="data">Campanha concluída</p>
-    <h2 class="capt">Fase {capitulo.f.numero} · {capitulo.f.nome}</h2>
-    <ul class="nums">
-      <li><strong>{capitulo.horas}h</strong>de estudo</li><li><strong>{capitulo.blocos}</strong>blocos</li>
-      <li><strong>{capitulo.questoes}</strong>questões</li><li><strong>{capitulo.erros}</strong>erros registrados</li>
-    </ul>
-    <p class="sub">Próxima campanha: {fase.nome}. {fase.foco}</p>
-    <button class="pri" onclick={() => verCapitulo(capitulo.f.id)}>Seguir para a próxima campanha</button>
-  </section>
-{/if}
+{#if questaoOntem && !atual}<p class="nota" role="status"><Icon nome="bulb" />Questão difícil de ontem, para o 1º bloco: {questaoOntem}</p>{/if}
+{#if tarefasOntem}<details class="nota"><summary><Icon nome="bulb" />Tarefas que você anotou ontem</summary><p class="pre">{tarefasOntem}</p></details>{/if}
 
 {#if prox}
   <a class="prova" href="#/calendario" style="--c:{prox.concurso.cor}">
     <span class="num">{prox.dias}</span>
     <span class="lbl"><strong>dias para {prox.concurso.nome}{prox.evento.nome ? ` · ${prox.evento.nome}` : ''}</strong>
       <span>{fmtBR(prox.evento.inicio)} · {prox.evento.status}</span></span>
-    <span class="emb" aria-hidden="true"><Emblema nome={EMB[prox.concurso.id] ?? 'estrela'} size={40} /></span>
   </a>
 {/if}
 
 {#each avisosTreino as a}<p class="nota" role="status">{a}</p>{/each}
+{#if avisoCaderno}<a class="nota alerta" href="#/erros"><Icon nome="clock" />{avisoCaderno}</a>{/if}
+{#if plano.aviso}<a class="nota alerta" href="#/trilha"><Icon nome="clock" />{plano.aviso.texto}</a>{/if}
 
 {#if focoSemana}
   <p class="foco-sem"><span class="data">Foco da semana</span>{focoSemana.foco}</p>
@@ -277,7 +258,7 @@
       {@const p = presenca.find((x) => x.nome === a.nome)}
       <li class="aula">
         <span class="txt"><span class="tit">{a.nome} · {a.inicio}–{a.fim}</span>
-          <span class="sub">{a.vou ? 'Você marcou "vou"' : 'Você marcou "não vou": a janela está liberada para estudo'}{p?.total ? ` · presença ${Math.round(p.pct * 100)}% (${p.presentes} de ${p.total})` : ''}</span></span>
+          <span class="sub">{a.vou ? 'Você marcou "vou"' : 'Você marcou "não vou"'}{p?.total ? ` · presença ${Math.round(p.pct * 100)}% (${p.presentes} de ${p.total})` : ''}</span></span>
         <span class="pres" role="group" aria-label="Presença em {a.nome}">
           <button class:on={app.presenca[a.nome]?.[app.dia] === 'p'} aria-pressed={app.presenca[a.nome]?.[app.dia] === 'p'} onclick={() => registrarPresenca(a.nome, app.dia, 'p')}>Fui</button>
           <button class:on={app.presenca[a.nome]?.[app.dia] === 'f'} aria-pressed={app.presenca[a.nome]?.[app.dia] === 'f'} onclick={() => registrarPresenca(a.nome, app.dia, 'f')}>Faltei</button>
@@ -295,6 +276,8 @@
         <Treino dia={app.dia} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} {curta} />
       {:else if it.k === 's'}
         <Sono dia={app.dia} tipo={it.tipo} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
+      {:else if it.k === 'f'}
+        <FimDia dia={app.dia} faseId={fase.id} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
       {:else if it.k === 'o'}
         <Oracao dia={app.dia} it={it.o} aberto={aberto === it.id} onAbrir={() => abrir(it.id)} />
       {:else}
@@ -322,7 +305,9 @@
         </button>
       {/if}
     {/snippet}
-    <Tarefa {tarefa} materia={b.materia} />
+    {#if tarefa}<p class="tarefa-txt"><strong>{tituloTarefa(b, tarefa)}</strong></p>{/if}
+    <Tarefa {tarefa} materia={b.materia} ctx={ctxPasso(b)} faseId={fase.id} />
+    <BlocoEspecial {b} nomeProva={b.titulo.replace(/^Prova antiga: /, '')} />
     {#if b.cat === 'plan'}
       <a class="pri" href="#/revisao">Fazer a revisão da semana (3 perguntas)</a>
     {/if}
@@ -376,6 +361,26 @@
   </ul>
 {/if}
 
+{#if retestes.length || retestesFuturos.length}
+  <h2 class="gr">Reteste de domínio<span class="n">{retestes.length} {retestes.length === 1 ? 'pendente' : 'pendentes'}</span></h2>
+  <ul class="lista">
+    {#each retestes as x (x.materia + x.topico)}
+      {@const k = x.materia + '|' + x.topico}
+      <li class="ret">
+        <span class="txt"><span class="tit">Reteste: {x.topico}</span><span class="sub">{x.materia} · passou em {fmtBR(x.desde)}. 10 questões, sem consultar: 8 acertos viram dominado.</span></span>
+        <span class="rf">
+          <label>Feitas<input type="number" inputmode="numeric" min="1" max="50" value={resRet[k]?.feitas ?? 10} onchange={(e) => (resRet[k] = { ...resRet[k], feitas: +e.currentTarget.value })} /></label>
+          <label>Acertos<input type="number" inputmode="numeric" min="0" max="50" value={resRet[k]?.acertos ?? ''} onchange={(e) => (resRet[k] = { ...resRet[k], acertos: +e.currentTarget.value })} /></label>
+          <button type="button" class="pri" disabled={resRet[k]?.acertos == null} onclick={() => registrarReteste(x.materia, x.topico, resRet[k]?.feitas ?? 10, resRet[k]?.acertos ?? 0)}>Registrar</button>
+        </span>
+      </li>
+    {/each}
+    {#each retestesFuturos as x (x.materia + x.topico)}
+      <li class="ret"><span class="txt"><span class="tit">{x.topico}</span><span class="sub">Reteste em {diaCurto(x.em)} (3 dias depois de passar). Só então vira dominado.</span></span></li>
+    {/each}
+  </ul>
+{/if}
+
 {#if bRegistro}<Registro b={bRegistro} tarefa={tarefas[bRegistro.id] ?? null} soErros={!!app.registroAberto?.soErros} />{/if}
 
 <p class="lembrete">
@@ -393,7 +398,6 @@
   .pres button.on { background: var(--ac); border-color: var(--ac); color: var(--ac-tx); }
   .sedes { display: block; font-size: .75rem; font-style: italic; color: var(--tx2); }
   header { padding: 20px 4px 4px; position: relative; }
-  .mini-farol { position: absolute; right: 0; top: 0; width: 62px; height: 48px; transform: scale(.5); transform-origin: right top; opacity: .7; pointer-events: none; }
   .data { color: var(--tx2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .14em; font-weight: 600; }
   h1 { margin-top: 4px; font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em; max-width: calc(100% - 60px); }
   .frase { margin-top: 8px; color: var(--tx2); font-size: .95rem; line-height: 1.45; max-width: 36ch; text-wrap: pretty; }
@@ -466,13 +470,15 @@
   .antes .acordar { font-size: 1.1rem; }
   .antes .acordar strong { color: var(--ac); font-variant-numeric: tabular-nums; }
   .antes .sub { color: var(--tx2); font-size: .9rem; margin: 0; }
-  .placar { margin-top: 16px; padding: 14px 16px; }
-  .pl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
-  .pl div { display: grid; gap: 2px; }
-  .pl strong { font-size: 1.25rem; color: var(--ac); }
-  .pl strong.atras { color: var(--al); }
-  .pl span { font-size: .8125rem; color: var(--tx2); }
-  .placar .sub { margin: 8px 0 0; font-size: .8125rem; color: var(--tx2); }
   .foco-sem { margin-top: 12px; padding: 4px 0 4px 14px; border-left: 2px solid var(--ac); display: grid; gap: 2px; font-weight: 600; }
   .lembrete { display: flex; gap: 8px; justify-content: center; align-items: center; color: var(--tx2); font-size: .85rem; margin: 24px 0 0; text-align: center; }
+  .tarefa-txt { margin: 0 0 8px; font-size: 1rem; }
+  .pre { white-space: pre-wrap; margin: 6px 0 0; }
+  .ret { display: grid; gap: 8px; padding: 10px 4px; border-top: 1px solid var(--line); }
+  .ret .txt { display: grid; gap: 2px; } .ret .tit { font-weight: 600; } .ret .sub { color: var(--tx2); font-size: .85rem; }
+  .rf { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: end; }
+  .rf label { display: grid; gap: 4px; font-size: .85rem; color: var(--tx2); }
+  .rf input { width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); }
+  .rf .pri { min-height: 44px; padding: 0 16px; border-radius: 12px; font-weight: 700; background: var(--ac); color: var(--ac-tx); }
+  .rf .pri:disabled { opacity: .5; }
 </style>

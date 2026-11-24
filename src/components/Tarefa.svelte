@@ -3,7 +3,10 @@
   import { limitesCota, linksDoBloco } from '../lib/tarefas.js';
   import { fichaDoTopico } from '../lib/erros.js';
   import { fmtBR, diaNome } from '../lib/dates.js';
-  let { tarefa, materia } = $props();
+  import { passosDoBloco, DICAS_QUESTOES } from '../lib/bloco.js';
+  import PedidoClaude from './PedidoClaude.svelte';
+  let { tarefa, materia, ctx = {}, faseId } = $props();
+  const pre = $derived(passosDoBloco(tarefa, ctx).find((p) => p.id === 'pretest'));
   const diaCurto = (d) => `${diaNome(d).slice(0, 3)} ${fmtBR(d).slice(0, 5)}`;
   const lim = $derived(limitesCota(app.cfg));
   // ficha de revisão rápida: seus últimos erros neste tópico, para reler antes de começar
@@ -41,9 +44,10 @@
     </details>
   {/if}
   <ol class="passos" aria-label="Tarefa deste bloco">
+    {#if pre}<li><span class="tx"><strong>{pre.titulo}</strong>{#if pre.detalhe}<span class="sub">{pre.detalhe}</span>{/if}</span></li>{/if}
     {#if tarefa.video}<li><span class="tx"><strong>Vídeo · ~{tarefa.video.min} min</strong>{#if tarefa.video.rotulo}<span class="sub">{tarefa.video.rotulo}</span>{/if}
-      {#each tarefa.video.buscas ?? [] as f}<a class="fonte" href={f.url} target="_blank" rel="noopener">{f.rotulo} ↗{#if f.auto}<small class="auto">busca automática</small>{/if}</a>{/each}
-    </span><a class="abrir" href={tarefa.video.url} target="_blank" rel="noopener">Abrir ↗</a></li>{/if}
+      {#each tarefa.video.buscas ?? [] as f}<a class="fonte" href={f.url} target="_blank" rel="noopener">{f.rotulo} ↗</a>{/each}
+    </span><a class="abrir" href={tarefa.video.url} target="_blank" rel="noopener">Abrir ↗</a></li>{:else if tarefa.semAula}<li><span class="tx"><strong>Sem aula dos canais</strong><span class="sub">Use só o livro neste tópico.</span></span></li>{/if}
     {#if tarefa.paginas}
       <li><span class="tx"><strong>{tarefa.paginas.livro}</strong><span class="sub">págs {tarefa.paginas.de}–{tarefa.paginas.ate} · ~{tarefa.paginas.min} min{tarefa.paginas.restante ? ` · faltam ${tarefa.paginas.restante} págs do tópico` : ''}</span></span></li>
       {#if tarefa.exercicios}<li><span class="tx"><strong>Exercícios nº {tarefa.exercicios.de}–{tarefa.exercicios.ate}</strong><span class="sub">sem consultar</span></span></li>{/if}
@@ -51,6 +55,7 @@
     {:else if tarefa.semPaginas && tarefa.temLivro}<li><span class="tx"><strong>Sem páginas cadastradas</strong><span class="sub">O bloco usa vídeo e questões.</span></span><a class="abrir" href="#/livros">Cadastrar páginas</a></li>{/if}
     <li><span class="tx"><strong>{tarefa.zero ? 'Exercícios' : 'Questões'} · {tarefa.questoes.n} do tópico</strong>
       <span class="sub">~{tarefa.questoes.min} min{tarefa.zero ? ' · sem consultar, com correção na hora' : ''}</span>
+      <span class="sub">{DICAS_QUESTOES.join(' ')}</span>
       {#if tarefa.zero || tarefa.matar}<span class="sub meta">Meta: 8 de 10 para liberar o próximo tópico{tarefa.repeticao ? `. Repetição ${tarefa.tentativa} de ${tarefa.maxTentativas}: exercícios novos, não os mesmos` : ''}.</span>{/if}
       {#if tarefa.questoes.semLinks && !tarefa.questoes.buscas?.length}<span class="sub">Cole os links das listas no tópico, na <a class="lk" href="#/trilha">Trilha</a>.</span>{/if}
       {#each tarefa.questoes.fontes as f}
@@ -58,8 +63,10 @@
       {/each}
       {#each tarefa.questoes.buscas ?? [] as f}<a class="fonte" href={f.url} target="_blank" rel="noopener">{f.rotulo} ↗<small class="auto">busca automática</small></a>{/each}
       {#if tarefa.questoes.buscas?.length}<span class="sub">Achou uma lista boa? Cole o link no tópico, na <a class="lk" href="#/trilha">Trilha</a>, e ela passa a abrir direto.</span>{/if}
+      <PedidoClaude topico={tarefa.topico} n={10} {faseId} />
       {#if tarefa.questoes.cotaEsgotada && !tarefa.zero}<span class="aviso">A cota grátis de hoje acabou ({lim.qconcursos} QConcursos + {lim.estuda} Estuda.com). {tarefa.questoes.alternativa === 'pdf' ? 'Use a prova em PDF.' : 'Faça os exercícios do livro.'}</span>{/if}
     </span></li>
+    <li><span class="tx"><strong>Registrar</strong><span class="sub">Acertos no app; erros no caderno de erros, com a causa.</span></span></li>
   </ol>
   {#if todos.length > 1}<button type="button" class="tudo" onclick={abrirTudo}>Abrir tudo do bloco ({todos.length} links) ↗</button>{/if}
 {:else if tarefa?.semTopico}<p class="sub">Todos os tópicos de {materia} estão dominados na Trilha. Revise com questões e provas antigas.</p>{/if}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { avaliarTopico, situacao, travados, destravar, resumo } from '../src/lib/dominio.js';
+import { avaliarTopico, situacao, travados, destravar, resumo, retestesDoDia, retestesAgendados, aguardaReteste } from '../src/lib/dominio.js';
 import { proximoTopico, semanaZero } from '../src/lib/trilha.js';
 
 const cfgMini = () => ({
@@ -13,9 +13,33 @@ const cfgMini = () => ({
 
 describe('modo domínio (Fase 0)', () => {
   const reg = (estado, nota, id, feitas, acertos, extra = {}) => avaliarTopico(estado, nota, id, { feitas, acertos, ...extra });
-  it('8 de 10 domina o tópico', () => {
-    const r = reg(null, 0, 'b1', 10, 8);
-    expect(r.nota).toBe(3); expect(r.veredito).toBe('dominado'); expect(situacao(r.nota, r.estado)).toBe('dominado');
+  it('8 de 10 no dia só agenda o reteste; domina depois da 2ª aprovação, 3 dias depois', () => {
+    const r = reg(null, 0, 'b1', 10, 8, { data: '2027-01-11' });
+    expect(r.nota).toBe(2); expect(r.veredito).toBe('reteste'); expect(situacao(r.nota, r.estado)).toBe('reteste');
+    expect(resumo(r.estado)).toMatchObject({ dominado: false, primeira: '2027-01-11', retesteEm: '2027-01-14' });
+    const cedo = reg(r.estado, r.nota, 'b2', 10, 9, { data: '2027-01-13' }); // só 2 dias depois: não vale
+    expect(cedo.veredito).toBe('reteste'); expect(cedo.nota).toBe(2);
+    const ok = reg(r.estado, r.nota, 'b3', 10, 8, { data: '2027-01-14' });
+    expect(ok.nota).toBe(3); expect(ok.veredito).toBe('dominado'); expect(situacao(ok.nota, ok.estado)).toBe('dominado');
+  });
+  it('reprovar no reteste zera a 1ª aprovação e conta como falha', () => {
+    let r = reg(null, 0, 'b1', 10, 9, { data: '2027-01-11' });
+    r = reg(r.estado, r.nota, 'b2', 10, 6, { data: '2027-01-14' });
+    expect(r.veredito).toBe('repetir'); expect(resumo(r.estado)).toMatchObject({ falhas: 1, retesteEm: null, dominado: false });
+    r = reg(r.estado, r.nota, 'b3', 10, 8, { data: '2027-01-15' }); // nova 1ª aprovação, não completa o par com a antiga
+    expect(r.veredito).toBe('reteste'); expect(resumo(r.estado).retesteEm).toBe('2027-01-18');
+  });
+  it('o reteste aparece como item no dia certo e some depois de dominado', () => {
+    const r = reg(null, 0, 'b1', 10, 8, { data: '2027-01-11' }), dom = { 'Matemática|A': r.estado };
+    expect(retestesDoDia(dom, '2027-01-13')).toEqual([]);
+    expect(retestesAgendados(dom, '2027-01-13')).toEqual([{ materia: 'Matemática', topico: 'A', desde: '2027-01-11', em: '2027-01-14' }]);
+    expect(retestesDoDia(dom, '2027-01-14')).toHaveLength(1); expect(retestesDoDia(dom, '2027-01-20')).toHaveLength(1); // fica até ser feito
+    const ok = reg(r.estado, 2, 'b2', 10, 8, { data: '2027-01-14' });
+    expect(retestesDoDia({ 'Matemática|A': ok.estado }, '2027-01-20')).toEqual([]); expect(aguardaReteste(ok.estado)).toBe(false);
+  });
+  it('o plano não repete o tópico que espera o reteste', () => {
+    const r = reg(null, 0, 'b1', 10, 8, { data: '2027-01-11' });
+    expect(proximoTopico(cfgMini(), { Matemática: { A: 2 } }, 'Matemática', 1, new Set(), { faseZero: true, dominio: { 'Matemática|A': r.estado } }).nome).toBe('B');
   });
   it('7 de 10 repete; a terceira tentativa ruim trava', () => {
     let nota = 0, estado = null;
@@ -31,8 +55,8 @@ describe('modo domínio (Fase 0)', () => {
     let r = reg(null, 0, 'b1', 10, 6);
     r = reg(r.estado, r.nota, 'b1', 10, 6); r = reg(r.estado, r.nota, 'b1', 10, 7); r = reg(r.estado, r.nota, 'b1', 10, 7);
     expect(resumo(r.estado).falhas).toBe(1); expect(r.veredito).toBe('repetir');
-    r = reg(r.estado, r.nota, 'b1', 10, 9); // corrigi: na verdade acertei 9
-    expect(r.veredito).toBe('dominado');
+    r = reg(r.estado, r.nota, 'b1', 10, 9, { data: '2027-01-11' }); // corrigi: na verdade acertei 9
+    expect(r.veredito).toBe('reteste');
   });
   it('menos de 50% de acerto marca "vi pouco"; entre 50 e 79% marca "quase lá"', () => {
     expect(reg(null, 0, 'b', 10, 3).nota).toBe(1);
@@ -49,7 +73,7 @@ describe('modo domínio (Fase 0)', () => {
     expect(r.nota).toBe(3); expect(r.veredito).toBe('dominado'); expect(situacao(r.nota, r.estado)).toBe('dominado');
   });
   it('a nota só sobe: reforço ruim num tópico dominado não tira o 3', () => {
-    const r = reg({ regs: { b0: { feitas: 10, acertos: 9 } } }, 3, 'b9', 10, 4);
+    const r = reg({ regs: { b0: { feitas: 10, acertos: 9, data: '2027-01-01' }, b1: { feitas: 10, acertos: 9, data: '2027-01-05' } } }, 3, 'b9', 10, 4);
     expect(r.nota).toBe(3); expect(r.veredito).toBe('dominado');
   });
   it('destravar: as falhas até agora deixam de contar e dá mais 3 tentativas', () => {
@@ -102,9 +126,10 @@ describe('próximo tópico na Fase 0', () => {
 
 describe('revisão: correções e travados', () => {
   it('corrigir para baixo o bloco que deu o domínio devolve a nota de antes', () => {
-    let r = avaliarTopico(null, 1, 'b1', { feitas: 10, acertos: 9 });
+    let r = avaliarTopico(null, 1, 'b1', { feitas: 10, acertos: 9, data: '2027-01-01' });
+    r = avaliarTopico(r.estado, r.nota, 'b2', { feitas: 10, acertos: 9, data: '2027-01-05' });
     expect(r.nota).toBe(3);
-    r = avaliarTopico(r.estado, r.nota, 'b1', { feitas: 10, acertos: 5 });
+    r = avaliarTopico(r.estado, r.nota, 'b2', { feitas: 10, acertos: 5, data: '2027-01-05' });
     expect(r.nota).toBe(2); expect(r.veredito).toBe('repetir');
   });
   it('destravar guarda quais falhas foram ignoradas: corrigir uma delas não afeta a contagem nova', () => {
@@ -121,5 +146,18 @@ describe('revisão: correções e travados', () => {
     const lac = { Matemática: { C: 3 } };
     const r = proximoTopico(c, lac, 'Matemática', 1, new Set(['B']), { faseZero: true, dominio: { 'Matemática|A': t3 } });
     expect(r.nome).toBe('B');
+  });
+});
+
+describe('regra antiga (1 aprovação) vira legado e nunca gera reteste', () => {
+  const est = { regs: { b: { feitas: 10, acertos: 9, data: '2026-10-01' } } };
+  it('9/10 em 01/10 com nota 3: dominado, sem reteste nem aguarda', async () => {
+    const { retestesDoDia, retestesAgendados, aguardaReteste, marcarLegado, resumo } = await import('../src/lib/dominio.js');
+    const dom = { 'Matemática|A': est }, lac = { Matemática: { A: 3 } };
+    expect(retestesDoDia(dom, '2026-12-01', lac)).toEqual([]); expect(retestesAgendados(dom, '2026-10-02', lac)).toEqual([]);
+    expect(aguardaReteste(est, 3)).toBe(false); expect(aguardaReteste(est, 2)).toBe(true);
+    const leg = marcarLegado(dom);
+    expect(leg['Matemática|A'].legado).toBe(true); expect(resumo(leg['Matemática|A'])).toMatchObject({ dominado: true, retesteEm: null });
+    expect(marcarLegado({ x: { regs: { b: { feitas: 10, acertos: 5, data: '2026-10-01' } } } }).x.legado).toBeUndefined(); // reprovado: não é legado
   });
 });

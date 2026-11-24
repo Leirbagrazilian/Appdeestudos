@@ -10,7 +10,7 @@ import { addDays } from '../src/lib/dates.js';
 import { legado } from './_legado.js';
 const cfg = () => legado(structuredClone(seed));
 const fases = gerarFases(cfg());
-const DIA = '2026-11-18'; // quarta-feira da semana 1 da Fase 0 (tem Matemática e Física)
+const DIA = '2026-11-24'; // terça-feira (tem Matemática, Física e Química)
 const urlOk = (u) => /^https:\/\/\S+$/.test(u) && !!new URL(u).hostname.includes('.');
 
 describe('integridade do seed: links e ids', () => {
@@ -100,8 +100,9 @@ describe('busca automática por tópico', () => {
       expect(t.questoes.buscas).toEqual(buscasDoTopico(m, t.topico).exercicios);
       const aulas = aulasDe(c, m, t.topico);
       if (aulas.length) expect(t.video).toMatchObject({ url: aulas[0].url, origem: 'aula' });
-      expect(t.video.buscas.filter((x) => x.auto)).toEqual(buscasDoTopico(m, t.topico).video.filter((x) => x.url !== t.video.url));
-      expect(t.video.buscas.filter((x) => !x.auto).map((x) => x.url)).toEqual(aulas.slice(1).map((a) => a.url).filter((u) => u !== t.video.url));
+      if (aulas.length) expect(t.video.buscas.map((x) => x.url)).toEqual(aulas.slice(1).map((a) => a.url).filter((u) => u !== t.video.url));
+      else { expect(t.video).toBeNull(); expect(t.semAula).toBe(true); } // sem aula dos canais: só o livro
+      expect(t.video?.buscas?.some((x) => x.auto) ?? false).toBe(false); // nada de busca nos canais
     }
   });
   it('quando você cola o link do tópico, a busca automática daquele passo some', () => {
@@ -115,10 +116,11 @@ describe('busca automática por tópico', () => {
     const c = cfg(), bls = blocosAjustados(c, fases, DIA, {});
     const t = tarefasDoDia(c, bls, { lacunas: {}, faseId: 'base' })[bls.find((x) => x.cat === 'mat').id];
     expect(t.questoes.buscas).toEqual([]);
-    expect(t.video.buscas.length).toBeGreaterThan(0);
+    expect(t.video === null || t.video.buscas.every((x) => !x.auto)).toBe(true);
   });
   it('matéria sem vídeo cadastrado cai na busca do YouTube; outras matérias continuam sem vídeo', () => {
     const c = cfg(); c.biblioteca.recursos = c.biblioteca.recursos.filter((r) => r.tipo === 'livro'); c.links = {};
+    const gases = c.topicos['Química'].find((x) => x.nome === 'Gases'); if (gases) delete gases.aulas; // tópico sem aula indicada
     expect(videoDe(c, 'Química', 'Gases')).toMatchObject({ origem: 'busca', auto: true, url: buscasDoTopico('Química', 'Gases').video[0].url });
     expect(videoDe(c, 'Hist/Geo', 'Brasil Colônia')).toBe(null);
     expect(videoDe(cfg(), 'Matemática', 'MMC').origem).toBe('recurso'); // tópico sem aula indicada: o recurso cadastrado continua na frente
@@ -139,11 +141,11 @@ describe('abrir tudo do bloco', () => {
   it('bloco sem tópico ou vazio não tem links', () => {
     expect(linksDoBloco(null)).toEqual([]); expect(linksDoBloco({ semTopico: true })).toEqual([]);
   });
-  it('todo bloco de Matemática/Física da Fase 0 tem 2 links https para abrir', () => {
+  it('todo bloco de Matemática/Física da Fase 0 abre o vídeo (se houver aula dos canais) e a lista, só com https', () => {
     const c = cfg(), bls = blocosAjustados(c, fases, DIA, {});
     const ts = Object.values(tarefasDoDia(c, bls, { lacunas: {}, faseId: 'zero' })).filter((t) => ['Matemática', 'Física'].includes(t.materia));
     expect(ts.length).toBeGreaterThan(0);
-    for (const t of ts) { const l = linksDoBloco(t); expect(l).toHaveLength(2); for (const x of l) expect(urlOk(x.url)).toBe(true); }
+    for (const t of ts) { const l = linksDoBloco(t); expect(l).toHaveLength(t.video ? 2 : 1); for (const x of l) expect(urlOk(x.url)).toBe(true); }
   });
 });
 

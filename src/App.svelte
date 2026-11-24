@@ -3,8 +3,6 @@
   import { app, iniciar, pf } from './stores/app.svelte.js';
   import { estado, fmtRelogio } from './lib/foco.js';
   import { movimentoReduzido } from './lib/prefs.js';
-  import Esquadrilha from './components/Esquadrilha.svelte';
-  import Emblema from './components/Emblema.svelte';
   import Hoje from './screens/Hoje.svelte';
   import Semana from './screens/Semana.svelte';
   import Erros from './screens/Erros.svelte';
@@ -16,7 +14,7 @@
     ajustes: () => import('./screens/Ajustes.svelte'), questoes: () => import('./screens/Questoes.svelte'),
     foco: () => import('./screens/Foco.svelte'), trilha: () => import('./screens/Trilha.svelte'),
     livros: () => import('./screens/Livros.svelte'), revisao: () => import('./screens/Revisao.svelte'),
-    progresso: () => import('./screens/Progresso.svelte'), conquistas: () => import('./screens/Conquistas.svelte'),
+    progresso: () => import('./screens/Progresso.svelte'),
     redacao: () => import('./screens/Redacao.svelte'),
   };
   let telas = $state.raw({}); // id -> componente já carregado
@@ -30,8 +28,8 @@
     { id: 'mais', nome: 'QG', d: 'M4 20V10l8-6 8 6v10h-5v-6H9v6z' },
   ];
   // Ordem das telas: define se a transição desliza para a esquerda ou para a direita.
-  const ORDEM = ['hoje', 'foco', 'semana', 'calendario', 'erros', 'mais', 'simulados', 'redacao', 'trilha', 'livros', 'revisao', 'progresso', 'conquistas', 'questoes', 'ajustes'];
-  const SUB_MAIS = ['simulados', 'ajustes', 'questoes', 'trilha', 'livros', 'revisao', 'progresso', 'conquistas', 'redacao'];
+  const ORDEM = ['hoje', 'foco', 'semana', 'calendario', 'erros', 'mais', 'simulados', 'redacao', 'trilha', 'livros', 'revisao', 'progresso', 'questoes', 'ajustes'];
+  const SUB_MAIS = ['simulados', 'ajustes', 'questoes', 'trilha', 'livros', 'revisao', 'progresso', 'redacao'];
   const ler = () => { const r = location.hash.replace('#/', '').split('?')[0] || 'hoje'; return r === 'lacunas' ? 'trilha' : r; }; // links antigos do mapa de lacunas
   let rota = $state(ler());
 
@@ -52,7 +50,6 @@
   let agora = $state(Date.now());
   $effect(() => { const i = setInterval(() => (agora = Date.now()), 1000); return () => clearInterval(i); });
   const est = $derived(app.timer ? estado(app.timer, agora) : null);
-  const mostrarEnxame = $derived(pf().animacoes === 'completas');
   carregar(rota);
   iniciar();
   // Com o app pronto e parado, busca as outras telas em segundo plano: abrir qualquer uma fica instantâneo.
@@ -64,7 +61,6 @@
   });
 </script>
 
-{#if mostrarEnxame}<Esquadrilha />{/if}
 <main>
   {#if !app.pronto}
     <p class="muted">Carregando…</p>
@@ -82,13 +78,6 @@
     <span class="ct">{app.timer.fase === 'pausa' ? 'Pausa' : app.timer.fase === 'fim' ? 'Registrar' : app.timer.materia}</span>
     <strong>{app.timer.fase === 'fim' ? 'bloco' : est.acabou ? 'Tempo!' : fmtRelogio(est.restante)}</strong>
   </a>
-{/if}
-
-{#if app.insignia}
-  <div class="insignia" role="status">
-    <span class="selo" aria-hidden="true"><Emblema nome="medalha" size={30} /></span>
-    <span><small>Condecoração recebida</small><strong>{app.insignia.nome}</strong><em>{app.insignia.desc}</em></span>
-  </div>
 {/if}
 
 {#if app.toast}
@@ -127,12 +116,6 @@
   @keyframes pisca { 50% { opacity: .25; } }
   @keyframes chama { to { transform: scale(1.06); } }
 
-  .insignia { z-index: 7; position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 16px; background: var(--card); border: 1px solid var(--ac); box-shadow: 0 10px 30px rgba(0,0,0,.4); animation: desce .45s cubic-bezier(.3,1.4,.5,1); }
-  .insignia span:last-child { display: grid; }
-  .insignia small { color: var(--ac2); font-size: .8125rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; }
-  .insignia em { color: var(--tx2); font-size: .85rem; font-style: normal; }
-  .selo { width: 48px; height: 48px; flex: none; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 50% 35%, var(--latao2), var(--latao) 72%); color: #1a1d10; }
-  @keyframes desce { from { opacity: 0; transform: translate(-50%, -16px) scale(.96); } }
 
   .toast { z-index: 6; position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(92vw, 420px); display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 8px 4px 16px; border-radius: 14px; background: var(--card); color: var(--tx); border: 1px solid var(--ac); box-shadow: 0 8px 24px rgba(0,0,0,.35); animation: sobe .25s ease; view-transition-name: toast; }
   .tx { display: grid; padding: 6px 0; } .tx em { color: var(--ac2); font-size: .85rem; font-style: normal; }

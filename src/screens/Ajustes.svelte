@@ -168,9 +168,7 @@
       <label>Tipo<select value={m?.tipo ?? 'upper'} disabled={!m} onchange={(e) => { app.cfg.treino.musculacao[wd].tipo = e.currentTarget.value; salvar(); }}><option value="upper">Upper</option><option value="lower">Lower</option></select></label>
     </div>
   {/each}
-  {#each alertasTreino(app.cfg, app.dia).filter((a) => !/fisio/.test(a)) as a}<p class="aviso-t" role="status">{a}</p>{/each}
-  <div class="tg"><span><strong>Liberação do fisio/ortopedista</strong><span class="muted">Necessária antes da Fase 2 da corrida (11/01/2027).</span></span>
-    <button role="switch" aria-checked={!!app.cfg.treino.liberadoFisio} aria-label="Liberação do fisio" class="sw" class:on={app.cfg.treino.liberadoFisio} onclick={() => { app.cfg.treino.liberadoFisio = !app.cfg.treino.liberadoFisio; salvar(); }}><i></i></button></div>
+  {#each alertasTreino(app.cfg, app.dia, app.treinos) as a}<p class="aviso-t" role="status">{a}</p>{/each}
 </section>
 
 <h2>Livros principais</h2>
@@ -193,7 +191,7 @@
 </section>
 
 <h2>Janelas de estudo</h2>
-<p class="muted">Calculadas sozinhas: 6h30 às 21h menos a corrida, a musculação, o jiu-jitsu, as refeições (12–13 h e 18–19 h; quinta janta 18–18h40), a Santa Missa (com o trajeto) e as aulas que você marcou "vou". O tempo de oração sai depois. Blocos de 50 min de foco e 10 de pausa. No sábado, a primeira janela é da prova antiga e o resgate; no domingo, revisão leve e planejamento.</p>
+<p class="muted">Fixas por dia, como na tabela do plano (~41 h líquidas por semana). Blocos de 50 min de foco e 10 de pausa; o tempo de oração sai depois. No sábado, a primeira janela é da prova antiga e do resgate; no domingo, a revisão de 2 h. Se você apagar as janelas de um dia, o app calcula de novo (6h30 às 20h30 menos treino e refeições).</p>
 {#each ordem as d}
   <section class="card bloco">
     <div class="cj"><strong>{DIAS[d]}</strong><span class="muted">{capacidade(d)}</span></div>
@@ -232,7 +230,7 @@
 
 <h2>Modo Sargento</h2>
 <section class="card bloco">
-  <div class="tg"><span><strong>Modo Sargento</strong><span class="muted">Frases secas de instrutor, cobrança nas notificações e o placar contra o concorrente na Hoje. Desligado, volta o tom padrão.</span></span>
+  <div class="tg"><span><strong>Modo Sargento</strong><span class="muted">Frases secas de instrutor, cobrança nas notificações na Hoje. Desligado, volta o tom padrão.</span></span>
     <button role="switch" aria-checked={app.cfg.tom !== 'padrao'} aria-label="Modo Sargento" class="sw" class:on={app.cfg.tom !== 'padrao'} onclick={() => { app.cfg.tom = app.cfg.tom === 'padrao' ? 'sargento' : 'padrao'; salvar(); }}><i></i></button></div>
 </section>
 

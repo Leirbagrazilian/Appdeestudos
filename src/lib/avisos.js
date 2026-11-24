@@ -1,4 +1,4 @@
-// Avisos com o app fechado (service worker) e placar contra o "concorrente".
+// Avisos com o app fechado (service worker). Sem placar nem concorrente: a cobrança é só contra o plano.
 // Tudo puro e leve: o service worker importa só este arquivo (e dates.js), nunca o planner.
 // Tempos em minutos desde 00:00. O app grava um resumo do dia no kv ('resumoAvisos'); o SW lê e decide.
 import { fmtMin } from './dates.js';
@@ -60,8 +60,8 @@ export function textoAviso(tom, sit, agora, janela) {
     return { titulo: 'Estuda Gabriel', corpo: sit.zerado ? `${hora}. Nenhum bloco feito ainda. Que tal começar pelo próximo?` : `Você está ${fmtMin(sit.falta)} atrás do plano de hoje. Um bloco agora já ajuda.` };
   }
   const corpo = sit.zerado
-    ? `${hora}. Zero blocos. ${sit.inicio1 != null ? `Seu concorrente começou às ${fmtMin(sit.inicio1)}. ` : 'Seu concorrente já começou. '}${FIM_DA_JANELA[janela] ?? 'Levanta.'}`
-    : `${hora}. ${fmtMin(sit.falta)} atrás do plano. O concorrente já cumpriu. ${FIM_DA_JANELA[janela] ?? 'Segue.'}`;
+    ? `${hora}. Zero blocos. ${sit.inicio1 != null ? `O primeiro era às ${fmtMin(sit.inicio1)}. ` : 'O dia já começou. '}${FIM_DA_JANELA[janela] ?? 'Levanta.'}`
+    : `${hora}. ${fmtMin(sit.falta)} atrás do plano. ${FIM_DA_JANELA[janela] ?? 'Segue.'}`;
   return { titulo: 'Sargento', corpo };
 }
 
@@ -79,31 +79,6 @@ export function decidirAviso({ resumo, feito = 0, agora, notificados = {}, tom =
   const sit = situacaoDoDia(resumo, feito, agora);
   if (!sit.atrasado) return null;
   return { chave, janela, ...textoAviso(tom, sit, agora, janela) };
-}
-
-// ---------- placar contra o concorrente ----------
-// O concorrente cumpre 100% da meta do plano todo dia. Você: minutos feitos. Saldo = feito - meta (negativo = atrás).
-
-/**
- * Saldo do dia e da semana contra o concorrente, que só fez o que o plano já pedia ATÉ AGORA (`agora` em minutos).
- * `dias` = [{ dia, blocos (com ini/fim/min), feito }]; dias anteriores contam inteiros, hoje até agora, dias futuros não contam.
- * Devolve { dia: { meta, devido, feito, saldo }, semana: { meta, devido, feito, saldo } }; saldo = feito - devido.
- */
-export function placar(dias, hoje, agora) {
-  const linhas = dias.filter((d) => d.dia <= hoje).map((d) => {
-    const bl = normalizarBlocos(d.blocos), meta = bl.reduce((s, b) => s + b.min, 0);
-    return { dia: d.dia, meta, devido: d.dia < hoje ? meta : devidoAte(bl, agora), feito: d.feito ?? 0 };
-  });
-  const h = linhas.find((l) => l.dia === hoje) ?? { meta: 0, devido: 0, feito: 0 };
-  const soma = (k) => linhas.reduce((s, l) => s + l[k], 0);
-  const mk = (o) => ({ ...o, saldo: o.feito - o.devido });
-  return { dia: mk({ meta: h.meta, devido: h.devido, feito: h.feito }), semana: mk({ meta: soma('meta'), devido: soma('devido'), feito: soma('feito') }) };
-}
-
-/** "2h30 atrás", "1h à frente" ou "empatado". */
-export function textoSaldo(saldo) {
-  const m = Math.round(Math.abs(saldo));
-  return m === 0 ? 'empatado' : `${fmtMin(m)} ${saldo < 0 ? 'atrás' : 'à frente'}`;
 }
 
 // ---------- aviso da noite: a que horas acordar amanhã ----------

@@ -3,7 +3,7 @@
 // Marcas do dia (kv 'oracoes'): { [dia]: { [itemId]: true } }.
 import { addDays, diffDays, weekday } from './dates.js';
 import { toMin, toHHMM } from './semana.js';
-import { missasDoDia, fixosDoDia } from './rotina.js';
+import { fixosDoDia } from './rotina.js';
 import { horariosNoite, horariosPadrao, acordarDe, acordarPadrao, horaManha } from './sono.js';
 
 const P = (cfg) => cfg.oracaoPlano ?? {};
@@ -119,11 +119,9 @@ export function novenaDoDia(cfg, dia) {
   return p ? { dia: 10 - p.falta, prova: p } : null;
 }
 
-/** Missa que cobre o intervalo [ini, ini + dur) do dia da semana `wd` (ou undefined). */
-const missaEm = (cfg, wd, ini, dur) => missasDoDia(cfg, wd).find((m) => ini < m.fim && ini + (dur || 1) > m.ini);
-/** Oração da manhã: 10 min depois de acordar; se isso cair na missa (sábado, 04:40), vai para a hora de acordar. */
-const manhaDe = (cfg, wd, acordar, dur) => { const m = horaManha(acordar); return missaEm(cfg, wd, toMin(m), dur) ? acordar : m; };
-/** Terços que cairiam em cima de um fixo do dia (missa, corrida, refeição, musculação) passam para logo depois dele. O Ângelus fica onde está. */
+/** Oração da manhã: 10 min depois de acordar. */
+const manhaDe = (cfg, wd, acordar) => horaManha(acordar);
+/** Terços que cairiam em cima de um fixo do dia (corrida, refeição, musculação) passam para logo depois dele. O Ângelus fica onde está. */
 const depoisDosFixos = (cfg, wd, id, hora, dur) => {
   if (!hora || id === 'manha' || id === 'angelus') return hora;
   const fixos = fixosDoDia(cfg, wd);
@@ -144,7 +142,7 @@ export function oracoesDoDia(cfg, dia, ctx = {}) {
   const h0 = T(cfg), d = h0.duracoes ?? {}, n = nivelOracao(cfg, ctx.oracoes ?? {}, dia);
   // terço, oração da noite e lectio saem da hora de dormir (terço −1 h, oração −40 min, lectio −20 min)
   const sn = cfg.sono ? horariosNoite(cfg, dia, { noites: ctx.noites, sono: ctx.sono }) : null;
-  const h = sn ? { ...h0, terco1: sn.terco, noite: sn.oracao, lectio: sn.lectio, manha: manhaDe(cfg, weekday(dia), acordarDe(cfg, dia, { noites: ctx.noites, sono: ctx.sono }), d.manha) } : { ...h0 };
+  const h = sn ? { ...h0, terco1: sn.terco, noite: sn.oracao, lectio: sn.lectio, manha: manhaDe(cfg, weekday(dia), acordarDe(cfg, dia, { noites: ctx.noites, sono: ctx.sono })) } : { ...h0 };
   const wd = weekday(dia);
   for (const id of ['terco2', 'terco3']) if (h[id]) h[id] = depoisDosFixos(cfg, wd, id, h[id], d.terco);
   const mis = misteriosDoDia(cfg, dia), outros = ['gozosos', 'dolorosos', 'gloriosos'].filter((x) => x !== mis.tipo);
@@ -163,11 +161,6 @@ export function oracoesDoDia(cfg, dia, ctx = {}) {
     noite: { titulo: 'Oração da noite', hora: h.noite, min: d.noite, partes: txt(cfg, 'exame', 'contricao', 'noite', 'anjo') },
   };
   const lista = itensDoNivel(cfg, n).map((id) => ({ id, conta: true, ...defs[id] }));
-  // Santa Missa: item extra (bônus, não entra na sequência nem nos 27/30), no horário da saída; o trajeto vem junto
-  for (const [k, m] of missasDoDia(cfg, weekday(dia)).entries()) {
-    lista.push({ id: k ? `missa${k + 1}` : 'missa', conta: false, titulo: 'Santa Missa', hora: toHHMM(m.ini), min: m.fim - m.ini, bonus: true,
-      sub: `Sair ${toHHMM(m.ini)} · missa ${toHHMM(m.missa)} · volta ${toHHMM(m.fim)}`, partes: [] });
-  }
   // ligação com o estudo e com as provas (não entram na regra dos 27/30)
   lista.push({ id: 'estudo', conta: false, titulo: 'Antes do 1º bloco de estudo', hora: null, min: d.estudo, partes: txt(cfg, 'vinde', 'tomas'), antesDoEstudo: true });
   if (ctx.temProva) lista.push({ id: 'prova', conta: false, titulo: 'Antes da prova: São José de Cupertino', hora: null, partes: txt(cfg, 'cupertino') });
@@ -199,9 +192,9 @@ export function reservasOracao(cfg, nivel) {
   const dur = { manha: d.manha, terco1: d.terco, terco2: d.terco, terco3: d.terco, angelus: d.angelus, lectio: d.lectio, noite: d.noite };
   for (let wd = 0; wd < 7; wd++) {
     const sp = cfg.sono ? horariosPadrao(cfg, wd) : null;
-    const h = sp ? { ...h0, terco1: sp.terco, noite: sp.oracao, lectio: sp.lectio, manha: manhaDe(cfg, wd, acordarPadrao(cfg, wd), d.manha) } : h0;
-    // o Ângelus de domingo cai dentro da missa: sem reserva separada; terços que cairiam na missa vão para depois dela
-    out[wd] = itens.filter((id) => h[id] && dur[id] && !(id === 'terco3' && wd === 0) && !(id === 'angelus' && missaEm(cfg, wd, toMin(h[id]), dur[id])))
+    const h = sp ? { ...h0, terco1: sp.terco, noite: sp.oracao, lectio: sp.lectio, manha: manhaDe(cfg, wd, acordarPadrao(cfg, wd)) } : h0;
+    // o 3º terço de domingo é depois do longão: sem reserva fixa
+    out[wd] = itens.filter((id) => h[id] && dur[id] && !(id === 'terco3' && wd === 0))
       .map((id) => { const hh = depoisDosFixos(cfg, wd, id, h[id], dur[id]); return { ini: toMin(hh), fim: toMin(hh) + dur[id] }; }).filter((x) => Number.isFinite(x.ini));
   }
   return out;

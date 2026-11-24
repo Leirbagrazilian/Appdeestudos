@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import seed from '../src/data/seed.json';
 import { migrarCfg } from '../src/lib/migracao.js';
 import { fraseDoDia, bancoDoTom } from '../src/lib/frases.js';
-import { resumoDoDia, devidoAte, situacaoDoDia, feitoDoResumo, janelaDe, emSilencio, decidirAviso, placar, textoSaldo, textoAviso, LIMIAR_MIN, RESUMO_DIAS } from '../src/lib/avisos.js';
+import { resumoDoDia, devidoAte, situacaoDoDia, feitoDoResumo, janelaDe, emSilencio, decidirAviso, textoAviso, LIMIAR_MIN, RESUMO_DIAS } from '../src/lib/avisos.js';
 
 const h = (s) => { const [a, b] = s.split(':').map(Number); return a * 60 + b; };
 // 06:30–08:20 (100 min), 08:30–10:20 (100 min), 14:00–15:40 (100 min)
@@ -71,7 +71,7 @@ describe('janela, silêncio e aviso', () => {
     const a = decidirAviso({ resumo: r, feito: 0, agora: h('10:00'), notificados: n });
     expect(a.chave).toBe('2027-01-18:aviso:manha');
     expect(a.titulo).toBe('Sargento');
-    expect(a.corpo).toContain('10h. Zero blocos. Seu concorrente começou às 6h30.');
+    expect(a.corpo).toContain('10h. Zero blocos. O primeiro era às 6h30.'); expect(a.corpo).not.toMatch(/concorrente/i);
     expect(decidirAviso({ resumo: r, feito: 0, agora: h('11:00'), notificados: { [a.chave]: 1 } })).toBeNull(); // mesma janela
     expect(decidirAviso({ resumo: undefined, feito: 0, agora: h('11:00') })).toBeNull(); // resumo vencido: silêncio
     expect(decidirAviso({ resumo: r, feito: 0, agora: h('16:00'), notificados: { [a.chave]: 1 } }).janela).toBe('tarde'); // outra janela
@@ -86,21 +86,9 @@ describe('janela, silêncio e aviso', () => {
   });
 });
 
-describe('placar contra o concorrente', () => {
-  const dia = (d, feito) => ({ dia: d, blocos, feito }); // meta 300 por dia
-  it('compara com o que o concorrente já fez até agora, não com o dia inteiro', () => {
-    const p = placar([dia('2027-01-18', 250)], '2027-01-18', h('10:30'));
-    expect(p.dia).toEqual({ meta: 300, devido: 200, feito: 250, saldo: 50 });
-    expect(placar([dia('2027-01-18', 0)], '2027-01-18', h('06:00')).dia.saldo).toBe(0);
-    expect(placar([dia('2027-01-18', 100)], '2027-01-18', h('07:25')).dia.saldo).toBe(50); // fração do bloco em andamento
-  });
-  it('semana: dias anteriores inteiros + hoje até agora; futuros não contam', () => {
-    const p = placar([dia('2027-01-18', 300), dia('2027-01-19', 100), dia('2027-01-20', 0)], '2027-01-19', h('10:30'));
-    expect(p.semana).toEqual({ meta: 600, devido: 500, feito: 400, saldo: -100 });
-    expect(p.dia.saldo).toBe(-100);
-  });
-  it('texto: atrás, à frente e empatado', () => {
-    expect(textoSaldo(-150)).toBe('2h30 atrás'); expect(textoSaldo(60)).toBe('1h à frente'); expect(textoSaldo(0)).toBe('empatado');
+describe('sem placar nem concorrente', () => {
+  it('os avisos do Sargento cobram só contra o plano', () => {
+    for (const sit of [{ zerado: true, falta: 100, inicio1: 390 }, { zerado: false, falta: 100 }]) for (const j of ['manha', 'tarde', 'noite']) expect(textoAviso('sargento', sit, h('10:00'), j).corpo).not.toMatch(/concorrente|rival/i);
   });
   it('o resumo cobre 14 dias', () => { expect(RESUMO_DIAS).toBe(14); });
 });

@@ -2,6 +2,8 @@
 export const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 export const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 export const today = () => iso(new Date());
+/** True se o dia guardado (AAAA-MM-DD) já não é o dia de `agora` (Date). */
+export const precisaVirar = (diaAtual, agora = new Date()) => diaAtual !== iso(agora);
 export const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return iso(d); };
 export const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
 export const weekday = (s) => parse(s).getDay(); // 0 = domingo
