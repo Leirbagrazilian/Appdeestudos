@@ -1,4 +1,4 @@
-import { estaTravado } from './dominio.js';
+import { estaTravado, aguardaReteste } from './dominio.js';
 // Trilha: tópicos de cada matéria em ordem de estudo, com os concursos que cada um serve.
 export const NIVEIS = [['0', 'nunca vi'], ['1', 'vi pouco'], ['2', 'quase lá'], ['3', 'domino']];
 export const MATERIAS_TRILHA = (cfg) => cfg.materias.filter((m) => cfg.topicos?.[m]);
@@ -29,7 +29,7 @@ export function proximoTopico(cfg, lacunas, materia, janela = 3, excluir = new S
   let lista = topicosDe(cfg, materia);
   if (faseZero) lista = lista.filter((t) => t.fase === 0);
   const travado = (t) => estaTravado(dominio[`${materia}|${t.nome}`]);
-  const livre = (t) => dominio_(lacunas, materia, t) < 3 && !travado(t) && !excluir.has(t.nome); // `excluir`: tópicos que já usaram todo o livro no dia
+  const livre = (t) => dominio_(lacunas, materia, t) < 3 && !travado(t) && !aguardaReteste(dominio[`${materia}|${t.nome}`]) && !excluir.has(t.nome); // `excluir`: tópicos que já usaram todo o livro no dia
   const primeiro = lista.findIndex(livre);
   if (primeiro >= 0) {
     const cand = lista.slice(primeiro, primeiro + (faseZero ? 1 : janela)).filter(livre);

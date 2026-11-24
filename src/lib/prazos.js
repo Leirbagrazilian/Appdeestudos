@@ -4,7 +4,7 @@
 import { addDays, diffDays, weekday } from './dates.js';
 import { diaLivre } from './rotina.js';
 import { baseMinutos } from './semana.js';
-import { estaTravado, resumo as resumoDominio } from './dominio.js';
+import { estaTravado, aguardaReteste, resumo as resumoDominio } from './dominio.js';
 
 export const BLOCO_MIN = 100; // 1 bloco previsto = 2 sessões de foco (100 min líquidos)
 export const MATERIAS_PRAZO = ['Matemática', 'Física', 'Química'];
@@ -217,6 +217,7 @@ export function escolherTopico(cfg, plano, materia, st, dia) {
   const zero = st.faseId === 'zero', sem = semConteudoNovo(st.faseId);
   const feito = (i) => st.feitos?.[chave(materia, i.nome)] ?? 0;
   const livre = (i) => !dominadoT(st.lacunas, materia, i.nome) && !emDivida(i, st, dia) && !prereqPendentes(plano, st.lacunas, i).length && !st.excluir?.has(i.nome) && !estaTravado(st.dominio?.[chave(materia, i.nome)]) // travado (3 tentativas): precisa de ajuda antes
+    && !aguardaReteste(st.dominio?.[chave(materia, i.nome)]) // passou uma vez: o reteste (3 dias depois) é um item à parte
     && !falhouMatar(st.dominio, materia, i.nome, st.lacunas); // não matou: vai para o resgate do sábado e o plano segue com o próximo
   const abertos = lista.filter((i) => livre(i) && (zero ? i.ano === 0 : true) && (sem ? feito(i) > 0 : true));
   const monta = (i, extra = {}) => {

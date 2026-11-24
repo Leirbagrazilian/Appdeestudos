@@ -1,90 +1,58 @@
-// Treino de corrida (SPEC v3 §13): blocos fixos fora das janelas de estudo. Tudo puro e testável.
-// Plano (seed, não editável): cfg.treinoPlano. Horários e escolhas (editáveis): cfg.treino.
+// Treino (SPEC v2 §2): musculação e corrida de manhã, antes de estudar, sem prova como meta. Tudo puro e testável.
+// Plano (seed, não editável): cfg.treinoPlano (volume estável por dia da semana + disciplina que alterna). Horários e escolhas (editáveis): cfg.treino.
 // Registros do dia (kv 'treinos'): { [dia]: { feito, km, dor, tornozelo, inchaco, minimo } }.
 // Semanas editadas por você aos domingos (kv 'treinoSemanas'): { [segunda]: { dias: { wd: km } } }.
 import { addDays, diffDays, startOfWeek, weekday } from './dates.js';
 import { toMin, toHHMM, janelasValidas } from './semana.js';
 import { minimoOracao } from './oracao.js';
-import { janelasDoDia, diaLivre, horaCorrida, missasDoDia } from './rotina.js';
+import { janelasDoDia, diaLivre, horaCorrida } from './rotina.js';
 
 export const r05 = (x) => Math.round(x * 2) / 2;
 const plano = (cfg) => cfg.treinoPlano ?? {};
 export const DOR_LIMITE = 3;
-const DIAS_NOME = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-
-/** Fase da corrida em `dia` (ou null antes do início / depois da prova final). */
-export const faseCorrida = (cfg, dia) => (plano(cfg).fases ?? []).find((f) => dia >= f.inicio && dia <= f.fim) ?? null;
+const FASE_UNICA = { n: 1, nome: 'Disciplina e evolução' }; // sem prova como meta (a ultra e a maratona saíram)
 
 /** Semana da corrida (0 = a semana do início), contada de segunda a domingo. */
 export const semanaCorrida = (cfg, dia) => Math.floor(diffDays(startOfWeek(plano(cfg).inicio), startOfWeek(dia)) / 7);
 
-/** Divide `total` km nos dias seg..sáb na proporção 2:3:2:4:2:2, arredondando a 0,5 km. */
-export function dividir(total, proporcao = [2, 3, 2, 4, 2, 2]) {
-  // em meios-quilômetros, pelo maior resto: a soma dos dias fecha exatamente com o total (arredondado a 0,5)
-  const soma = proporcao.reduce((a, b) => a + b, 0), meios = Math.max(0, Math.round(total * 2));
-  const ex = proporcao.map((p) => (meios * p) / soma), base = ex.map(Math.floor);
-  let resto = meios - base.reduce((a, b) => a + b, 0);
-  const ordem = ex.map((x, i) => [x - base[i], i]).sort((a, b) => b[0] - a[0]);
-  for (let k = 0; resto > 0; k++, resto--) base[ordem[k % ordem.length][1]]++;
-  return Object.fromEntries(base.map((m, i) => [i + 1, m / 2]));
-}
-
-/** Meta da semana nas fases 2 a 5: sobe do início ao fim da fase, com 1 semana leve (80%) a cada 4. */
-function metaSemanal(f, seg) {
-  const n = Math.max(1, Math.ceil((diffDays(startOfWeek(f.inicio), startOfWeek(f.fim)) + 1) / 7));
-  const i = Math.max(0, Math.floor(diffDays(startOfWeek(f.inicio), seg) / 7));
-  const base = f.kmIni + ((f.kmFim - f.kmIni) * Math.min(i, n - 1)) / Math.max(1, n - 1);
-  return r05(f.polimento ? base : i % 4 === 3 ? base * 0.8 : base); // no polimento só desce
+/** Disciplina de cada dia da semana que começa em `seg` (wd -> tipo). Quinta alterna intervalado, fartlek, ritmo e subida; o resto é
+ *  rodagem leve e o longão de domingo. */
+export function tiposDaSemana(cfg, seg) {
+  const P = plano(cfg), tipos = { ...(P.tipos ?? {}) }, ciclo = P.ciclo ?? ['intervalado', 'fartlek', 'ritmo', 'subida'];
+  const n = Math.max(0, semanaCorrida(cfg, seg));
+  for (const [wd, t] of Object.entries(tipos)) if (t === 'qualidade') tipos[wd] = ciclo[n % ciclo.length];
+  return tipos;
 }
 
 /**
- * Plano da semana que começa em `seg`: { fase, semana, km, longao, leve, dias: { wd: km }, prova, travados } (wd 0 = domingo).
- * `travados`: dias (wd) que não aceitam edição: o dia da prova e os seguintes.
- * Fase 1 vem do seed (semana 1 = semana modelo; as demais = (km − longão) em 2:3:2:4:2:2).
- * Fases 2 a 5: só a meta; os km diários são os que você editou no domingo (senão, uma sugestão na mesma proporção).
+ * Plano da semana que começa em `seg`: { fase, semana, km, longao, leve, dias: { wd: km }, tipos, prova, travados } (wd 0 = domingo).
+ * O volume é estável: o mesmo `kmDia` toda semana (não sobe sozinho). Só muda se você editar os km no domingo (`editadas`).
  */
 export function planoSemanaCorrida(cfg, seg, editadas = {}) {
-  const P = plano(cfg), f = faseCorrida(cfg, seg) ?? faseCorrida(cfg, addDays(seg, 6));
-  if (!f) return null;
-  const semana = semanaCorrida(cfg, seg);
-  let km, longao, dias;
-  if (f.n === 1) {
-    km = P.fase1.km[semana] ?? P.fase1.km.at(-1); longao = P.fase1.longao[semana] ?? P.fase1.longao.at(-1);
-    dias = semana === 0 ? { ...Object.fromEntries(Object.entries(P.semana1).map(([k, v]) => [+k, v])) } : dividir(km - longao, P.proporcao);
-  } else {
-    km = metaSemanal(f, seg); longao = r05(km * 0.3);
-    dias = dividir(km - longao, P.proporcao);
-  }
-  dias[0] = longao;
-  // semana de prova (maratona, 100 km): dias antes da prova curtos e leves, a prova no dia, descanso depois (sem longão)
-  const prova = (P.provas ?? []).find((p) => p.data >= seg && p.data <= addDays(seg, 6));
-  const ordem = [1, 2, 3, 4, 5, 6, 0], antes = prova ? ordem.indexOf(weekday(prova.data)) : 7;
-  if (prova) {
-    for (const [k, wd] of ordem.entries()) dias[wd] = k < antes ? Math.min(dias[wd], k < antes - 1 ? 4 : 2) : k === antes ? prova.km : 0;
-  }
-  // semana do início (começa numa terça): dias antes do início não contam
+  const P = plano(cfg);
+  if (!P.inicio || addDays(seg, 6) < P.inicio) return null;
+  const dias = Object.fromEntries([1, 2, 3, 4, 5, 6, 0].map((wd) => [wd, +P.kmDia?.[wd] || 0]));
+  // semana do início (começa no meio): dias antes do início não contam
   for (let i = 0; i < 7; i++) if (addDays(seg, i) < P.inicio) dias[(i + 1) % 7] = 0;
-  // edições de domingo: só nos dias antes da prova (o dia da prova e os seguintes ficam travados)
-  const travados = ordem.slice(antes);
   const ed = editadas[seg]?.dias;
-  if (ed) for (const [wd, v] of Object.entries(ed)) if (v != null && v !== '' && Number.isFinite(+v) && !travados.includes(+wd)) dias[+wd] = Math.max(0, +v);
-  const leve = f.n === 1 ? semana === 3 || semana === 7 : !f.polimento && diffDays(startOfWeek(f.inicio), seg) / 7 % 4 === 3;
+  if (ed) for (const [wd, v] of Object.entries(ed)) if (v != null && v !== '' && Number.isFinite(+v)) dias[+wd] = Math.max(0, +v);
   const total = Object.values(dias).reduce((a, b) => a + b, 0);
-  return { fase: f, semana, km: prova || seg < P.inicio ? total : km, longao: dias[0], leve, dias, prova: prova ?? null, travados };
+  return { fase: FASE_UNICA, semana: semanaCorrida(cfg, seg), km: total, longao: dias[0], leve: false, dias, tipos: tiposDaSemana(cfg, seg), prova: null, travados: [] };
 }
 
 const INTENSIDADE = {
-  leve: 'Leve: dá para conversar o tempo todo.',
-  'bem leve': 'Bem leve: solto, dá para conversar.',
-  strides: 'Leve (dá para conversar) + 6 strides de ~20 s no fim.',
-  qualidade: '1 km confortavelmente forte no meio (ou 4–5 subidas curtas). O resto leve.',
-  prova: 'Dia de prova: ritmo de completar, hidratação e comida testadas antes.',
-  descanso: 'Descanso depois da prova: só caminhada leve, se quiser.',
+  leve: 'Rodagem leve: dá para conversar o tempo todo.',
+  'bem leve': 'Bem leve (véspera do longão): solto, dá para conversar.',
+  intervalado: 'Intervalado: 10 min leves, 4 a 6 tiros de 400 m fortes com 90 s de trote entre eles, e solta.',
+  fartlek: 'Fartlek: 20 min alternando 1 min mais forte e 2 min leves, sem cronometrar rígido.',
+  ritmo: 'Ritmo: 15 min num ritmo "confortavelmente forte" (frases curtas) no meio, o resto leve.',
+  subida: 'Subida: 6 a 8 subidas curtas de ~30 s fortes, descendo caminhando. O resto leve.',
   longao: 'Longão devagar: dá para conversar. Objetivo é completar.',
   caminhada: 'Só caminhada hoje: o joelho manda.',
 };
+const FORTES = ['intervalado', 'fartlek', 'ritmo', 'subida', 'longao'];
 
-/** Treino do dia: corrida (ou longão), musculação, fortalecimento e alertas. `ctx` = { treinos, editadas }. */
+/** Treino do dia: corrida (ou longão), musculação, fortalecimento e alertas. `ctx` = { treinos, editadas, noiteCurta }. */
 export function treinoDoDia(cfg, dia, ctx = {}) {
   const P = plano(cfg), T = cfg.treino ?? {};
   if (!P.inicio || dia < P.inicio) return null;
@@ -92,37 +60,32 @@ export function treinoDoDia(cfg, dia, ctx = {}) {
   if (!sem) return null;
   const wd = weekday(dia), reg = ctx.treinos?.[dia] ?? {};
   const dor = (reg.dor ?? 0) > DOR_LIMITE || (reg.tornozelo ?? 0) > DOR_LIMITE || !!reg.inchaco;
-  let tipo = P.tipos?.[wd] ?? 'leve';
-  if (sem.prova) tipo = dia === sem.prova.data ? 'prova' : dia > sem.prova.data ? 'descanso' : ['qualidade', 'strides', 'longao'].includes(tipo) ? 'leve' : tipo;
+  let tipo = sem.tipos[wd] ?? 'leve';
   const curta = !!ctx.noiteCurta; // dormiu pouco: corrida leve ou caminhada
-  if (curta && ['qualidade', 'strides', 'longao'].includes(tipo)) tipo = 'leve';
+  if (curta && FORTES.includes(tipo)) tipo = 'leve';
   if (dor) tipo = 'caminhada';
   const km = dor ? 0 : sem.dias[wd] ?? 0;
-  // musculação some nos 2 dias antes de uma prova, no dia e no resto da semana dela
-  const pertoDeProva = (P.provas ?? []).some((p) => dia >= addDays(p.data, -2) && dia <= addDays(startOfWeek(p.data), 6));
-  const musCfg = T.musculacao?.[wd] ?? null, mus = pertoDeProva ? null : musCfg;
+  const mus = T.musculacao?.[wd] ?? null;
   const hora = wd === 0 ? T.longao : horaCorrida(cfg, wd);
-  // duração estimada (ritmo leve + 10 min de aquecimento) e se cruza alguma janela de estudo do dia (sobreposição real)
-  const min = km ? Math.round(km * (T.ritmoMinKm ?? 7) + 10) : T.corridaMin ?? 45;
+  // duração estimada (ritmo leve; 10 min de aquecimento só quando não há musculação antes) e se cruza alguma janela de estudo do dia
+  const min = km ? Math.round(km * (T.ritmoMinKm ?? 7) + (mus ? 0 : 10)) : T.corridaMin ?? 45;
   const horaOk = typeof hora === 'string' && /^\d{1,2}:\d{2}$/.test(hora);
   const ini = horaOk ? toMin(hora) : null, fim = horaOk ? ini + min : null;
-  const temCorrida = km > 0 && !['prova', 'descanso', 'caminhada'].includes(tipo);
+  const temCorrida = km > 0 && tipo !== 'caminhada';
   const janela = horaOk && temCorrida ? janelasValidas(janelasDoDia(cfg, wd)).find((j) => j.ini < fim && j.fim > ini) : null;
-  const missa = horaOk && temCorrida ? missasDoDia(cfg, wd).find((m) => m.ini < fim && m.fim > ini) : null;
-  const choque = missa ? `A corrida (${toHHMM(ini)} às ${toHHMM(fim)}) bate com a Santa Missa (sair ${toHHMM(missa.ini)}, volta ${toHHMM(missa.fim)}): mude o horário da corrida.`
-    : !janela ? null
+  const choque = !janela ? null
     : janela.ini >= ini ? `A corrida termina por volta de ${toHHMM(fim)} e o estudo começa às ${toHHMM(janela.ini)}: saia mais cedo ou encurte o aquecimento.`
     : `A corrida termina por volta de ${toHHMM(fim)} e cai dentro da janela de estudo das ${toHHMM(janela.ini)}: mude o horário da corrida ou da janela.`;
   return {
-    dia, wd, tipo, km, longao: wd === 0 && !sem.prova, hora, min, choque, prova: sem.prova && dia === sem.prova.data ? sem.prova : null,
+    dia, wd, tipo, km, longao: wd === 0, hora: mus?.ini ?? hora, horaCorrida: hora, min, choque, prova: null,
     intensidade: INTENSIDADE[tipo] ?? INTENSIDADE.leve,
-    tenis: tipo === 'strides' ? `${T.tenis?.principal ?? 'X-Step'} (o ${T.tenis?.rapido ?? 'Metaspeed'} só nos strides)` : T.tenis?.principal ?? 'X-Step',
-    dica: `${musCfg && !mus ? 'Sem musculação: semana de prova. ' : ''}Descidas íngremes: caminhando.`,
-    musculacao: mus ? { ...mus, correrAntes: mus.tipo === 'lower' && wd === 2 } : null,
+    tenis: tipo === 'intervalado' ? `${T.tenis?.principal ?? 'X-Step'} (o ${T.tenis?.rapido ?? 'Metaspeed'} só nos tiros)` : T.tenis?.principal ?? 'X-Step',
+    dica: 'Descidas íngremes: caminhando.',
+    musculacao: mus ? { ...mus, correrAntes: false } : null,
     fortalecimento: (T.fortalecimentoDias ?? []).includes(wd) ? P.fortalecimento : null,
     noiteCurta: curta,
     dor, alerta: dor ? 'Dor acima de 3/10 ou inchaço: hoje é só caminhada. Ajuste o plano de corrida.' : curta ? 'Noite curta: corrida leve (ou caminhada), sem forçar.' : null,
-    fase: sem.fase, semanaLeve: sem.leve, metaSemana: sem.km,
+    fase: sem.fase, semanaLeve: false, metaSemana: sem.km,
   };
 }
 
@@ -130,27 +93,18 @@ export function treinoDoDia(cfg, dia, ctx = {}) {
 export const treinoFeito = (reg) => !!(reg?.feito || reg?.minimo);
 
 /**
- * Avisos das regras da semana (para Hoje e Ajustes):
- * lower nunca na véspera do longão; jiu-jitsu só em dia de corrida leve e nunca na véspera do longão;
- * liberação do fisio/ortopedista antes da Fase 2.
+ * Avisos das regras da semana (para Hoje e Ajustes). Perna no sábado (véspera do longão) é escolha sua: não bloqueia.
+ * Só avisa quando há dor no joelho registrada nos últimos 3 dias (até `dia`) e a musculação de sábado é de inferiores.
+ * `treinos` = registros do treino por dia.
  */
-export function alertasTreino(cfg, dia) {
+export function alertasTreino(cfg, dia, treinos = {}) {
   const P = plano(cfg), T = cfg.treino ?? {}, out = [];
   if (!P.inicio) return out;
-  const vespera = 6; // longão no domingo -> véspera é sábado
-  for (const [wd, m] of Object.entries(T.musculacao ?? {})) if (+wd === vespera && m.tipo === 'lower') out.push('Lower no sábado é véspera do longão: mude para outro dia.');
-  for (const [wd, m] of Object.entries(T.musculacao ?? {})) {
-    const ini = toMin(m.ini), fim = ini + (T.musculacaoMin ?? 60), x = missasDoDia(cfg, +wd).find((s) => s.ini < fim && s.fim > ini);
-    if (x && Number.isFinite(ini)) out.push(`Musculação de ${DIAS_NOME[+wd]} bate com a Santa Missa (${toHHMM(x.ini)}–${toHHMM(x.fim)}): mude o horário.`);
+  const wd = weekday(dia);
+  if (T.musculacao?.[6]?.tipo === 'lower' && (wd === 5 || wd === 6)) {
+    const dor = Math.max(0, ...[0, 1, 2, 3].map((i) => +treinos[addDays(dia, -i)]?.dor || 0));
+    if (dor > 0) out.push(`Dor no joelho registrada (${dor}/10) e perna no sábado, véspera do longão: avalie reduzir a carga ou pular a perna. A decisão é sua.`);
   }
-  for (const a of cfg.rotina?.aulas ?? []) {
-    if (!/jiu/i.test(a.nome ?? '')) continue;
-    if (a.dia === vespera) out.push('Jiu-jitsu no sábado é véspera do longão: evite.');
-    else if (a.dia === 0) out.push('Jiu-jitsu no domingo é dia de longão: evite.');
-    else if (P.tipos?.[a.dia] === 'qualidade') out.push('Jiu-jitsu no dia do treino forte: troque o dia do jiu-jitsu ou deixe a corrida leve.');
-  }
-  const f2 = (P.fases ?? []).find((f) => f.n === 2);
-  if (f2 && !T.liberadoFisio && dia >= addDays(f2.inicio, -14) && dia < f2.inicio) out.push('Antes da Fase 2 da corrida: pegue a liberação do fisio/ortopedista (marque em Ajustes).');
   return out;
 }
 
@@ -182,12 +136,13 @@ export function textoResumoCorrida(cfg, seg, treinos = {}, c = {}, editadas = {}
   const fmt = (x) => String(x).replace('.', ',');
   const dias = Array.from({ length: 7 }, (_, i) => {
     const d = addDays(seg, i), r = treinos[d] ?? {}, plan = p?.dias?.[(i + 1) % 7] ?? 0;
+    const tp = p?.tipos?.[(i + 1) % 7];
     const feito = r.feito ? `${fmt(r.km ?? plan)} km` : r.minimo ? 'caminhada 20 min' : 'não fez';
     const dor = r.dor || r.tornozelo || r.inchaco ? ` (dor joelho ${r.dor ?? 0}, tornozelo ${r.tornozelo ?? 0}${r.inchaco ? ', inchaço' : ''})` : '';
-    return `${nomes[i]}: ${feito} de ${fmt(plan)} km${dor}`;
+    return `${nomes[i]}: ${feito} de ${fmt(plan)} km${tp ? ` (${tp})` : ''}${dor}`;
   });
   return [
-    `Resumo da semana de corrida (${seg.split('-').reverse().join('/')})${p ? ` · Fase ${p.fase.n} ${p.fase.nome}, semana ${p.semana + 1}${p.leve ? ' (leve)' : ''}` : ''}`,
+    `Resumo da semana de corrida (${seg.split('-').reverse().join('/')})${p ? ` · semana ${p.semana + 1}` : ''}`,
     `Km: ${fmt(c.km ?? k.feitos)} de ${fmt(k.meta)}`,
     ...dias,
     `Dor no joelho (0–10): ${c.joelho ?? '-'} · tornozelo: ${c.tornozelo ?? '-'}`,

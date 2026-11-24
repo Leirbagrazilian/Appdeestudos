@@ -185,7 +185,7 @@
       {
         "dia": 1,
         "inicio": "07:30",
-        "fim": "11:10",
+        "fim": "11:00",
         "nome": "Faculdade seg",
         "tipo": "faculdade",
         "vou": false
@@ -193,65 +193,26 @@
       {
         "dia": 3,
         "inicio": "09:00",
-        "fim": "11:00",
+        "fim": "12:30",
         "nome": "Faculdade qua",
         "tipo": "faculdade",
         "vou": false
       },
       {
         "dia": 4,
-        "inicio": "13:30",
-        "fim": "17:00",
+        "inicio": "13:00",
+        "fim": "19:30",
         "nome": "Faculdade qui",
         "tipo": "faculdade",
         "vou": false
-      },
-      {
-        "dia": 2,
-        "inicio": "18:30",
-        "fim": "20:00",
-        "nome": "Jiu-jitsu",
-        "tipo": "fixo"
-      },
-      {
-        "dia": 5,
-        "inicio": "05:40",
-        "fim": "07:20",
-        "nome": "Missa sexta",
-        "tipo": "missa",
-        "trajeto": 20
-      },
-      {
-        "dia": 6,
-        "inicio": "04:40",
-        "fim": "06:20",
-        "nome": "Missa sábado",
-        "tipo": "missa",
-        "trajeto": 20
-      },
-      {
-        "dia": 0,
-        "inicio": "11:40",
-        "fim": "13:20",
-        "nome": "Missa domingo",
-        "tipo": "missa",
-        "trajeto": 20
-      },
-      {
-        "dia": 4,
-        "inicio": "18:40",
-        "fim": "20:20",
-        "nome": "Missa quinta",
-        "tipo": "missa",
-        "trajeto": 20
       }
     ],
     "inicioEstudo": "06:30",
-    "fimEstudo": "21:00",
+    "fimEstudo": "20:30",
     "refeicoes": [
       {
         "ini": "12:00",
-        "fim": "13:00"
+        "fim": "12:40"
       },
       {
         "ini": "18:00",
@@ -262,14 +223,14 @@
       "ini": "15:00",
       "fim": "17:00"
     },
-    "metaLiquida": 56,
+    "metaLiquida": 41,
     "metaDia": {
-      "1": 9.6,
-      "2": 8,
-      "3": 9.6,
-      "4": 9.6,
-      "5": 9.6,
-      "6": 8,
+      "1": 4.5,
+      "2": 7.67,
+      "3": 6.33,
+      "4": 3.5,
+      "5": 9.5,
+      "6": 7.67,
       "0": 2
     },
     "diaRedacao": 3,
@@ -287,26 +248,83 @@
       "fator": 0.75
     },
     "resgateSabadoMin": 120,
-    "refeicoesPorDia": {
-      "0": [
+    "janelas": {
+      "1": [
         {
-          "ini": "13:20",
-          "fim": "14:00"
+          "ini": "13:00",
+          "fim": "17:00"
+        },
+        {
+          "ini": "19:00",
+          "fim": "20:30"
+        }
+      ],
+      "2": [
+        {
+          "ini": "07:45",
+          "fim": "12:00"
+        },
+        {
+          "ini": "13:00",
+          "fim": "18:00"
+        }
+      ],
+      "3": [
+        {
+          "ini": "06:30",
+          "fim": "08:40"
+        },
+        {
+          "ini": "13:00",
+          "fim": "17:00"
+        },
+        {
+          "ini": "19:00",
+          "fim": "20:30"
         }
       ],
       "4": [
         {
-          "ini": "12:00",
-          "fim": "13:00"
+          "ini": "07:45",
+          "fim": "12:00"
+        }
+      ],
+      "5": [
+        {
+          "ini": "06:30",
+          "fim": "11:30"
         },
         {
-          "ini": "18:00",
-          "fim": "18:40"
+          "ini": "13:00",
+          "fim": "18:00"
+        },
+        {
+          "ini": "19:00",
+          "fim": "20:30"
+        }
+      ],
+      "6": [
+        {
+          "ini": "07:45",
+          "fim": "12:00",
+          "tipo": "prova"
+        },
+        {
+          "ini": "13:00",
+          "fim": "18:00"
+        }
+      ],
+      "0": [
+        {
+          "ini": "15:00",
+          "fim": "17:00",
+          "tipo": "domingo"
         }
       ]
     },
-    "fimEstudoPorDia": {
-      "4": "18:40"
+    "cochilo": {
+      "ini": "12:40",
+      "min": 20
     }
   },
   "metodos": {
@@ -3680,7 +3698,7 @@
       }
     ]
   },
-  "versaoSeed": 16,
+  "versaoSeed": 17,
   "frases": {
     "inicio": [
       "Sua família vai se orgulhar do homem que você está construindo hoje.",
@@ -3693,7 +3711,7 @@
       "Quem quer servir à Pátria começa servindo à própria rotina.",
       "A vaga tem dono. Trabalhe para que o nome seja o seu.",
       "Sua família vai estar protegida porque você não fugiu do dever hoje.",
-      "Alvorada. O concorrente ainda dorme e você já está de pé.",
+      "Alvorada. O dia ainda está quieto e você já está de pé.",
       "Honra não se promete, se pratica. Primeiro bloco, agora.",
       "O juramento que você vai fazer um dia começa a valer hoje.",
       "Hoje ninguém vê o seu esforço. Na formatura, todos vão ver o resultado.",
@@ -3703,7 +3721,7 @@
       "Cada questão resolvida é um degrau a menos até o portão da Escola Naval."
     ],
     "bloco": [
-      "Bloco cumprido. É assim que se conquista terreno.",
+      "Bloco cumprido. É assim que se avança.",
       "Mais uma luz acesa na base. Siga para a próxima.",
       "Bom trabalho, guerreiro. Beba água e volte ao posto.",
       "Isso é disciplina: fazer, registrar e seguir.",
@@ -3711,7 +3729,7 @@
       "Um bloco por vez. É assim que se atravessa um oceano.",
       "O dever de agora está cumprido. Mantenha o ritmo.",
       "Sua família ainda não sabe, mas hoje você lutou por ela.",
-      "Terreno conquistado não se devolve. Próximo objetivo.",
+      "Terreno ganho não se devolve. Próximo objetivo.",
       "Sem alarde: você fez o que disse que faria.",
       "Cada bloco feito é uma promessa cumprida a você mesmo.",
       "Avançou. Quem avança todo dia chega."
@@ -3760,7 +3778,7 @@
       "Dia inteiro cumprido. É assim que se veste uma farda.",
       "Base toda acesa. Descanse com a consciência tranquila.",
       "Você honrou a palavra que deu a si mesmo. Dispensado por hoje.",
-      "Cem por cento. O sacrifício de hoje é a conquista de amanhã.",
+      "Cem por cento. O sacrifício de hoje é a vitória de amanhã.",
       "Serviço encerrado. Seus futuros filhos agradecem.",
       "Hoje você foi o homem que quer ser. Repita amanhã.",
       "Dia vencido. Sua mãe ainda vai contar essa história com orgulho.",
@@ -3770,16 +3788,16 @@
     "sargento": {
       "inicio": [
         "Dia começou. Primeiro bloco agora.",
-        "O concorrente já abriu o caderno. Abre o seu.",
+        "O caderno está fechado. Abre o seu, agora.",
         "Sem negociar com a cama. Mesa, agora.",
         "Plano está pronto. Falta você.",
         "Não pensa. Começa.",
-        "Cada minuto parado é do concorrente."
+        "Cada minuto parado é um minuto que não volta."
       ],
       "bloco": [
         "Bloco feito. Não comemora. Próximo.",
         "Um bloco não é um dia. Segue.",
-        "Feito. O concorrente já está no próximo.",
+        "Feito. Próximo bloco, sem conversa.",
         "Registrou, acabou. Próximo bloco.",
         "Ritmo. Não desacelera agora.",
         "Bom. Agora repete."
@@ -3789,7 +3807,7 @@
         "Cumpriu. Era o mínimo. Descansa e volta no horário.",
         "Dia fechado. Dorme direito, que amanhã tem mais.",
         "Missão do dia concluída. Sem exagero, sem folga.",
-        "Igualou o concorrente hoje. Amanhã, passa dele."
+        "Dia cumprido. Amanhã, o mesmo padrão."
       ],
       "dificil": [
         "Dia ruim existe. Dia mínimo é obrigatório.",
@@ -3809,7 +3827,7 @@
         "Domingo também conta. Longão e revisão da semana.",
         "Fecha a semana: revisa, ajusta, prepara a próxima.",
         "Descanso é o que sobra depois do dever. Cumpre primeiro.",
-        "O concorrente não tem domingo. Faz o plano.",
+        "Domingo também tem plano. Faz.",
         "Revisão da semana. Olha os números sem enfeitar."
       ],
       "noite": [
@@ -3896,52 +3914,52 @@
       "provas": 0
     },
     "ano1": {
-      "mat": 38,
+      "mat": 40,
       "fis": 32,
       "qui": 15,
       "por": 6,
       "red": 5,
-      "ing": 4,
+      "ing": 2,
       "hg": 0,
       "provas": 0
     },
     "ano2": {
-      "mat": 38,
+      "mat": 40,
       "fis": 32,
       "qui": 15,
       "por": 6,
       "red": 5,
-      "ing": 4,
+      "ing": 2,
       "hg": 0,
       "provas": 0
     },
     "ano3": {
-      "mat": 38,
+      "mat": 40,
       "fis": 32,
       "qui": 15,
       "por": 6,
       "red": 5,
-      "ing": 4,
+      "ing": 2,
       "hg": 0,
       "provas": 0
     },
     "leve": {
-      "mat": 38,
+      "mat": 40,
       "fis": 32,
       "qui": 15,
       "por": 6,
       "red": 5,
-      "ing": 4,
+      "ing": 2,
       "hg": 0,
       "provas": 0
     },
     "ita": {
-      "mat": 25,
+      "mat": 28,
       "fis": 22,
       "qui": 22,
       "por": 6,
       "red": 5,
-      "ing": 5,
+      "ing": 2,
       "hg": 0,
       "provas": 15
     },
@@ -6535,112 +6553,30 @@
   },
   "treinoPlano": {
     "inicio": "2026-11-20",
-    "meta": {
-      "nome": "100 km",
-      "data": "2027-11-25"
-    },
-    "provas": [
-      {
-        "data": "2027-10-07",
-        "nome": "Maratona preparatória",
-        "km": 42.2
-      },
-      {
-        "data": "2027-11-25",
-        "nome": "100 km",
-        "km": 100
-      }
-    ],
-    "fases": [
-      {
-        "n": 1,
-        "nome": "Retomada diária",
-        "inicio": "2026-11-20",
-        "fim": "2027-01-10",
-        "kmIni": 20,
-        "kmFim": 33
-      },
-      {
-        "n": 2,
-        "nome": "Base ampliada",
-        "inicio": "2027-01-11",
-        "fim": "2027-04-18",
-        "kmIni": 33,
-        "kmFim": 50
-      },
-      {
-        "n": 3,
-        "nome": "Construção",
-        "inicio": "2027-04-19",
-        "fim": "2027-07-25",
-        "kmIni": 50,
-        "kmFim": 65
-      },
-      {
-        "n": 4,
-        "nome": "Específica + maratona",
-        "inicio": "2027-07-26",
-        "fim": "2027-10-07",
-        "kmIni": 65,
-        "kmFim": 72
-      },
-      {
-        "n": 5,
-        "nome": "Bloco final e polimento",
-        "inicio": "2027-10-08",
-        "fim": "2027-11-25",
-        "kmIni": 72,
-        "kmFim": 40,
-        "polimento": true
-      }
-    ],
-    "fase1": {
-      "km": [
-        20,
-        22,
-        25,
-        20,
-        27,
-        30,
-        33,
-        26
-      ],
-      "longao": [
-        5,
-        6,
-        7,
-        5,
-        8,
-        9,
-        10,
-        8
-      ]
-    },
-    "semana1": {
-      "1": 2,
-      "2": 3,
-      "3": 2,
+    "kmDia": {
+      "1": 3,
+      "2": 4,
+      "3": 5,
       "4": 4,
-      "5": 2,
-      "6": 2
+      "5": 5,
+      "6": 3,
+      "0": 8
     },
-    "proporcao": [
-      2,
-      3,
-      2,
-      4,
-      2,
-      2
-    ],
     "tipos": {
       "1": "leve",
-      "2": "strides",
+      "2": "leve",
       "3": "leve",
       "4": "qualidade",
       "5": "leve",
       "6": "bem leve",
       "0": "longao"
     },
+    "ciclo": [
+      "intervalado",
+      "fartlek",
+      "ritmo",
+      "subida"
+    ],
     "fortalecimento": [
       "Agachamento unilateral",
       "Panturrilha",
@@ -6657,36 +6593,44 @@
     "longao": "06:00",
     "musculacao": {
       "1": {
-        "ini": "18:30",
+        "ini": "05:30",
         "tipo": "upper"
       },
       "2": {
-        "ini": "15:00",
+        "ini": "05:30",
         "tipo": "lower"
       },
       "4": {
-        "ini": "17:00",
+        "ini": "05:30",
         "tipo": "upper"
       },
-      "5": {
-        "ini": "17:00",
+      "6": {
+        "ini": "05:30",
         "tipo": "lower"
       }
     },
     "fortalecimentoDias": [
-      3,
-      6
+      3
     ],
     "tenis": {
       "principal": "X-Step",
       "rapido": "Metaspeed"
     },
-    "liberadoFisio": false,
     "ritmoMinKm": 7,
-    "corridaSab": "07:00",
     "musculacaoMin": 60,
     "corridaPorDia": {
-      "5": "07:30"
+      "1": "06:30",
+      "2": "06:30",
+      "3": "05:30",
+      "4": "06:30",
+      "5": "05:30",
+      "6": "06:30"
+    },
+    "corridaFimPorDia": {
+      "1": "06:50",
+      "2": "07:00",
+      "4": "07:00",
+      "6": "07:00"
     }
   },
   "oracaoPlano": {
@@ -7045,12 +6989,12 @@
         "acordar": "05:00"
       },
       "5": {
-        "dormir": "21:30",
-        "acordar": "04:30"
+        "dormir": "22:00",
+        "acordar": "05:00"
       },
       "6": {
-        "dormir": "21:00",
-        "acordar": "05:15"
+        "dormir": "22:00",
+        "acordar": "05:00"
       }
     },
     "minimoH": 6,

@@ -1,5 +1,5 @@
 <script>
-  import { app, listaConquistas, fazerBackup } from '../stores/app.svelte.js';
+  import { app, fazerBackup } from '../stores/app.svelte.js';
   import { situacao, totalRedacao } from '../lib/erros.js';
   import { diffDays } from '../lib/dates.js';
   import { coberturaGeral } from '../lib/trilha.js';
@@ -12,8 +12,6 @@
   const deltaSim = $derived(sims.length > 1 ? Math.round(media(sims.at(-1)) - media(sims.at(-2))) : null);
   const reds = $derived(Object.values(app.redacoes ?? {}).sort((a, b) => a.data.localeCompare(b.data)));
   const lacunasPct = $derived(coberturaGeral(app.cfg, app.lacunas));
-  const ins = $derived(listaConquistas());
-  const insOk = $derived(ins.filter((c) => c.ok).length);
   const paraTreinar = $derived(Object.values(app.errors).filter((e) => situacao(e) !== 'dominado').length);
   const diasBackup = $derived(app.ultimoBackup ? diffDays(app.ultimoBackup, app.dia) : null);
   const backupAtrasado = $derived(diasBackup == null || diasBackup >= 7);
@@ -44,10 +42,6 @@
     <span class="rot">Erros para treinar</span>
     <strong>{paraTreinar}</strong><span class="sub">{paraTreinar ? 'toque para treinar' : 'nenhum pendente'}</span>
   </a>
-  <a class="card c" href="#/conquistas">
-    <span class="rot">Condecorações</span>
-    <strong>{insOk}<small> / {ins.length}</small></strong>
-  </a>
   <div class="card c backup" class:atrasado={backupAtrasado}>
     <span class="rot">Backup</span>
     <strong class="bk">{diasBackup == null ? 'Nunca feito' : diasBackup === 0 ? 'Feito hoje' : `Há ${diasBackup} ${diasBackup === 1 ? 'dia' : 'dias'}`}</strong>
@@ -69,7 +63,6 @@
   <li><a href="#/revisao"><span class="t"><strong>Revisão da semana</strong><span class="sub">3 perguntas de domingo, resumo e o foco da próxima semana</span></span><Icon nome="clock" size={18} /></a></li>
   <li><a href="#/redacao"><span class="t"><strong>Redação</strong><span class="sub">Nota por competência, checklist e evolução</span></span><Icon nome="ext" size={18} /></a></li>
   <li><a href="#/trilha"><span class="t"><strong>Trilha</strong><span class="sub">Tópicos de cada matéria, seu domínio e o que estudar a seguir</span></span><Icon nome="mapa" size={18} /></a></li>
-  <li><a href="#/conquistas"><span class="t"><strong>Condecorações e campanhas</strong><span class="sub">Suas medalhas e as fases concluídas</span></span><Icon nome="trofeu" size={18} /></a></li>
 </ul>
 
 <h2>Recursos</h2>

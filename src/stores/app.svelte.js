@@ -6,7 +6,6 @@ import { agendarRevisoes, avaliar } from '../lib/spaced.js';
 import { verificar } from '../lib/notify.js';
 import { prefs, aplicarPrefs, vibrar } from '../lib/prefs.js';
 import { sino } from '../lib/audio.js';
-import { conquistas } from '../lib/conquistas.js';
 import * as foco from '../lib/foco.js';
 import { treinar } from '../lib/erros.js';
 import { montar } from '../lib/backup.js';
@@ -29,7 +28,7 @@ const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {},
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
-  ...structuredClone(EXTRAS), timer: null, dia: today(), toast: null, insignia: null,
+  ...structuredClone(EXTRAS), timer: null, dia: today(), toast: null,
   ultimoBackup: null, lembreteAdiado: null, persistente: null, registroAberto: null,
 });
 export const fases = () => gerarFases(app.cfg);
@@ -59,8 +58,6 @@ export async function iniciar() {
   app.ultimoBackup = ultimoBackup ?? null;
   app.lembreteAdiado = lembreteAdiado ?? null;
   protegerDados();
-  // Primeira vez com insígnias: as já conquistadas entram como vistas, sem enxurrada de avisos.
-  if (!Object.keys(app.vistos.conquistas).length) { for (const c of conquistas(dadosConquistas())) if (c.ok) app.vistos.conquistas[c.id] = true; await salvarKV('vistos'); }
   verificar(app.cfg, app.reviews, app.dia);
   agendarTelas(app.cfg, app.dia, { noites: app.sonoNoites, sono: app.sono });
   await sincronizarDividas();
@@ -132,7 +129,6 @@ async function registrar(b, extra = {}) {
   agendarResumo();
   comemorar();
   avisar(`${b.titulo} concluído`, () => desmarcar(b.id), undefined, REGISTRAVEL.includes(b.cat) ? { rotulo: 'Registrar', fn: () => { app.toast = null; app.registroAberto = { id: b.id }; } } : null);
-  checarConquistas();
 }
 
 /** Marca/desmarca um bloco. Se tiver assunto, agenda revisões em 1, 7 e 30 dias. */
@@ -172,7 +168,6 @@ export async function salvarRevisao(seg, dados) {
   await salvarKV('revisoes');
   vibrar(pf(), 'ok');
   avisar('Revisão da semana salva', null, dados.foco?.trim() ? `Foco da próxima semana: ${dados.foco.trim()}` : 'Boa semana de estudo.');
-  checarConquistas();
 }
 export async function apagarRevisao(seg) { delete app.revisoes[seg]; await salvarKV('revisoes'); }
 
@@ -209,7 +204,6 @@ export async function salvarSemanaTreino(seg, dias) { app.treinoSemanas[seg] = {
 export async function marcarCumprido(dia) {
   if (app.cumpridos[dia]) return;
   app.cumpridos[dia] = true; await salvarKV('cumpridos');
-  checarConquistas();
 }
 
 // ---------- revisões ----------
@@ -224,7 +218,6 @@ export async function avaliarRevisao(r, nota) {
     for (const [k, v] of Object.entries(antes)) { app.reviews[k] = v; await db.put('reviews', k, v); }
     app.toast = null;
   }, sub);
-  checarConquistas();
 }
 export async function alternarRevisao(r) {
   if (!r.feita) return avaliarRevisao(r, 'ok');
@@ -241,7 +234,6 @@ export async function addErro({ materia, assunto, tipo, licao = '', foto = null 
   app.errors[id] = e; await db.put('errors', id, e);
   for (const r of agendarRevisoes({ origem: `erro:${id}`, assunto: e.assunto, materia, dia: app.dia })) { app.reviews[r.id] = r; await db.put('reviews', r.id, r); }
   comemorar();
-  checarConquistas();
 }
 export async function delErro(id) {
   delete app.errors[id]; await db.del('errors', id);
@@ -258,7 +250,6 @@ export async function treinarErro(id, acertou) {
   app.errors[id] = e; await db.put('errors', id, e);
   vibrar(pf(), acertou ? 'ok' : 'toque');
   if (e.status === 'dominado' && antes.status !== 'dominado') { if (pf().sons) sino(); avisar(`${e.assunto}: dominado`, null, 'Dois acertos seguidos. Esse vilão foi preso.'); }
-  checarConquistas();
   return e;
 }
 
@@ -309,7 +300,7 @@ export async function fazerBackup(modo = 'auto') {
 }
 export async function adiarLembreteBackup() { app.lembreteAdiado = app.dia; await db.put('kv', 'lembreteAdiado', app.dia); }
 
-export async function addExame(ex) { const id = novoId(); app.exams[id] = { id, ...ex }; await db.put('exams', id, { id, ...ex }); comemorar(); checarConquistas(); }
+export async function addExame(ex) { const id = novoId(); app.exams[id] = { id, ...ex }; await db.put('exams', id, { id, ...ex }); comemorar(); }
 export async function delExame(id) { delete app.exams[id]; await db.del('exams', id); }
 
 export async function setLacuna(materia, topico, nota) {
@@ -479,9 +470,8 @@ export async function registrarResultado(b, d) {
     app.done[b.id] = r; await db.put('done', b.id, r);
   }
   app.registroAberto = null;
-  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); checarConquistas(); return; }
+  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); return; }
   avisar('Resultado registrado', null, d.feitas ? `${d.acertos ?? 0} de ${d.feitas} questões${n ? ` · ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno` : ''}` : 'Páginas e tempo salvos.');
-  checarConquistas();
 }
 export const fecharRegistro = () => { app.registroAberto = null; };
 
@@ -501,19 +491,7 @@ export async function concluirFoco(b) {
   if ((r.feitas ?? 0) - (r.acertos ?? 0) > 0 && REGISTRAVEL.includes(t.chave?.replace(/\d+$/, ''))) app.registroAberto = { id: alvo.id, soErros: true };
 }
 
-// ---------- insígnias e capítulos ----------
-const dadosConquistas = () => ({ done: app.done, reviews: app.reviews, errors: app.errors, exams: app.exams, cumpridos: app.cumpridos });
-let timerInsignia;
-export async function checarConquistas() {
-  const novas = conquistas(dadosConquistas()).filter((c) => c.ok && !app.vistos.conquistas[c.id]);
-  if (!novas.length) return;
-  for (const c of novas) app.vistos.conquistas[c.id] = true;
-  await salvarKV('vistos');
-  clearTimeout(timerInsignia);
-  app.insignia = novas.length === 1 ? novas[0] : { nome: `${novas.length} condecorações novas`, desc: novas.map((c) => c.nome).join(' · ') };
-  timerInsignia = setTimeout(() => (app.insignia = null), 5000);
-}
-export const listaConquistas = () => conquistas(dadosConquistas());
+// ---------- capítulos ----------
 export async function verCapitulo(id) { app.vistos.capitulos[id] = true; await salvarKV('vistos'); }
 
 // ---------- backup ----------
