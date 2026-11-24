@@ -4,7 +4,7 @@
   import { addDays } from '../lib/dates.js';
   import Linha from './Linha.svelte';
 
-  // Cartões de sono da tela Hoje. tipo: 'manha' (Como dormiu?), 'noite' (Dormir às...) ou 'cochilo' (depois de noite curta).
+  // Cartões de sono da tela Hoje. tipo: 'manha' (Como dormiu?), 'noite' (Dormir às...) ou 'cochilo' (20 min depois do almoço, todo dia).
   let { dia, tipo, aberto = false, onAbrir } = $props();
   const ctx = $derived({ noites: app.sonoNoites, sono: app.sono });
   const ontem = $derived(addDays(dia, -1));
@@ -73,7 +73,7 @@
     {/if}
   </li>
 {:else}
-  <li class="noite"><div class="cab"><span class="tit">Cochilo de 20 min</span><span class="sub">Depois do almoço, por causa da noite curta. Alarme de 20 min.</span></div></li>
+  <li class="noite"><div class="cab"><span class="tit">Cochilo de 20 min</span><span class="sub">Depois do almoço: olho fechado, sem celular. Alarme de 20 min.</span></div></li>
 {/if}
 
 <style>

@@ -132,7 +132,7 @@ describe('revisão da etapa 2', () => {
     const nivel3 = (seg) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, v]));
     const dias = planoSemana(c, gerarFases(c), '2027-08-02', { reservas: nivel3 });
     const prova = dias[5].blocos.filter((b) => b.cat === 'prova' && !b.sessoes);
-    expect(prova).toHaveLength(1); expect(prova[0].ini).toBe(8 * 60);
+    expect(prova).toHaveLength(1); expect(prova[0].ini).toBe(7 * 60 + 45);
   });
   it('sobras do recorte não viram bloco curto de Matemática', () => {
     const c = cfg(); const res = { 1: [{ ini: 12 * 60 + 55, fim: 13 * 60 + 15 }] };

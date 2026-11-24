@@ -72,6 +72,23 @@ export function alocar(pesos, total) {
  * (o que não cabe na janela do ano é empurrado para o ano seguinte, com aviso).
  */
 export function planoPrazos(cfg, fases) {
+  const p = planoPrazosBase(cfg, fases, false), limite = fases.find((f) => f.id === 'ano3')?.fim;
+  const alem = (pl) => (limite ? Object.values(pl.porMateria).flat().filter((i) => i.alem || i.prazo > limite) : []);
+  const sobra = alem(p);
+  p.aviso = null;
+  if (!sobra.length) return p;
+  // o conteúdo novo passa do fim do Ano 3 (22/08): refaz o plano com Escola Naval e ITA na frente (EFOMM, ESA e ENEM ficam por último)
+  const q = planoPrazosBase(cfg, fases, true), depois = alem(q);
+  q.aviso = { limite, antes: sobra.length, depois: depois.length, fimSemPrioridade: p.fim, itens: depois.map((i) => ({ materia: i.materia, nome: i.nome, prazo: i.prazo })),
+    texto: `O conteúdo novo passa de ${limite.split('-').reverse().join('/')}: ${depois.length ? `${depois.length} tópicos ficam além do fim do Ano 3` : 'os tópicos foram reordenados para caber'}. Priorizei o que cai na Escola Naval e no ITA; EFOMM, ESA e ENEM ficam por último.` };
+  return q;
+}
+/** 0 = cai na Escola Naval ou no ITA; 1 = só em EFOMM, ESA ou ENEM (secundários). Sem marcação, vale o padrão da matéria. */
+export function prioridadeAlvo(cfg, materia, t) {
+  const ids = t.concursos ?? cfg.materiasInfo?.[materia]?.concursos ?? ['en', 'ita'];
+  return ids.some((c) => c === 'en' || c === 'ita') ? 0 : 1;
+}
+function planoPrazosBase(cfg, fases, priorizar) {
   const porMateria = {}, por = new Map(), prazoMat = new Map();
   const janela = (ano) => fases.find((f) => f.id === FASE_DO_ANO[ano]);
   let seq = 0;
@@ -83,7 +100,7 @@ export function planoPrazos(cfg, fases) {
       const f = janela(ano);
       if (!f) continue;
       const doAno = todos.filter((x) => x.ano === ano).map(({ t }) => ({ t, ano, empurrado: false }));
-      const fila = [...carry, ...doAno];
+      const fila = priorizar ? [...carry, ...doAno].sort((a, b) => prioridadeAlvo(cfg, materia, a.t) - prioridadeAlvo(cfg, materia, b.t)) : [...carry, ...doAno]; // sort estável: a ordem da trilha se mantém dentro de cada grupo
       const mk = (x) => {
         const libera = materia === 'Matemática' ? null : (x.t.prereq ?? []).reduce((m, c) => (prazoMat.has(c) && prazoMat.get(c) > (m ?? '') ? prazoMat.get(c) : m), null);
         return { materia, nome: x.t.nome, codigo: x.t.codigo ?? x.t.nome, ano: x.ano ?? ano, peso: pesoDe(cfg, materia, x.t), prereq: x.t.prereq ?? [], libera: libera ? addDays(libera, 1) : null, empurrado: x.empurrado, aviso: null, alem: false };

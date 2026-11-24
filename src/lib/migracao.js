@@ -51,6 +51,19 @@ export function migrarCfg(salvo, seed) {
       for (const t of Object.keys(porTopico ?? {})) { const { khan: _k, ...resto } = porTopico[t] ?? {}; cfg.questoesLinks[m][t] = resto; }
   }
 
+  if (v < 17) {
+    // v17 (SPEC v2, ~41 h): rotina, treino e sono padrão novos. Sem missas, jiu-jitsu, ultra nem maratona. O que você editou em compromissos
+    // é substituído pela rotina nova; ficam o "vou/não vou" da faculdade, a presença mínima, os dias livres, a rampa, o ritmo e o tênis.
+    const r0 = salvo.rotina ?? {}, vou = Object.fromEntries((r0.aulas ?? []).filter((a) => a.tipo === 'faculdade').map((a) => [a.nome, a.vou]));
+    cfg.rotina = { ...structuredClone(seed.rotina), presencaMin: r0.presencaMin ?? seed.rotina.presencaMin, diasLivres: r0.diasLivres ?? seed.rotina.diasLivres, rampa: r0.rampa ?? seed.rotina.rampa };
+    cfg.rotina.aulas = cfg.rotina.aulas.map((a) => ({ ...a, vou: vou[a.nome] ?? a.vou }));
+    cfg.treino = { ...structuredClone(seed.treino), ritmoMinKm: salvo.treino?.ritmoMinKm ?? seed.treino.ritmoMinKm, tenis: salvo.treino?.tenis ?? seed.treino.tenis };
+    const ANTIGOS_SONO = ['22:00>05:00', '22:00>06:30', '21:30>04:30', '21:00>05:15']; // padrões do seed antigo: não editados trocam pelo novo
+    const padrao = {};
+    for (let wd = 0; wd < 7; wd++) { const s = salvo.sono?.padrao?.[wd]; padrao[wd] = s && !ANTIGOS_SONO.includes(`${s.dormir}>${s.acordar}`) ? s : structuredClone(seed.sono.padrao[wd]); }
+    cfg.sono = { ...(cfg.sono ?? {}), padrao };
+  }
+
   const antigos = new Map((salvo.concursos ?? []).map((c) => [c.id, c]));
   cfg.concursos = seed.concursos.map((novo) => {
     const velho = antigos.get(novo.id);

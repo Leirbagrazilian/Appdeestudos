@@ -12,7 +12,7 @@ import { montar } from '../lib/backup.js';
 import { migrarCfg } from '../lib/migracao.js';
 import { migrarLacunas, migrarDominio, migrarDone } from '../lib/trilha.js';
 import { avaliarTopico, chave as chaveTopico, resumo as resumoTopico, destravar } from '../lib/dominio.js';
-import { faseDoDia, maxExtraZero } from '../lib/phases.js';
+import { faseDoDia, maxExtraZero, proximaProva } from '../lib/phases.js';
 import { reservasDaSemana, proximaPergunta } from '../lib/oracao.js';
 import { ajustarLeitura } from '../lib/livros.js';
 import { aplicarCota, deltaResultado, REGISTRAVEL } from '../lib/tarefas.js';
@@ -22,9 +22,10 @@ import { blocosAjustados } from '../lib/planner.js';
 import { diaLivre, antesDoInicio } from '../lib/rotina.js';
 import { resumoDoDia, RESUMO_DIAS } from '../lib/avisos.js';
 import { agendarTelas, registrarPeriodico } from '../lib/notify.js';
+import { agendarRefazer } from '../lib/provasantigas.js';
 
 // Dados guardados como chave única no "kv" do IndexedDB.
-const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { base: 1, dias: {}, proxima: 1 }, sono: {}, sonoNoites: {}, presenca: {}, dividas: {} };
+const EXTRAS = { adiados: {}, dificeis: {}, lacunas: {}, leitura: {}, cotas: {}, revisoes: {}, cumpridos: {}, vistos: { conquistas: {}, capitulos: {} }, redacoes: {}, dominio: {}, checkpoints: {}, portao: {}, treinos: {}, treinoSemanas: {}, oracoes: {}, catecismo: { base: 1, dias: {}, proxima: 1 }, sono: {}, sonoNoites: {}, presenca: {}, dividas: {}, fimDia: {} };
 
 export const app = $state({
   pronto: false, cfg: structuredClone(seed), done: {}, reviews: {}, errors: {}, exams: {},
@@ -53,6 +54,7 @@ export async function iniciar() {
   aplicarPrefs(pf());
   Object.assign(app, { done, reviews, errors, exams });
   chaves.forEach((k, i) => { app[k] = extras[i] ?? structuredClone(EXTRAS[k]); });
+  if (antes < 17) { app.treinoSemanas = {}; await salvarKV('treinoSemanas'); } // km editados do plano antigo (ultra/maratona) não valem no volume estável
   if (antes < 12) await migrarEstadosAntigos(); // notas, domínio e blocos dos tópicos antigos passam para os novos (campo `antigos`)
   app.timer = timer ?? null;
   app.ultimoBackup = ultimoBackup ?? null;
@@ -452,7 +454,8 @@ async function avaliarDominio(b, d) {
   return r.veredito;
 }
 const AVISO_DOMINIO = {
-  dominado: 'Tópico dominado. O próximo já está liberado.',
+  dominado: 'Tópico dominado: 8 em 10 no dia e de novo 3 dias depois. O próximo já está liberado.',
+  reteste: 'Passou! Falta o reteste, 3 dias depois: ele aparece como item na Hoje. Só então o tópico vira dominado.',
   repetir: 'Abaixo de 8 em 10: o próximo bloco repete este tópico com exercícios novos.',
   travado: 'Tópico travado depois de 3 tentativas. Peça ajuda (professor, colega ou outro vídeo) e destrave na Trilha.',
   parcial: 'Faça pelo menos 10 exercícios para o tópico ser avaliado (8 em 10).',
@@ -470,7 +473,7 @@ export async function registrarResultado(b, d) {
     app.done[b.id] = r; await db.put('done', b.id, r);
   }
   app.registroAberto = null;
-  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); return; }
+  if (veredito) { avisar(veredito === 'dominado' ? 'Dominado!' : veredito === 'reteste' ? 'Reteste agendado' : 'Resultado registrado', null, `${AVISO_DOMINIO[veredito]}${n ? ` ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno.` : ''}`); return; }
   avisar('Resultado registrado', null, d.feitas ? `${d.acertos ?? 0} de ${d.feitas} questões${n ? ` · ${n} ${n === 1 ? 'erro foi' : 'erros foram'} para o caderno` : ''}` : 'Páginas e tempo salvos.');
 }
 export const fecharRegistro = () => { app.registroAberto = null; };
@@ -502,9 +505,36 @@ export async function importar(d) {
   const antes = d.cfg.versaoSeed ?? 1;
   app.cfg = migrarCfg(d.cfg, seed); await salvarCfg(); // backup antigo também recebe o conteúdo novo do seed
   if (antes < 12) await migrarEstadosAntigos();
+  if (antes < 17) { app.treinoSemanas = {}; await salvarKV('treinoSemanas'); }
 }
 export async function restaurarSeed() {
   const manter = { prefs: app.cfg.prefs, carta: app.cfg.carta, links: app.cfg.links, notaCorte: app.cfg.notaCorte, tema: app.cfg.tema, tom: app.cfg.tom,
     questoesLinks: app.cfg.questoesLinks, biblioteca: app.cfg.biblioteca, cotasGratis: app.cfg.cotasGratis };
   app.cfg = { ...structuredClone(seed), ...manter }; await salvarCfg();
+}
+
+// ---------- reteste, fim do dia e provas antigas ----------
+/** Reteste de domínio (3 dias depois da 1ª aprovação): `feitas` e `acertos` do dia. Entra no modo domínio como um registro a mais. */
+export async function registrarReteste(materia, topico, feitas, acertos) {
+  const k = chaveTopico(materia, topico), atual = app.lacunas[materia]?.[topico] ?? 0;
+  const r = avaliarTopico(app.dominio[k], atual, `${app.dia}:reteste:${k}`, { feitas, acertos, data: app.dia });
+  app.dominio[k] = r.estado; await salvarKV('dominio');
+  if (r.nota !== atual) { app.lacunas[materia] ??= {}; app.lacunas[materia][topico] = r.nota; await salvarKV('lacunas'); }
+  if (r.veredito === 'dominado') await sincronizarDividas();
+  vibrar(pf(), 'ok');
+  avisar(r.veredito === 'dominado' ? 'Dominado!' : 'Reteste registrado', null, AVISO_DOMINIO[r.veredito] ?? 'Abaixo de 8 em 10: o tópico volta ao resgate de sábado.');
+  return r.veredito;
+}
+/** Fim do dia: passos feitos, a questão difícil de amanhã e as tarefas de amanhã (por dia). */
+export async function salvarFimDia(dia, dados) {
+  app.fimDia[dia] = { ...(app.fimDia[dia] ?? {}), ...dados, passos: { ...(app.fimDia[dia]?.passos ?? {}), ...(dados.passos ?? {}) } };
+  await salvarKV('fimDia');
+}
+/** Prova antiga feita: agenda o refazer (1 semana depois e antes da prova) como revisões e guarda onde foi lento. */
+export async function registrarProvaFeita(b, nome, lento = '') {
+  const prox = proximaProva(app.cfg, app.dia);
+  const revs = agendarRefazer({ origem: `prova:${b.id}`, nome, dia: app.dia, provaData: prox?.evento?.inicio ?? null, lento });
+  for (const r of revs) { app.reviews[r.id] = r; await db.put('reviews', r.id, r); }
+  vibrar(pf(), 'ok');
+  avisar('Refazer agendado', null, `1ª vez em ${revs[0].due.split('-').reverse().join('/')} e a 2ª em ${revs[1].due.split('-').reverse().join('/')}.`);
 }
