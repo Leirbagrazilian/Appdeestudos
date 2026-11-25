@@ -420,6 +420,11 @@ export async function iniciarFoco(b) {
   app.timer = foco.iniciar(b, app.cfg.foco, Date.now());
   await salvarTimer(); vibrar(pf(), 'toque');
 }
+/** "Começar" do cartão do bloco: inicia o cronômetro persistido e marca o início dos "só 5 minutos" no próprio timer. */
+export async function iniciarCinco(b) {
+  app.timer = { ...foco.iniciar(b, app.cfg.foco, Date.now()), cinco: Date.now() };
+  await salvarTimer(); vibrar(pf(), 'toque');
+}
 export async function atualizarTimer(mudar) { app.timer = mudar(snap(app.timer)); await salvarTimer(); }
 export const encerrarSessao = () => atualizarTimer((t) => foco.encerrarSessao(t, Date.now()));
 export const proximaSessao = () => atualizarTimer((t) => foco.proximaSessao(t, Date.now()));

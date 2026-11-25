@@ -3,7 +3,8 @@ import seed from '../src/data/seed.json';
 import { gerarFases } from '../src/lib/phases.js';
 import { planoPrazos } from '../src/lib/prazos.js';
 import { migrarCfg } from '../src/lib/migracao.js';
-import { blocoAtual, tituloTarefa, passosDoBloco, timerCinco, TIMER_MIN } from '../src/lib/bloco.js';
+import * as foco from '../src/lib/foco.js';
+import { blocoAtual, tituloTarefa, passosDoBloco, timerCinco, cincoDoTimer, TIMER_MIN } from '../src/lib/bloco.js';
 import { pedidoClaude, nivelDaFase, fonteDasQuestoes } from '../src/lib/questoesIA.js';
 import { horaFimDia, mostrarFimDia, PASSOS_FIM_DIA, faseDeProvas, questaoDeOntem, passosFeitos } from '../src/lib/fimdia.js';
 import { agendarRefazer, PASSOS_PROVA } from '../src/lib/provasantigas.js';
@@ -157,5 +158,21 @@ describe('migração v17 sem perder dados', () => {
     expect(n.sono.padrao[5]).toEqual({ dormir: '22:00', acordar: '05:00' }); expect(n.sono.padrao[6]).toEqual({ dormir: '22:00', acordar: '05:00' });
     expect(n.sono.padrao[3]).toEqual({ dormir: '23:00', acordar: '06:00' }); // você editou: fica
     expect(migrarCfg(n, cfg())).toBe(n); // já migrado
+  });
+});
+
+describe('cronômetro persistido ao sair do app', () => {
+  it('cincoDoTimer continua pelo timestamp após 3 min fora', () => {
+    const t = { id: 'b1', cinco: 1000 };
+    expect(cincoDoTimer(t, 'b1', 1000 + 180000)).toEqual({ restante: 120, acabou: false });
+    expect(cincoDoTimer(t, 'b2', 5000)).toBeNull();
+    expect(cincoDoTimer({ id: 'b1' }, 'b1', 5000)).toBeNull();
+    expect(cincoDoTimer(null, 'b1', 5000)).toBeNull();
+  });
+  it('sessão de foco continua certa após 20 min fora', () => {
+    const t = foco.iniciar({ id: 'b1', titulo: 'x', min: 50 }, undefined, 0);
+    const e = foco.estado(t, 20 * 60000);
+    expect(e.restante).toBe(30 * 60000); expect(e.acabou).toBe(false);
+    expect(foco.minutosFoco(t, 20 * 60000)).toBe(20);
   });
 });

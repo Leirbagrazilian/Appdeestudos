@@ -73,3 +73,9 @@ export function timerCinco(inicio, agora) {
   const rest = Math.max(0, TIMER_MIN * 60 - Math.floor((agora - inicio) / 1000));
   return { restante: rest, acabou: rest === 0 };
 }
+
+/** Contagem dos "só 5 minutos" derivada do cronômetro persistido (`timer.cinco` = hora de início). null se não for deste bloco ou não houver marca. */
+export function cincoDoTimer(timer, blocoId, agora) {
+  if (!timer || timer.id !== blocoId || timer.cinco == null) return null;
+  return timerCinco(timer.cinco, agora);
+}
