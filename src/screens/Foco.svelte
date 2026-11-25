@@ -12,8 +12,8 @@
   $effect(() => {
     const tick = () => (agora = Date.now());
     const i = setInterval(tick, 1000);
-    document.addEventListener('visibilitychange', tick);
-    return () => { clearInterval(i); document.removeEventListener('visibilitychange', tick); };
+    document.addEventListener('visibilitychange', tick); window.addEventListener('pageshow', tick);
+    return () => { clearInterval(i); document.removeEventListener('visibilitychange', tick); window.removeEventListener('pageshow', tick); };
   });
   const t = $derived(app.timer);
   const est = $derived(t ? estado(t, agora) : null);
